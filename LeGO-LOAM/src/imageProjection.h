@@ -59,7 +59,7 @@ class ImageProjection {
   ros::Publisher _pub_segmented_cloud_info;
   ros::Publisher _pub_outlier_cloud;
 
-  cloud_msgs::cloud_info _seg_msg;
+  cloud_msgs::CloudInfo _seg_msg;
 
   int _label_count;
 

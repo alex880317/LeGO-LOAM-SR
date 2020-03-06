@@ -154,22 +154,22 @@ void FeatureAssociation::adjustDistortion() {
 
     float ori = -atan2(point.x, point.z);
     if (!halfPassed) {
-      if (ori < segInfo.startOrientation - M_PI / 2)
+      if (ori < segInfo.start_orientation - M_PI / 2)
         ori += 2 * M_PI;
-      else if (ori > segInfo.startOrientation + M_PI * 3 / 2)
+      else if (ori > segInfo.start_orientation + M_PI * 3 / 2)
         ori -= 2 * M_PI;
 
-      if (ori - segInfo.startOrientation > M_PI) halfPassed = true;
+      if (ori - segInfo.start_orientation > M_PI) halfPassed = true;
     } else {
       ori += 2 * M_PI;
 
-      if (ori < segInfo.endOrientation - M_PI * 3 / 2)
+      if (ori < segInfo.end_orientation - M_PI * 3 / 2)
         ori += 2 * M_PI;
-      else if (ori > segInfo.endOrientation + M_PI / 2)
+      else if (ori > segInfo.end_orientation + M_PI / 2)
         ori -= 2 * M_PI;
     }
 
-    float relTime = (ori - segInfo.startOrientation) / segInfo.orientationDiff;
+    float relTime = (ori - segInfo.start_orientation) / segInfo.orientation_diff;
     point.intensity =
         int(segmentedCloud->points[i].intensity) + _scan_period * relTime;
 
@@ -180,17 +180,17 @@ void FeatureAssociation::adjustDistortion() {
 void FeatureAssociation::calculateSmoothness() {
   int cloudSize = segmentedCloud->points.size();
   for (int i = 5; i < cloudSize - 5; i++) {
-    float diffRange = segInfo.segmentedCloudRange[i - 5] +
-                      segInfo.segmentedCloudRange[i - 4] +
-                      segInfo.segmentedCloudRange[i - 3] +
-                      segInfo.segmentedCloudRange[i - 2] +
-                      segInfo.segmentedCloudRange[i - 1] -
-                      segInfo.segmentedCloudRange[i] * 10 +
-                      segInfo.segmentedCloudRange[i + 1] +
-                      segInfo.segmentedCloudRange[i + 2] +
-                      segInfo.segmentedCloudRange[i + 3] +
-                      segInfo.segmentedCloudRange[i + 4] +
-                      segInfo.segmentedCloudRange[i + 5];
+    float diffRange = segInfo.segmented_cloud_range[i - 5] +
+                      segInfo.segmented_cloud_range[i - 4] +
+                      segInfo.segmented_cloud_range[i - 3] +
+                      segInfo.segmented_cloud_range[i - 2] +
+                      segInfo.segmented_cloud_range[i - 1] -
+                      segInfo.segmented_cloud_range[i] * 10 +
+                      segInfo.segmented_cloud_range[i + 1] +
+                      segInfo.segmented_cloud_range[i + 2] +
+                      segInfo.segmented_cloud_range[i + 3] +
+                      segInfo.segmented_cloud_range[i + 4] +
+                      segInfo.segmented_cloud_range[i + 5];
 
     cloudCurvature[i] = diffRange * diffRange;
 
@@ -206,10 +206,10 @@ void FeatureAssociation::markOccludedPoints() {
   int cloudSize = segmentedCloud->points.size();
 
   for (int i = 5; i < cloudSize - 6; ++i) {
-    float depth1 = segInfo.segmentedCloudRange[i];
-    float depth2 = segInfo.segmentedCloudRange[i + 1];
-    int columnDiff = std::abs(int(segInfo.segmentedCloudColInd[i + 1] -
-                                  segInfo.segmentedCloudColInd[i]));
+    float depth1 = segInfo.segmented_cloud_range[i];
+    float depth2 = segInfo.segmented_cloud_range[i + 1];
+    int columnDiff = std::abs(int(segInfo.segmented_cloud_col_ind[i + 1] -
+                                  segInfo.segmented_cloud_col_ind[i]));
 
     if (columnDiff < 10) {
       if (depth1 - depth2 > 0.3) {
@@ -229,11 +229,11 @@ void FeatureAssociation::markOccludedPoints() {
       }
     }
 
-    float diff1 = std::abs(float(segInfo.segmentedCloudRange[i-1] - segInfo.segmentedCloudRange[i]));
-    float diff2 = std::abs(float(segInfo.segmentedCloudRange[i+1] - segInfo.segmentedCloudRange[i]));
+    float diff1 = std::abs(float(segInfo.segmented_cloud_range[i-1] - segInfo.segmented_cloud_range[i]));
+    float diff2 = std::abs(float(segInfo.segmented_cloud_range[i+1] - segInfo.segmented_cloud_range[i]));
 
-    if (diff1 > 0.02 * segInfo.segmentedCloudRange[i] &&
-        diff2 > 0.02 * segInfo.segmentedCloudRange[i])
+    if (diff1 > 0.02 * segInfo.segmented_cloud_range[i] &&
+        diff2 > 0.02 * segInfo.segmented_cloud_range[i])
       cloudNeighborPicked[i] = 1;
   }
 }
@@ -249,10 +249,10 @@ void FeatureAssociation::extractFeatures() {
 
     for (int j = 0; j < 6; j++) {
       int sp =
-          (segInfo.startRingIndex[i] * (6 - j) + segInfo.endRingIndex[i] * j) /
+          (segInfo.start_ring_index[i] * (6 - j) + segInfo.end_ring_index[i] * j) /
           6;
-      int ep = (segInfo.startRingIndex[i] * (5 - j) +
-                segInfo.endRingIndex[i] * (j + 1)) /
+      int ep = (segInfo.start_ring_index[i] * (5 - j) +
+                segInfo.end_ring_index[i] * (j + 1)) /
                    6 -
                1;
 
@@ -266,7 +266,7 @@ void FeatureAssociation::extractFeatures() {
         int ind = cloudSmoothness[k].ind;
         if (cloudNeighborPicked[ind] == 0 &&
             cloudCurvature[ind] > _edge_threshold &&
-            segInfo.segmentedCloudGroundFlag[ind] == false) {
+            segInfo.segmented_cloud_ground_flag[ind] == false) {
           largestPickedNum++;
           if (largestPickedNum <= 2) {
             cloudLabel[ind] = 2;
@@ -281,12 +281,12 @@ void FeatureAssociation::extractFeatures() {
 
           cloudNeighborPicked[ind] = 1;
           for (int l = 1; l <= 5; l++) {
-            if ( ind + l >= static_cast<int>(segInfo.segmentedCloudColInd.size()) ) {
+            if ( ind + l >= static_cast<int>(segInfo.segmented_cloud_col_ind.size()) ) {
               continue;
             }
             int columnDiff =
-                std::abs(int(segInfo.segmentedCloudColInd[ind + l] -
-                             segInfo.segmentedCloudColInd[ind + l - 1]));
+                std::abs(int(segInfo.segmented_cloud_col_ind[ind + l] -
+                             segInfo.segmented_cloud_col_ind[ind + l - 1]));
             if (columnDiff > 10) break;
             cloudNeighborPicked[ind + l] = 1;
           }
@@ -295,8 +295,8 @@ void FeatureAssociation::extractFeatures() {
               continue;
             }
             int columnDiff =
-                std::abs(int(segInfo.segmentedCloudColInd[ind + l] -
-                             segInfo.segmentedCloudColInd[ind + l + 1]));
+                std::abs(int(segInfo.segmented_cloud_col_ind[ind + l] -
+                             segInfo.segmented_cloud_col_ind[ind + l + 1]));
             if (columnDiff > 10) break;
             cloudNeighborPicked[ind + l] = 1;
           }
@@ -308,7 +308,7 @@ void FeatureAssociation::extractFeatures() {
         int ind = cloudSmoothness[k].ind;
         if (cloudNeighborPicked[ind] == 0 &&
             cloudCurvature[ind] < _surf_threshold &&
-            segInfo.segmentedCloudGroundFlag[ind] == true) {
+            segInfo.segmented_cloud_ground_flag[ind] == true) {
           cloudLabel[ind] = -1;
           surfPointsFlat->push_back(segmentedCloud->points[ind]);
 
@@ -319,12 +319,12 @@ void FeatureAssociation::extractFeatures() {
 
           cloudNeighborPicked[ind] = 1;
           for (int l = 1; l <= 5; l++) {
-            if ( ind + l >= static_cast<int>(segInfo.segmentedCloudColInd.size()) ) {
+            if ( ind + l >= static_cast<int>(segInfo.segmented_cloud_col_ind.size()) ) {
               continue;
             }
             int columnDiff =
-                std::abs(int(segInfo.segmentedCloudColInd.at(ind + l) -
-                             segInfo.segmentedCloudColInd.at(ind + l - 1)));
+                std::abs(int(segInfo.segmented_cloud_col_ind.at(ind + l) -
+                             segInfo.segmented_cloud_col_ind.at(ind + l - 1)));
             if (columnDiff > 10) break;
 
             cloudNeighborPicked[ind + l] = 1;
@@ -334,8 +334,8 @@ void FeatureAssociation::extractFeatures() {
               continue;
             }
             int columnDiff =
-                std::abs(int(segInfo.segmentedCloudColInd.at(ind + l) -
-                             segInfo.segmentedCloudColInd.at(ind + l + 1)));
+                std::abs(int(segInfo.segmented_cloud_col_ind.at(ind + l) -
+                             segInfo.segmented_cloud_col_ind.at(ind + l + 1)));
             if (columnDiff > 10) break;
 
             cloudNeighborPicked[ind + l] = 1;

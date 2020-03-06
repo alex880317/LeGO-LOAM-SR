@@ -53,7 +53,7 @@ class FeatureAssociation {
 
   pcl::VoxelGrid<PointType> downSizeFilter;
 
-  cloud_msgs::cloud_info segInfo;
+  cloud_msgs::CloudInfo segInfo;
   std_msgs::Header cloudHeader;
 
   std::vector<smoothness_t> cloudSmoothness;

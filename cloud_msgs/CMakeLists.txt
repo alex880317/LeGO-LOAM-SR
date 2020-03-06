@@ -12,7 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   DIRECTORY msg
   FILES
-  cloud_info.msg
+  CloudInfo.msg
 )
 
 generate_messages(
@@ -24,10 +24,10 @@ generate_messages(
 
 
 catkin_package(
-  CATKIN_DEPENDS 
-  message_runtime 
+  CATKIN_DEPENDS
+  message_runtime
   message_generation
-  geometry_msgs 
+  geometry_msgs
   std_msgs
   nav_msgs
 )
@@ -35,6 +35,3 @@ catkin_package(
 include_directories(
   ${catkin_INCLUDE_DIRS}
 )
-
-
-

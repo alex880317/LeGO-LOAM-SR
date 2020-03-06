@@ -48,7 +48,7 @@ ImageProjection::ImageProjection(ros::NodeHandle& nh,
   _pub_segmented_cloud_pure =
       nh.advertise<sensor_msgs::PointCloud2>("/segmented_cloud_pure", 1);
   _pub_segmented_cloud_info =
-      nh.advertise<cloud_msgs::cloud_info>("/segmented_cloud_info", 1);
+      nh.advertise<cloud_msgs::CloudInfo>("/segmented_cloud_info", 1);
   _pub_outlier_cloud = nh.advertise<sensor_msgs::PointCloud2>("/outlier_cloud", 1);
 
   nh.getParam("/lego_loam/laser/num_vertical_scans", _vertical_scans);
@@ -119,12 +119,12 @@ void ImageProjection::resetParameters() {
   std::fill(_full_info_cloud->points.begin(), _full_info_cloud->points.end(),
             nanPoint);
 
-  _seg_msg.startRingIndex.assign(_vertical_scans, 0);
-  _seg_msg.endRingIndex.assign(_vertical_scans, 0);
+  _seg_msg.start_ring_index.assign(_vertical_scans, 0);
+  _seg_msg.end_ring_index.assign(_vertical_scans, 0);
 
-  _seg_msg.segmentedCloudGroundFlag.assign(cloud_size, false);
-  _seg_msg.segmentedCloudColInd.assign(cloud_size, 0);
-  _seg_msg.segmentedCloudRange.assign(cloud_size, 0);
+  _seg_msg.segmented_cloud_ground_flag.assign(cloud_size, false);
+  _seg_msg.segmented_cloud_col_ind.assign(cloud_size, 0);
+  _seg_msg.segmented_cloud_range.assign(cloud_size, 0);
 }
 
 void ImageProjection::cloudHandler(
@@ -201,18 +201,18 @@ void ImageProjection::projectPointCloud() {
 void ImageProjection::findStartEndAngle() {
   // start and end orientation of this cloud
   auto point = _laser_cloud_in->points.front();
-  _seg_msg.startOrientation = -std::atan2(point.y, point.x);
+  _seg_msg.start_orientation = -std::atan2(point.y, point.x);
 
   point = _laser_cloud_in->points.back();
-  _seg_msg.endOrientation = -std::atan2(point.y, point.x) + 2 * M_PI;
+  _seg_msg.end_orientation = -std::atan2(point.y, point.x) + 2 * M_PI;
 
-  if (_seg_msg.endOrientation - _seg_msg.startOrientation > 3 * M_PI) {
-    _seg_msg.endOrientation -= 2 * M_PI;
-  } else if (_seg_msg.endOrientation - _seg_msg.startOrientation < M_PI) {
-    _seg_msg.endOrientation += 2 * M_PI;
+  if (_seg_msg.end_orientation - _seg_msg.start_orientation > 3 * M_PI) {
+    _seg_msg.end_orientation -= 2 * M_PI;
+  } else if (_seg_msg.end_orientation - _seg_msg.start_orientation < M_PI) {
+    _seg_msg.end_orientation += 2 * M_PI;
   }
-  _seg_msg.orientationDiff =
-      _seg_msg.endOrientation - _seg_msg.startOrientation;
+  _seg_msg.orientation_diff =
+      _seg_msg.end_orientation - _seg_msg.start_orientation;
 }
 
 void ImageProjection::groundRemoval() {
@@ -279,7 +279,7 @@ void ImageProjection::cloudSegmentation() {
   int sizeOfSegCloud = 0;
   // extract segmented cloud for lidar odometry
   for (int i = 0; i < _vertical_scans; ++i) {
-    _seg_msg.startRingIndex[i] = sizeOfSegCloud - 1 + 5;
+    _seg_msg.start_ring_index[i] = sizeOfSegCloud - 1 + 5;
 
     for (int j = 0; j < _horizontal_scans; ++j) {
       if (_label_mat(i, j) > 0 || _ground_mat(i, j) == 1) {
@@ -299,12 +299,12 @@ void ImageProjection::cloudSegmentation() {
         }
         // mark ground points so they will not be considered as edge features
         // later
-        _seg_msg.segmentedCloudGroundFlag[sizeOfSegCloud] =
+        _seg_msg.segmented_cloud_ground_flag[sizeOfSegCloud] =
             (_ground_mat(i, j) == 1);
         // mark the points' column index for marking occlusion later
-        _seg_msg.segmentedCloudColInd[sizeOfSegCloud] = j;
+        _seg_msg.segmented_cloud_col_ind[sizeOfSegCloud] = j;
         // save range info
-        _seg_msg.segmentedCloudRange[sizeOfSegCloud] =
+        _seg_msg.segmented_cloud_range[sizeOfSegCloud] =
             _range_mat(i, j);
         // save seg cloud
         _segmented_cloud->push_back(_full_cloud->points[j + i * _horizontal_scans]);
@@ -313,7 +313,7 @@ void ImageProjection::cloudSegmentation() {
       }
     }
 
-    _seg_msg.endRingIndex[i] = sizeOfSegCloud - 1 - 5;
+    _seg_msg.end_ring_index[i] = sizeOfSegCloud - 1 - 5;
   }
 
   // extract segmented cloud for visualization

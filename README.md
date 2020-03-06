@@ -95,7 +95,7 @@ If the point cloud is not projected properly, you will lose many points and perf
 You may process a rosbag using the following command:
 
 ```
-roslaunch lego_loam_bor run.launch rosbag:=/path/to/your/rosbag lidar_topic:=/velodyne_points
+roslaunch lego_loam_sr run.launch rosbag:=/path/to/your/rosbag lidar_topic:=/velodyne_points
 ```
 
 Change the parameters `rosbag`, `lidar_topic` as needed.
@@ -117,7 +117,7 @@ The VLP-16 rotation rate is set to 10Hz. This data-set features over 20K scans a
 
 ## Cite *LeGO-LOAM*
 
-Thank you for citing our *LeGO-LOAM* paper if you use any of this code: 
+Thank you for citing our *LeGO-LOAM* paper if you use any of this code:
 ```
 @inproceedings{legoloam2018,
   title={LeGO-LOAM: Lightweight and Ground-Optimized Lidar Odometry and Mapping on Variable Terrain},

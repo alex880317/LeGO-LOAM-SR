@@ -9,7 +9,7 @@
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/TransformStamped.h>
 
-#include "cloud_msgs/cloud_info.h"
+#include "cloud_msgs/CloudInfo.h"
 
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
@@ -64,7 +64,7 @@ struct ProjectionOut
 {
   pcl::PointCloud<PointType>::Ptr segmented_cloud;
   pcl::PointCloud<PointType>::Ptr outlier_cloud;
-  cloud_msgs::cloud_info seg_msg;
+  cloud_msgs::CloudInfo seg_msg;
 };
 
 
