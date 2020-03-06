@@ -1,60 +1,31 @@
 <?xml version="1.0"?>
-<package>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>lego_loam_sr</name>
   <version>1.0.0</version>
-  <description>Fork of LeGO-LOAM</description>
+  <description>LeGO-LOAM implementation for ROS2</description>
 
   <maintainer email="eduardo.perdices@star-robotics.com">Eduardo Perdices</maintainer>
-
-  <license>BSD</license>
 
   <author>Tixiao Shan</author>
   <author>Davide Faconti</author>
   <author>Eduardo Perdices</author>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <license>BSD</license>
 
-  <build_depend>roscpp</build_depend>
-  <run_depend>roscpp</run_depend>
-
-  <build_depend>rospy</build_depend>
-  <run_depend>rospy</run_depend>
-
-  <build_depend>ros_bridge</build_depend>
-  <run_depend>ros_bridge</run_depend>
-
-  <build_depend>rosbag_storage</build_depend>
-  <run_depend>rosbag_storage</run_depend>
-
-  <build_depend>tf2</build_depend>
-  <run_depend>tf2</run_depend>
-
-  <build_depend>tf2_ros</build_depend>
-  <run_depend>tf2_ros</run_depend>
-
-  <build_depend>pcl_ros</build_depend>
-  <run_depend>pcl_ros</run_depend>
-  <build_depend>pcl_conversions</build_depend>
-  <run_depend>pcl_conversions</run_depend>
-
-  <build_depend>cv_bridge</build_depend>
-  <run_depend>cv_bridge</run_depend>
-
-  <build_depend>std_msgs</build_depend>
-  <run_depend>std_msgs</run_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
   <build_depend>cloud_msgs</build_depend>
-  <run_depend>cloud_msgs</run_depend>
-  <build_depend>sensors_msgs</build_depend>
-  <run_depend>sensors_msgs</run_depend>
-  <build_depend>geometry_msgs</build_depend>
-  <run_depend>geometry_msgs</run_depend>
-  <build_depend>nav_msgs</build_depend>
-  <run_depend>nav_msgs</run_depend>
 
-  <build_depend>image_transport</build_depend>
-  <run_depend>image_transport</run_depend>
+  <exec_depend>rclcpp</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>
+  <exec_depend>tf2</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>cloud_msgs</exec_depend>
 
-  <build_depend>gtsam</build_depend>
-  <run_depend>gtsam</run_depend>
-
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
 </package>

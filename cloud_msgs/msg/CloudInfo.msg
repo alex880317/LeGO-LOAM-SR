@@ -1,4 +1,4 @@
-Header header
+std_msgs/Header header
 
 int32[] start_ring_index
 int32[] end_ring_index
