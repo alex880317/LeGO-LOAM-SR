@@ -241,8 +241,8 @@ class MapOptimization {
 
   void extractSurroundingKeyFrames();
   void downsampleCurrentScan();
-  void cornerOptimization(int iterCount);
-  void surfOptimization(int iterCount);
+  void cornerOptimization();
+  void surfOptimization();
 
   bool LMOptimization(int iterCount);
   void scan2MapOptimization();

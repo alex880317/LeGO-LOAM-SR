@@ -554,14 +554,14 @@ void MapOptimization::publishGlobalMap() {
       pointSearchIndGlobalMap, pointSearchSqDisGlobalMap);
   mtx.unlock();
 
-  for (int i = 0; i < pointSearchIndGlobalMap.size(); ++i)
+  for (size_t i = 0; i < pointSearchIndGlobalMap.size(); ++i)
     globalMapKeyPoses->points.push_back(
         cloudKeyPoses3D->points[pointSearchIndGlobalMap[i]]);
   // downsample near selected key frames
   downSizeFilterGlobalMapKeyPoses.setInputCloud(globalMapKeyPoses);
   downSizeFilterGlobalMapKeyPoses.filter(*globalMapKeyPosesDS);
   // extract visualized and downsampled key frames
-  for (int i = 0; i < globalMapKeyPosesDS->points.size(); ++i) {
+  for (size_t i = 0; i < globalMapKeyPosesDS->points.size(); ++i) {
     int thisKeyInd = (int)globalMapKeyPosesDS->points[i].intensity;
     *globalMapKeyFrames += *transformPointCloud(
         cornerCloudKeyFrames[thisKeyInd], &cloudKeyPoses6D->points[thisKeyInd]);
@@ -602,7 +602,7 @@ bool MapOptimization::detectLoopClosure() {
       pointSearchSqDisLoop);
 
   closestHistoryFrameID = -1;
-  for (int i = 0; i < pointSearchIndLoop.size(); ++i) {
+  for (size_t i = 0; i < pointSearchIndLoop.size(); ++i) {
     int id = pointSearchIndLoop[i];
     if (abs(cloudKeyPoses6D->points[id].time - timeLaserOdometry) > 30.0) {
       closestHistoryFrameID = id;
@@ -751,7 +751,7 @@ void MapOptimization::extractSurroundingKeyFrames() {
 
   if (_loop_closure_enabled == true) {
     // only use recent key poses for graph building
-    if (recentCornerCloudKeyFrames.size() <
+    if (static_cast<int>(recentCornerCloudKeyFrames.size()) <
         _surrounding_keyframe_search_num) {  // queue is not full (the beginning
                                          // of mapping or a loop is just
                                          // closed)
@@ -771,12 +771,12 @@ void MapOptimization::extractSurroundingKeyFrames() {
             transformPointCloud(surfCloudKeyFrames[thisKeyInd]));
         recentOutlierCloudKeyFrames.push_front(
             transformPointCloud(outlierCloudKeyFrames[thisKeyInd]));
-        if (recentCornerCloudKeyFrames.size() >= _surrounding_keyframe_search_num)
+        if (static_cast<int>(recentCornerCloudKeyFrames.size()) >= _surrounding_keyframe_search_num)
           break;
       }
     } else {  // queue is full, pop the oldest key frame and push the latest
               // key frame
-      if (latestFrameID != cloudKeyPoses3D->points.size()-1) {
+      if (latestFrameID != static_cast<int>(cloudKeyPoses3D->points.size()) - 1) {
         // if the robot is not moving, no need to
         // update recent frames
 
@@ -797,7 +797,7 @@ void MapOptimization::extractSurroundingKeyFrames() {
       }
     }
 
-    for (int i = 0; i < recentCornerCloudKeyFrames.size(); ++i) {
+    for (size_t i = 0; i < recentCornerCloudKeyFrames.size(); ++i) {
       *laserCloudCornerFromMap += *recentCornerCloudKeyFrames[i];
       *laserCloudSurfFromMap += *recentSurfCloudKeyFrames[i];
       *laserCloudSurfFromMap += *recentOutlierCloudKeyFrames[i];
@@ -811,7 +811,7 @@ void MapOptimization::extractSurroundingKeyFrames() {
         currentRobotPosPoint, (double)_surrounding_keyframe_search_radius,
         pointSearchInd, pointSearchSqDis);
 
-    for (int i = 0; i < pointSearchInd.size(); ++i){
+    for (size_t i = 0; i < pointSearchInd.size(); ++i){
       surroundingKeyPoses->points.push_back(
           cloudKeyPoses3D->points[pointSearchInd[i]]);
     }
@@ -821,7 +821,7 @@ void MapOptimization::extractSurroundingKeyFrames() {
 
     // delete key frames that are not in surrounding region
     int numSurroundingPosesDS = surroundingKeyPosesDS->points.size();
-    for (int i = 0; i < surroundingExistingKeyPosesID.size(); ++i) {
+    for (size_t i = 0; i < surroundingExistingKeyPosesID.size(); ++i) {
       bool existingFlag = false;
       for (int j = 0; j < numSurroundingPosesDS; ++j) {
         if (surroundingExistingKeyPosesID[i] ==
@@ -868,7 +868,7 @@ void MapOptimization::extractSurroundingKeyFrames() {
       }
     }
 
-    for (int i = 0; i < surroundingExistingKeyPosesID.size(); ++i) {
+    for (size_t i = 0; i < surroundingExistingKeyPosesID.size(); ++i) {
       *laserCloudCornerFromMap += *surroundingCornerCloudKeyFrames[i];
       *laserCloudSurfFromMap += *surroundingSurfCloudKeyFrames[i];
       *laserCloudSurfFromMap += *surroundingOutlierCloudKeyFrames[i];
@@ -909,7 +909,7 @@ void MapOptimization::downsampleCurrentScan() {
   laserCloudSurfTotalLastDSNum = laserCloudSurfTotalLastDS->points.size();
 }
 
-void MapOptimization::cornerOptimization(int iterCount) {
+void MapOptimization::cornerOptimization() {
   updatePointAssociateToMapSinCos();
   for (int i = 0; i < laserCloudCornerLastDSNum; i++) {
     pointOri = laserCloudCornerLastDS->points[i];
@@ -1017,7 +1017,7 @@ void MapOptimization::cornerOptimization(int iterCount) {
   }
 }
 
-void MapOptimization::surfOptimization(int iterCount) {
+void MapOptimization::surfOptimization() {
   updatePointAssociateToMapSinCos();
   for (int i = 0; i < laserCloudSurfTotalLastDSNum; i++) {
     pointOri = laserCloudSurfTotalLastDS->points[i];
@@ -1204,8 +1204,8 @@ void MapOptimization::scan2MapOptimization() {
       laserCloudOri->clear();
       coeffSel->clear();
 
-      cornerOptimization(iterCount);
-      surfOptimization(iterCount);
+      cornerOptimization();
+      surfOptimization();
 
       if (LMOptimization(iterCount) == true) break;
     }

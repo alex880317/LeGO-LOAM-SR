@@ -286,7 +286,7 @@ void FeatureAssociation::extractFeatures() {
 
           cloudNeighborPicked[ind] = 1;
           for (int l = 1; l <= 5; l++) {
-            if( ind + l >= segInfo.segmentedCloudColInd.size() ) {
+            if ( ind + l >= static_cast<int>(segInfo.segmentedCloudColInd.size()) ) {
               continue;
             }
             int columnDiff =
@@ -324,7 +324,7 @@ void FeatureAssociation::extractFeatures() {
 
           cloudNeighborPicked[ind] = 1;
           for (int l = 1; l <= 5; l++) {
-            if( ind + l >= segInfo.segmentedCloudColInd.size() ) {
+            if ( ind + l >= static_cast<int>(segInfo.segmentedCloudColInd.size()) ) {
               continue;
             }
             int columnDiff =
@@ -1318,7 +1318,7 @@ void FeatureAssociation::runFeatureAssociation() {
     //--------------
     _cycle_count++;
 
-    if (_cycle_count == _mapping_frequency_div) {
+    if (static_cast<int>(_cycle_count) == _mapping_frequency_div) {
       _cycle_count = 0;
       AssociationOut out;
       out.cloud_corner_last.reset(new pcl::PointCloud<PointType>());

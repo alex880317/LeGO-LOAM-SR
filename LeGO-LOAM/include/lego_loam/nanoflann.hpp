@@ -175,9 +175,8 @@ class KNNResultSet {
   inline bool addPoint(DistanceType dist, IndexType index) {
     CountType i;
     for (i = count; i > 0; --i) {
-#ifdef NANOFLANN_FIRST_MATCH // If defined and two points have the same \
-    // distance, the one with the lowest-index will be                   \
-    // returned first.
+#ifdef NANOFLANN_FIRST_MATCH
+    // If defined and two points have the same distance, the one with the lowest-index will be returned first.
       if ((dists[i - 1] > dist) ||
           ((dist == dists[i - 1]) && (indices[i - 1] > index))) {
 #else

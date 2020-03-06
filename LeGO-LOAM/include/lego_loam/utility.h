@@ -112,7 +112,7 @@ inline void OdometryToTransform(const nav_msgs::Odometry& odometry,
 struct PointXYZIRPYT
 {
     PCL_ADD_POINT4D
-    PCL_ADD_INTENSITY;
+    PCL_ADD_INTENSITY
     float roll;
     float pitch;
     float yaw;
