@@ -32,10 +32,10 @@ inline Eigen::Affine3f pclPointToAffine3fCameraToLidar(
 }
 
 
-class MapOptimization {
+class MapOptimization : public rclcpp::Node {
 
  public:
-  MapOptimization(ros::NodeHandle& node, Channel<AssociationOut> &input_channel);
+  MapOptimization(const std::string &name, Channel<AssociationOut> &input_channel);
 
   ~MapOptimization();
 
@@ -47,7 +47,6 @@ class MapOptimization {
   gtsam::ISAM2 *isam;
   gtsam::Values isamCurrentEstimate;
 
-  ros::NodeHandle& nh;
   bool _loop_closure_enabled;
 
   float _surrounding_keyframe_search_radius;
@@ -68,13 +67,13 @@ class MapOptimization {
   std::thread _loop_closure_thread;
   void loopClosureThread();
 
-  ros::Publisher pubLaserCloudSurround;
-  ros::Publisher pubOdomAftMapped;
-  ros::Publisher pubKeyPoses;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pubLaserCloudSurround;
+  rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr pubOdomAftMapped;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pubKeyPoses;
 
-  ros::Publisher pubHistoryKeyFrames;
-  ros::Publisher pubIcpKeyFrames;
-  ros::Publisher pubRecentKeyFrames;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pubHistoryKeyFrames;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pubIcpKeyFrames;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pubRecentKeyFrames;
 
   nav_msgs::msg::Odometry odomAftMapped;
   geometry_msgs::msg::TransformStamped aftMappedTrans;

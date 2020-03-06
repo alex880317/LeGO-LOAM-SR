@@ -29,51 +29,66 @@
 #include <boost/circular_buffer.hpp>
 #include "imageProjection.h"
 
-ImageProjection::ImageProjection(ros::NodeHandle& nh,
-                                 Channel<ProjectionOut>& output_channel)
-    : _nh(nh),
-      _output_channel(output_channel)
+ImageProjection::ImageProjection(const std::string &name, Channel<ProjectionOut>& output_channel)
+    : Node(name),  _output_channel(output_channel)
 {
-  _sub_laser_cloud = nh.subscribe<sensor_msgs::msg::PointCloud2>(
-      "/lidar_points", 1, &ImageProjection::cloudHandler, this);
+  _sub_laser_cloud = this->create_subscription<sensor_msgs::msg::PointCloud2>(
+      "/lidar_points", 1, std::bind(&ImageProjection::cloudHandler, this, std::placeholders::_1));
 
-  _pub_full_cloud =
-      nh.advertise<sensor_msgs::msg::PointCloud2>("/full_cloud_projected", 1);
-  _pub_full_info_cloud =
-      nh.advertise<sensor_msgs::msg::PointCloud2>("/full_cloud_info", 1);
+  _pub_full_cloud = this->create_publisher<sensor_msgs::msg::PointCloud2>("/full_cloud_projected", 1);
+  _pub_full_info_cloud = this->create_publisher<sensor_msgs::msg::PointCloud2>("/full_cloud_info", 1);
+  _pub_ground_cloud = this->create_publisher<sensor_msgs::msg::PointCloud2>("/ground_cloud", 1);
+  _pub_segmented_cloud = this->create_publisher<sensor_msgs::msg::PointCloud2>("/segmented_cloud", 1);
+  _pub_segmented_cloud_pure = this->create_publisher<sensor_msgs::msg::PointCloud2>("/segmented_cloud_pure", 1);
+  _pub_segmented_cloud_info = this->create_publisher<cloud_msgs::msg::CloudInfo>("/segmented_cloud_info", 1);
+  _pub_outlier_cloud = this->create_publisher<sensor_msgs::msg::PointCloud2>("/outlier_cloud", 1);
 
-  _pub_ground_cloud = nh.advertise<sensor_msgs::msg::PointCloud2>("/ground_cloud", 1);
-  _pub_segmented_cloud =
-      nh.advertise<sensor_msgs::msg::PointCloud2>("/segmented_cloud", 1);
-  _pub_segmented_cloud_pure =
-      nh.advertise<sensor_msgs::msg::PointCloud2>("/segmented_cloud_pure", 1);
-  _pub_segmented_cloud_info =
-      nh.advertise<cloud_msgs::msg::CloudInfo>("/segmented_cloud_info", 1);
-  _pub_outlier_cloud = nh.advertise<sensor_msgs::msg::PointCloud2>("/outlier_cloud", 1);
+  // Declare parameters
+  this->declare_parameter("/lego_loam/laser/num_vertical_scans");
+  this->declare_parameter("/lego_loam/laser/num_horizontal_scans");
+  this->declare_parameter("/lego_loam/laser/vertical_angle_bottom");
+  this->declare_parameter("/lego_loam/laser/vertical_angle_top");
+  this->declare_parameter("/lego_loam/imageProjection/segment_theta");
+  this->declare_parameter("/lego_loam/imageProjection/segment_valid_point_num");
+  this->declare_parameter("/lego_loam/imageProjection/segment_valid_line_num");
+  this->declare_parameter("/lego_loam/laser/ground_scan_index");
+  this->declare_parameter("/lego_loam/laser/sensor_mount_angle");
 
-  nh.getParam("/lego_loam/laser/num_vertical_scans", _vertical_scans);
-  nh.getParam("/lego_loam/laser/num_horizontal_scans", _horizontal_scans);
-  nh.getParam("/lego_loam/laser/vertical_angle_bottom", _ang_bottom);
   float vertical_angle_top;
-  nh.getParam("/lego_loam/laser/vertical_angle_top", vertical_angle_top);
+
+  // Read parameters
+  if (!this->get_parameter("/lego_loam/laser/num_vertical_scans", _vertical_scans) {
+    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  }
+  if (!this->get_parameter("/lego_loam/laser/num_horizontal_scans", _horizontal_scans) {
+    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  }
+  if (!this->get_parameter("/lego_loam/laser/vertical_angle_bottom", _ang_bottom) {
+    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  }
+  if (!this->get_parameter("/lego_loam/laser/vertical_angle_top", vertical_angle_top) {
+    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  }
+  if (!this->get_parameter("/lego_loam/imageProjection/segment_theta", _segment_theta) {
+    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  }
+  if (!this->get_parameter("/lego_loam/imageProjection/segment_valid_point_num", _segment_valid_point_num) {
+    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  }
+  if (!this->get_parameter("/lego_loam/imageProjection/segment_valid_line_num", _segment_valid_line_num) {
+    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  }
+  if (!this->get_parameter("/lego_loam/laser/ground_scan_index", _ground_scan_index) {
+    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  }
+  if (!this->get_parameter("/lego_loam/laser/sensor_mount_angle", _sensor_mount_angle) {
+    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  }
 
   _ang_resolution_X = (M_PI*2) / (_horizontal_scans);
   _ang_resolution_Y = DEG_TO_RAD*(vertical_angle_top - _ang_bottom) / float(_vertical_scans-1);
   _ang_bottom = -( _ang_bottom - 0.1) * DEG_TO_RAD;
-
-  nh.getParam("/lego_loam/imageProjection/segment_theta", _segment_theta);
   _segment_theta *= DEG_TO_RAD;
-
-  nh.getParam("/lego_loam/imageProjection/segment_valid_point_num",
-              _segment_valid_point_num);
-  nh.getParam("/lego_loam/imageProjection/segment_valid_line_num",
-              _segment_valid_line_num);
-
-  nh.getParam("/lego_loam/laser/ground_scan_index",
-              _ground_scan_index);
-
-  nh.getParam("/lego_loam/laser/sensor_mount_angle",
-              _sensor_mount_angle);
   _sensor_mount_angle *= DEG_TO_RAD;
 
   const size_t cloud_size = _vertical_scans * _horizontal_scans;

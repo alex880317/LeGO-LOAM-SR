@@ -5,11 +5,10 @@
 #include "lego_loam/channel.h"
 #include <Eigen/QR>
 
-class ImageProjection {
+class ImageProjection : public rclcpp::Node {
  public:
 
-  ImageProjection(ros::NodeHandle& nh,
-                  Channel<ProjectionOut>& output_channel);
+  ImageProjection(const std::string &name, Channel<ProjectionOut>& output_channel);
 
   ~ImageProjection() = default;
 
@@ -34,7 +33,6 @@ class ImageProjection {
   pcl::PointCloud<PointType>::Ptr _segmented_cloud_pure;
   pcl::PointCloud<PointType>::Ptr _outlier_cloud;
 
-  ros::NodeHandle& _nh;
   int _vertical_scans;
   int _horizontal_scans;
   float _ang_bottom;
@@ -48,16 +46,16 @@ class ImageProjection {
 
   Channel<ProjectionOut>& _output_channel;
 
-  ros::Subscriber _sub_laser_cloud;
+  rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr _sub_laser_cloud;
 
-  ros::Publisher _pub_full_cloud;
-  ros::Publisher _pub_full_info_cloud;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr _pub_full_cloud;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr _pub_full_info_cloud;
 
-  ros::Publisher _pub_ground_cloud;
-  ros::Publisher _pub_segmented_cloud;
-  ros::Publisher _pub_segmented_cloud_pure;
-  ros::Publisher _pub_segmented_cloud_info;
-  ros::Publisher _pub_outlier_cloud;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr _pub_ground_cloud;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr _pub_segmented_cloud;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr _pub_segmented_cloud_pure;
+  rclcpp::Publisher<cloud_msgs::msg::CloudInfo>::SharedPtr _pub_segmented_cloud_info;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr _pub_outlier_cloud;
 
   cloud_msgs::msg::CloudInfo _seg_msg;
 

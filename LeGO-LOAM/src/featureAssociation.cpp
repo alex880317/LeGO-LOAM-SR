@@ -38,43 +38,56 @@
 
 const float RAD2DEG = 180.0 / M_PI;
 
-FeatureAssociation::FeatureAssociation(ros::NodeHandle &node,
-                                       Channel<ProjectionOut> &input_channel,
+FeatureAssociation::FeatureAssociation(const std::string &name, Channel<ProjectionOut> &input_channel,
                                        Channel<AssociationOut> &output_channel)
-    : nh(node),
-      _input_channel(input_channel),
-      _output_channel(output_channel) {
+    : Node(name), _input_channel(input_channel), _output_channel(output_channel) {
 
-  pubCornerPointsSharp =
-      nh.advertise<sensor_msgs::msg::PointCloud2>("/laser_cloud_sharp", 1);
-  pubCornerPointsLessSharp =
-      nh.advertise<sensor_msgs::msg::PointCloud2>("/laser_cloud_less_sharp", 1);
-  pubSurfPointsFlat =
-      nh.advertise<sensor_msgs::msg::PointCloud2>("/laser_cloud_flat", 1);
-  pubSurfPointsLessFlat =
-      nh.advertise<sensor_msgs::msg::PointCloud2>("/laser_cloud_less_flat", 1);
+  pubCornerPointsSharp = this->create_publisher<sensor_msgs::msg::PointCloud2>("/laser_cloud_sharp", 1);
+  pubCornerPointsLessSharp = this->create_publisher<sensor_msgs::msg::PointCloud2>("/laser_cloud_less_sharp", 1);
+  pubSurfPointsFlat = this->create_publisher<sensor_msgs::msg::PointCloud2>("/laser_cloud_flat", 1);
+  pubSurfPointsLessFlat = this->create_publisher<sensor_msgs::msg::PointCloud2>("/laser_cloud_less_flat", 1);
 
-  _pub_cloud_corner_last =
-      nh.advertise<sensor_msgs::msg::PointCloud2>("/laser_cloud_corner_last", 2);
-  _pub_cloud_surf_last =
-      nh.advertise<sensor_msgs::msg::PointCloud2>("/laser_cloud_surf_last", 2);
-  _pub_outlier_cloudLast =
-      nh.advertise<sensor_msgs::msg::PointCloud2>("/outlier_cloud_last", 2);
-  pubLaserOdometry = nh.advertise<nav_msgs::msg::Odometry>("/laser_odom_to_init", 5);
+  _pub_cloud_corner_last = this->create_publisher<sensor_msgs::msg::PointCloud2>("/laser_cloud_corner_last", 2);
+  _pub_cloud_surf_last = this->create_publisher<sensor_msgs::msg::PointCloud2>("/laser_cloud_surf_last", 2);
+  _pub_outlier_cloudLast = this->create_publisher<sensor_msgs::msg::PointCloud2>("/outlier_cloud_last", 2);
+  pubLaserOdometry = this->create_publisher<nav_msgs::msg::Odometry>("/laser_odom_to_init", 5);
 
   _cycle_count = 0;
 
-  nh.getParam("/lego_loam/laser/num_vertical_scans", _vertical_scans);
-  nh.getParam("/lego_loam/laser/num_horizontal_scans", _horizontal_scans);
-  nh.getParam("/lego_loam/laser/scan_period", _scan_period);
-
-  nh.getParam("/lego_loam/featureAssociation/edge_threshold", _edge_threshold);
-  nh.getParam("/lego_loam/featureAssociation/surf_threshold", _surf_threshold);
-
-  nh.getParam("/lego_loam/mapping/mapping_frequency_divider", _mapping_frequency_div);
+  // Declare parameters
+  this->declare_parameter("/lego_loam/laser/num_vertical_scans");
+  this->declare_parameter("/lego_loam/laser/num_horizontal_scans");
+  this->declare_parameter("/lego_loam/laser/scan_period");
+  this->declare_parameter("/lego_loam/featureAssociation/edge_threshold");
+  this->declare_parameter("/lego_loam/featureAssociation/surf_threshold");
+  this->declare_parameter("/lego_loam/mapping/mapping_frequency_divider");
+  this->declare_parameter("/lego_loam/featureAssociation/nearest_feature_search_distance");
 
   float nearest_dist;
-  nh.getParam("/lego_loam/featureAssociation/nearest_feature_search_distance", nearest_dist);
+
+  // Read parameters
+  if (!this->get_parameter("/lego_loam/laser/num_vertical_scans", _vertical_scans) {
+    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  }
+  if (!this->get_parameter("/lego_loam/laser/num_horizontal_scans", _horizontal_scans) {
+    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  }
+  if (!this->get_parameter("/lego_loam/laser/scan_period", _scan_period) {
+    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  }
+  if (!this->get_parameter("/lego_loam/featureAssociation/edge_threshold", _edge_threshold) {
+    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  }
+  if (!this->get_parameter("/lego_loam/featureAssociation/surf_threshold", _surf_threshold) {
+    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  }
+  if (!this->get_parameter("/lego_loam/mapping/mapping_frequency_divider", _mapping_frequency_div) {
+    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  }
+  if (!this->get_parameter("/lego_loam/featureAssociation/nearest_feature_search_distance", nearest_dist) {
+    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  }
+
   _nearest_feature_dist_sqr = nearest_dist*nearest_dist;
 
   initializationValue();

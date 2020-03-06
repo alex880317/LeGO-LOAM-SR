@@ -39,29 +39,20 @@
 
 using namespace gtsam;
 
-MapOptimization::MapOptimization(ros::NodeHandle &node,
-                                 Channel<AssociationOut> &input_channel)
-    : nh(node),
-      _input_channel(input_channel),
-      _publish_global_signal(false),
-      _loop_closure_signal(false)
+MapOptimization::MapOptimization(const std::string &name, Channel<AssociationOut> &input_channel)
+    : Node(name), _input_channel(input_channel), _publish_global_signal(false), _loop_closure_signal(false)
 {
   ISAM2Params parameters;
   parameters.relinearizeThreshold = 0.01;
   parameters.relinearizeSkip = 1;
   isam = new ISAM2(parameters);
 
-  pubKeyPoses = nh.advertise<sensor_msgs::msg::PointCloud2>("/key_pose_origin", 2);
-  pubLaserCloudSurround =
-      nh.advertise<sensor_msgs::msg::PointCloud2>("/laser_cloud_surround", 2);
-  pubOdomAftMapped = nh.advertise<nav_msgs::msg::Odometry>("/aft_mapped_to_init", 5);
-
-  pubHistoryKeyFrames =
-      nh.advertise<sensor_msgs::msg::PointCloud2>("/history_cloud", 2);
-  pubIcpKeyFrames =
-      nh.advertise<sensor_msgs::msg::PointCloud2>("/corrected_cloud", 2);
-  pubRecentKeyFrames =
-      nh.advertise<sensor_msgs::msg::PointCloud2>("/recent_cloud", 2);
+  pubKeyPoses = this->create_publisher<sensor_msgs::msg::PointCloud2>("/key_pose_origin", 2);
+  pubLaserCloudSurround = this->create_publisher<sensor_msgs::msg::PointCloud2>("/laser_cloud_surround", 2);
+  pubOdomAftMapped = this->create_publisher<nav_msgs::msg::Odometry>("/aft_mapped_to_init", 5);
+  pubHistoryKeyFrames = this->create_publisher<sensor_msgs::msg::PointCloud2>("/history_cloud", 2);
+  pubIcpKeyFrames = this->create_publisher<sensor_msgs::msg::PointCloud2>("/corrected_cloud", 2);
+  pubRecentKeyFrames = this->create_publisher<sensor_msgs::msg::PointCloud2>("/recent_cloud", 2);
 
   downSizeFilterCorner.setLeafSize(0.2, 0.2, 0.2);
   downSizeFilterSurf.setLeafSize(0.4, 0.4, 0.4);
@@ -83,25 +74,38 @@ MapOptimization::MapOptimization(ros::NodeHandle &node,
   aftMappedTrans.header.frame_id = "/camera_init";
   aftMappedTrans.child_frame_id = "/aft_mapped";
 
-  nh.getParam("/lego_loam/mapping/enable_loop_closure", _loop_closure_enabled);
+  // Declare parameters
+  this->declare_parameter("/lego_loam/laser/scan_period");
+  this->declare_parameter("/lego_loam/mapping/enable_loop_closure");
+  this->declare_parameter("/lego_loam/mapping/history_keyframe_search_radius");
+  this->declare_parameter("/lego_loam/mapping/history_keyframe_search_num");
+  this->declare_parameter("/lego_loam/mapping/history_keyframe_fitness_score");
+  this->declare_parameter("/lego_loam/mapping/surrounding_keyframe_search_radius");
+  this->declare_parameter("/lego_loam/mapping/surrounding_keyframe_search_num");
+  this->declare_parameter("/lego_loam/mapping/global_map_visualization_search_radius");
 
-  nh.getParam("/lego_loam/mapping/history_keyframe_search_radius",
-              _history_keyframe_search_radius);
-
-  nh.getParam("/lego_loam/mapping/history_keyframe_search_num",
-              _history_keyframe_search_num);
-
-  nh.getParam("/lego_loam/mapping/history_keyframe_fitness_score",
-              _history_keyframe_fitness_score);
-
-  nh.getParam("/lego_loam/mapping/surrounding_keyframe_search_radius",
-              _surrounding_keyframe_search_radius);
-
-  nh.getParam("/lego_loam/mapping/surrounding_keyframe_search_num",
-              _surrounding_keyframe_search_num);
-
-  nh.getParam("/lego_loam/mapping/global_map_visualization_search_radius",
-              _global_map_visualization_search_radius);
+  // Read parameters
+  if (!this->get_parameter("/lego_loam/mapping/enable_loop_closure", _loop_closure_enabled)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  }
+  if (!this->get_parameter("/lego_loam/mapping/history_keyframe_search_radius", _history_keyframe_search_radius) {
+    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  }
+  if (!this->get_parameter("/lego_loam/mapping/history_keyframe_search_num", _history_keyframe_search_num) {
+    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  }
+  if (!this->get_parameter("/lego_loam/mapping/history_keyframe_fitness_score", _history_keyframe_fitness_score) {
+    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  }
+  if (!this->get_parameter("/lego_loam/mapping/surrounding_keyframe_search_radius", _surrounding_keyframe_search_radius) {
+    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  }
+  if (!this->get_parameter("/lego_loam/mapping/surrounding_keyframe_search_num", _surrounding_keyframe_search_num) {
+    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  }
+  if (!this->get_parameter("/lego_loam/mapping/global_map_visualization_search_radius", _global_map_visualization_search_radius) {
+    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  }
 
   allocateMemory();
 

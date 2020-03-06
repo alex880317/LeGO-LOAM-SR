@@ -7,11 +7,10 @@
 #include <Eigen/Eigenvalues>
 #include <Eigen/QR>
 
-class FeatureAssociation {
+class FeatureAssociation : public rclcpp::Node {
 
  public:
-  FeatureAssociation( ros::NodeHandle& node,
-                     Channel<ProjectionOut>& input_channel,
+  FeatureAssociation(const std::string &name, Channel<ProjectionOut>& input_channel,
                      Channel<AssociationOut>& output_channel);
 
   ~FeatureAssociation();
@@ -19,8 +18,6 @@ class FeatureAssociation {
   void runFeatureAssociation();
 
  private:
-
-  ros::NodeHandle& nh;
 
   int _vertical_scans;
   int _horizontal_scans;
@@ -35,10 +32,10 @@ class FeatureAssociation {
   Channel<ProjectionOut>& _input_channel;
   Channel<AssociationOut>& _output_channel;
 
-  ros::Publisher pubCornerPointsSharp;
-  ros::Publisher pubCornerPointsLessSharp;
-  ros::Publisher pubSurfPointsFlat;
-  ros::Publisher pubSurfPointsLessFlat;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pubCornerPointsSharp;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pubCornerPointsLessSharp;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pubSurfPointsFlat;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pubSurfPointsLessFlat;
 
   pcl::PointCloud<PointType>::Ptr segmentedCloud;
   pcl::PointCloud<PointType>::Ptr outlierCloud;
@@ -61,10 +58,10 @@ class FeatureAssociation {
   std::vector<int> cloudNeighborPicked;
   std::vector<int> cloudLabel;
 
-  ros::Publisher _pub_cloud_corner_last;
-  ros::Publisher _pub_cloud_surf_last;
-  ros::Publisher pubLaserOdometry;
-  ros::Publisher _pub_outlier_cloudLast;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr _pub_cloud_corner_last;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr _pub_cloud_surf_last;
+  rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr pubLaserOdometry;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr _pub_outlier_cloudLast;
 
   int skipFrameNum;
   bool systemInitedLM;

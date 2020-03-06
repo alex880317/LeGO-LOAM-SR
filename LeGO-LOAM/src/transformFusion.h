@@ -3,12 +3,11 @@
 
 #include "lego_loam/utility.h"
 
-class TransformFusion {
+class TransformFusion : public rclcpp::Node {
  private:
-  ros::NodeHandle& nh;
-  ros::Publisher pubLaserOdometry2;
-  ros::Subscriber subLaserOdometry;
-  ros::Subscriber subOdomAftMapped;
+  rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr pubLaserOdometry2;
+  rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr subLaserOdometry;
+  rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr subOdomAftMapped;
 
   nav_msgs::msg::Odometry laserOdometry2;
   geometry_msgs::msg::TransformStamped laserOdometryTrans2;
@@ -21,7 +20,7 @@ class TransformFusion {
   float transformAftMapped[6];
 
  public:
-  TransformFusion(ros::NodeHandle& node);
+  TransformFusion(const std::string &name);
 
   void transformAssociateToMap();
   void laserOdometryHandler(const nav_msgs::msg::Odometry::ConstPtr& laserOdometry);

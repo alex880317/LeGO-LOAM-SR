@@ -32,13 +32,12 @@
 
 #include "transformFusion.h"
 
-TransformFusion::TransformFusion(ros::NodeHandle& node) : nh(node) {
-  pubLaserOdometry2 =
-      nh.advertise<nav_msgs::msg::Odometry>("/integrated_to_init", 5);
-  subLaserOdometry = nh.subscribe<nav_msgs::msg::Odometry>(
-      "/laser_odom_to_init", 5, &TransformFusion::laserOdometryHandler, this);
-  subOdomAftMapped = nh.subscribe<nav_msgs::msg::Odometry>(
-      "/aft_mapped_to_init", 5, &TransformFusion::odomAftMappedHandler, this);
+TransformFusion::TransformFusion(const std::string &name, ) : Node(name) {
+  pubLaserOdometry2 = this->create_publisher<nav_msgs::msg::Odometry>("/integrated_to_init", 5);
+  subLaserOdometry = this->create_subscription<nav_msgs::msg::Odometry>(
+      "/laser_odom_to_init", 5, std::bind(&TransformFusion::laserOdometryHandler, this, std::placeholders::_1));
+  subOdomAftMapped = this->create_subscription<nav_msgs::msg::Odometry>(
+      "/aft_mapped_to_init", 5, std::bind(&TransformFusion::odomAftMappedHandler, this, std::placeholders::_1));
 
   laserOdometry2.header.frame_id = "/camera_init";
   laserOdometry2.child_frame_id = "/camera";
