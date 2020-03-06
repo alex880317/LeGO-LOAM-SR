@@ -177,7 +177,7 @@ void MapOptimization::allocateMemory() {
   globalMapKeyFrames.reset(new pcl::PointCloud<PointType>());
   globalMapKeyFramesDS.reset(new pcl::PointCloud<PointType>());
 
-  timeLaserOdometry = 0;
+  timeLaserOdometry = ros::Time::now();
 
   for (int i = 0; i < 6; ++i) {
     transformLast[i] = 0;
@@ -490,7 +490,7 @@ void MapOptimization::publishTF() {
   q.setRPY(transformAftMapped[2], -transformAftMapped[0], -transformAftMapped[1]);
   tf2::convert(q, geoQuat);
 
-  odomAftMapped.header.stamp = ros::Time().fromSec(timeLaserOdometry);
+  odomAftMapped.header.stamp = timeLaserOdometry;
   odomAftMapped.pose.pose.orientation.x = -geoQuat.y;
   odomAftMapped.pose.pose.orientation.y = -geoQuat.z;
   odomAftMapped.pose.pose.orientation.z = geoQuat.x;
@@ -506,7 +506,7 @@ void MapOptimization::publishTF() {
   odomAftMapped.twist.twist.linear.z = transformBefMapped[5];
   pubOdomAftMapped.publish(odomAftMapped);
 
-  aftMappedTrans.header.stamp = ros::Time().fromSec(timeLaserOdometry);
+  aftMappedTrans.header.stamp = timeLaserOdometry;
   aftMappedTrans.transform.translation.x = transformAftMapped[3];
   aftMappedTrans.transform.translation.y = transformAftMapped[4];
   aftMappedTrans.transform.translation.z = transformAftMapped[5];
@@ -521,7 +521,7 @@ void MapOptimization::publishKeyPosesAndFrames() {
   if (pubKeyPoses.getNumSubscribers() != 0) {
     sensor_msgs::PointCloud2 cloudMsgTemp;
     pcl::toROSMsg(*cloudKeyPoses3D, cloudMsgTemp);
-    cloudMsgTemp.header.stamp = ros::Time().fromSec(timeLaserOdometry);
+    cloudMsgTemp.header.stamp = timeLaserOdometry;
     cloudMsgTemp.header.frame_id = "/camera_init";
     pubKeyPoses.publish(cloudMsgTemp);
   }
@@ -529,7 +529,7 @@ void MapOptimization::publishKeyPosesAndFrames() {
   if (pubRecentKeyFrames.getNumSubscribers() != 0) {
     sensor_msgs::PointCloud2 cloudMsgTemp;
     pcl::toROSMsg(*laserCloudSurfFromMapDS, cloudMsgTemp);
-    cloudMsgTemp.header.stamp = ros::Time().fromSec(timeLaserOdometry);
+    cloudMsgTemp.header.stamp = timeLaserOdometry;
     cloudMsgTemp.header.frame_id = "/camera_init";
     pubRecentKeyFrames.publish(cloudMsgTemp);
   }
@@ -573,7 +573,7 @@ void MapOptimization::publishGlobalMap() {
 
   sensor_msgs::PointCloud2 cloudMsgTemp;
   pcl::toROSMsg(*globalMapKeyFramesDS, cloudMsgTemp);
-  cloudMsgTemp.header.stamp = ros::Time().fromSec(timeLaserOdometry);
+  cloudMsgTemp.header.stamp = timeLaserOdometry;
   cloudMsgTemp.header.frame_id = "/camera_init";
   pubLaserCloudSurround.publish(cloudMsgTemp);
 
@@ -600,7 +600,7 @@ bool MapOptimization::detectLoopClosure() {
   closestHistoryFrameID = -1;
   for (size_t i = 0; i < pointSearchIndLoop.size(); ++i) {
     int id = pointSearchIndLoop[i];
-    if (abs(cloudKeyPoses6D->points[id].time - timeLaserOdometry) > 30.0) {
+    if (abs(cloudKeyPoses6D->points[id].time - timeLaserOdometry.toSec()) > 30.0) {
       closestHistoryFrameID = id;
       break;
     }
@@ -645,7 +645,7 @@ bool MapOptimization::detectLoopClosure() {
   if (pubHistoryKeyFrames.getNumSubscribers() != 0) {
     sensor_msgs::PointCloud2 cloudMsgTemp;
     pcl::toROSMsg(*nearHistorySurfKeyFrameCloudDS, cloudMsgTemp);
-    cloudMsgTemp.header.stamp = ros::Time().fromSec(timeLaserOdometry);
+    cloudMsgTemp.header.stamp = timeLaserOdometry;
     cloudMsgTemp.header.frame_id = "/camera_init";
     pubHistoryKeyFrames.publish(cloudMsgTemp);
   }
@@ -664,7 +664,6 @@ void MapOptimization::performLoopClosure() {
     if (detectLoopClosure() == true) {
       potentialLoopFlag = true;  // find some key frames that is old enough or
                                  // close enough for loop closure
-      timeSaveFirstCurrentScanForLoopClosure = timeLaserOdometry;
     }
     if (potentialLoopFlag == false) return;
   }
@@ -695,7 +694,7 @@ void MapOptimization::performLoopClosure() {
                              icp.getFinalTransformation());
     sensor_msgs::PointCloud2 cloudMsgTemp;
     pcl::toROSMsg(*closed_cloud, cloudMsgTemp);
-    cloudMsgTemp.header.stamp = ros::Time().fromSec(timeLaserOdometry);
+    cloudMsgTemp.header.stamp = timeLaserOdometry;
     cloudMsgTemp.header.frame_id = "/camera_init";
     pubIcpKeyFrames.publish(cloudMsgTemp);
   }
@@ -1303,7 +1302,7 @@ void MapOptimization::saveKeyFramesAndFactor() {
   thisPose6D.roll = latestEstimate.rotation().pitch();
   thisPose6D.pitch = latestEstimate.rotation().yaw();
   thisPose6D.yaw = latestEstimate.rotation().roll();  // in camera frame
-  thisPose6D.time = timeLaserOdometry;
+  thisPose6D.time = timeLaserOdometry.toSec();
   cloudKeyPoses6D->push_back(thisPose6D);
   /**
    * save updated transform
@@ -1391,7 +1390,7 @@ void MapOptimization::run() {
       laserCloudSurfLast = association.cloud_surf_last;
       laserCloudOutlierLast = association.cloud_outlier_last;
 
-      timeLaserOdometry = association.laser_odometry.header.stamp.toSec();
+      timeLaserOdometry = association.laser_odometry.header.stamp;
 
       OdometryToTransform(association.laser_odometry, transformSum);
 

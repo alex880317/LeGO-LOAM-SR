@@ -170,7 +170,7 @@ class MapOptimization {
   pcl::VoxelGrid<PointType>
       downSizeFilterGlobalMapKeyFrames;  // for global map visualization
 
-  double timeLaserOdometry;
+  ros::Time timeLaserOdometry;
 
   float transformLast[6];
   float transformSum[6];
@@ -178,7 +178,7 @@ class MapOptimization {
   float transformTobeMapped[6];
   float transformBefMapped[6];
   float transformAftMapped[6];
-  
+
   std::mutex mtx;
 
   PointType pointOri, pointSel, pointProj, coeff;
@@ -203,7 +203,6 @@ class MapOptimization {
   int laserCloudSurfTotalLastDSNum;
 
   bool potentialLoopFlag;
-  double timeSaveFirstCurrentScanForLoopClosure;
   int closestHistoryFrameID;
   int latestFrameIDLoopCloure;
 
