@@ -234,10 +234,8 @@ void FeatureAssociation::markOccludedPoints() {
       }
     }
 
-    float diff1 = std::abs(segInfo.segmentedCloudRange[i - 1] -
-                           segInfo.segmentedCloudRange[i]);
-    float diff2 = std::abs(segInfo.segmentedCloudRange[i + 1] -
-                           segInfo.segmentedCloudRange[i]);
+    float diff1 = std::abs(float(segInfo.segmentedCloudRange[i-1] - segInfo.segmentedCloudRange[i]));
+    float diff2 = std::abs(float(segInfo.segmentedCloudRange[i+1] - segInfo.segmentedCloudRange[i]));
 
     if (diff1 > 0.02 * segInfo.segmentedCloudRange[i] &&
         diff2 > 0.02 * segInfo.segmentedCloudRange[i])
