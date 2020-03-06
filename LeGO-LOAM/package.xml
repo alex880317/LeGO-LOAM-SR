@@ -1,15 +1,16 @@
 <?xml version="1.0"?>
 <package>
-  <name>lego_loam_bor</name>
+  <name>lego_loam_sr</name>
   <version>1.0.0</version>
   <description>Fork of LeGO-LOAM</description>
 
-  <maintainer email="davide.faconti@gmail.com">Davide Faconti</maintainer>
+  <maintainer email="eduardo.perdices@star-robotics.com">Eduardo Perdices</maintainer>
 
   <license>BSD</license>
 
-  <author >Tixiao Shan</author>
-  <author >Davide Faconti</author>
+  <author>Tixiao Shan</author>
+  <author>Davide Faconti</author>
+  <author>Eduardo Perdices</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 
