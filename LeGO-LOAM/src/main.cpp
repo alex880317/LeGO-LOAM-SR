@@ -13,11 +13,9 @@ int main(int argc, char** argv) {
 
   ros::NodeHandle nh("~");
   std::string rosbag;
-  std::string imu_topic;
   std::string lidar_topic;
 
   nh.getParam("rosbag", rosbag);
-  nh.getParam("imu_topic", imu_topic);
   nh.getParam("lidar_topic", lidar_topic);
 
   bool use_rosbag = false;
@@ -56,7 +54,6 @@ int main(int argc, char** argv) {
   else{
     ROS_INFO("ROSBAG");
     std::vector<std::string> topics;
-    topics.push_back(imu_topic);
     topics.push_back(lidar_topic);
 
     rosbag::View view(bag, rosbag::TopicQuery(topics));
@@ -71,7 +68,7 @@ int main(int argc, char** argv) {
 
     for(const rosbag::MessageInstance& m: view)
     {
-      const sensor_msgs::PointCloud2ConstPtr &cloud = m.instantiate<sensor_msgs::PointCloud2>(); 
+      const sensor_msgs::PointCloud2ConstPtr &cloud = m.instantiate<sensor_msgs::PointCloud2>();
       if (cloud != NULL){
         IP.cloudHandler(cloud);
         //ROS_INFO("cloud");
@@ -108,5 +105,3 @@ int main(int argc, char** argv) {
 
   return 0;
 }
-
-

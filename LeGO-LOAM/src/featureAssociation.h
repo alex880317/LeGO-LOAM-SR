@@ -53,13 +53,8 @@ class FeatureAssociation {
 
   pcl::VoxelGrid<PointType> downSizeFilter;
 
-  double timeScanCur;
-
   cloud_msgs::cloud_info segInfo;
   std_msgs::Header cloudHeader;
-
-  int systemInitCount;
-  bool systemInited;
 
   std::vector<smoothness_t> cloudSmoothness;
   std::vector<float> cloudCurvature;
@@ -77,11 +72,9 @@ class FeatureAssociation {
   int laserCloudCornerLastNum;
   int laserCloudSurfLastNum;
 
-  std::vector<int> pointSelCornerInd;
   std::vector<float> pointSearchCornerInd1;
   std::vector<float> pointSearchCornerInd2;
 
-  std::vector<int> pointSelSurfInd;
   std::vector<float> pointSearchSurfInd1;
   std::vector<float> pointSearchSurfInd2;
   std::vector<float> pointSearchSurfInd3;

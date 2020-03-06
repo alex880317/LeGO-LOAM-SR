@@ -83,8 +83,6 @@ MapOptimization::MapOptimization(ros::NodeHandle &node,
   aftMappedTrans.header.frame_id = "/camera_init";
   aftMappedTrans.child_frame_id = "/aft_mapped";
 
-  nh.getParam("/lego_loam/laser/scan_period", _scan_period);
-
   nh.getParam("/lego_loam/mapping/enable_loop_closure", _loop_closure_enabled);
 
   nh.getParam("/lego_loam/mapping/history_keyframe_search_radius",
@@ -180,8 +178,6 @@ void MapOptimization::allocateMemory() {
   globalMapKeyFramesDS.reset(new pcl::PointCloud<PointType>());
 
   timeLaserOdometry = 0;
-  timeLastGloalMapPublish = 0;
-  timeLastProcessing = -1;
 
   for (int i = 0; i < 6; ++i) {
     transformLast[i] = 0;
@@ -1396,7 +1392,6 @@ void MapOptimization::run() {
       laserCloudOutlierLast = association.cloud_outlier_last;
 
       timeLaserOdometry = association.laser_odometry.header.stamp.toSec();
-      timeLastProcessing = timeLaserOdometry;
 
       OdometryToTransform(association.laser_odometry, transformSum);
 

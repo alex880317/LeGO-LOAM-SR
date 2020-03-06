@@ -109,17 +109,12 @@ void FeatureAssociation::initializationValue() {
   cloudNeighborPicked.resize(cloud_size);
   cloudLabel.resize(cloud_size);
 
-  pointSelCornerInd.resize(cloud_size);
   pointSearchCornerInd1.resize(cloud_size);
   pointSearchCornerInd2.resize(cloud_size);
 
-  pointSelSurfInd.resize(cloud_size);
   pointSearchSurfInd1.resize(cloud_size);
   pointSearchSurfInd2.resize(cloud_size);
   pointSearchSurfInd3.resize(cloud_size);
-
-  systemInitCount = 0;
-  systemInited = false;
 
   skipFrameNum = 1;
 
@@ -1288,7 +1283,6 @@ void FeatureAssociation::runFeatureAssociation() {
     segInfo = std::move(projection.seg_msg);
 
     cloudHeader = segInfo.header;
-    timeScanCur = cloudHeader.stamp.toSec();
 
     /**  1. Feature Extraction  */
     adjustDistortion();

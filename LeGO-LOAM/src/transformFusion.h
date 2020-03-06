@@ -14,19 +14,11 @@ class TransformFusion {
   geometry_msgs::TransformStamped laserOdometryTrans2;
   tf2_ros::TransformBroadcaster tfBroadcaster2;
 
-  geometry_msgs::TransformStamped map_2_camera_init_Trans;
-  tf2_ros::TransformBroadcaster tfBroadcasterMap2CameraInit;
-
-  geometry_msgs::TransformStamped camera_2_base_link_Trans;
-  tf2_ros::TransformBroadcaster tfBroadcasterCamera2Baselink;
-
   float transformSum[6];
   float transformIncre[6];
   float transformMapped[6];
   float transformBefMapped[6];
   float transformAftMapped[6];
-
-  std_msgs::Header currentHeader;
 
  public:
   TransformFusion(ros::NodeHandle& node);

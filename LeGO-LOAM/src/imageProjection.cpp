@@ -60,8 +60,6 @@ ImageProjection::ImageProjection(ros::NodeHandle& nh,
   _ang_resolution_X = (M_PI*2) / (_horizontal_scans);
   _ang_resolution_Y = DEG_TO_RAD*(vertical_angle_top - _ang_bottom) / float(_vertical_scans-1);
   _ang_bottom = -( _ang_bottom - 0.1) * DEG_TO_RAD;
-  _segment_alpha_X = _ang_resolution_X;
-  _segment_alpha_Y = _ang_resolution_Y;
 
   nh.getParam("/lego_loam/imageProjection/segment_theta", _segment_theta);
   _segment_theta *= DEG_TO_RAD;

@@ -44,13 +44,11 @@ class MapOptimization {
  private:
   gtsam::NonlinearFactorGraph gtSAMgraph;
   gtsam::Values initialEstimate;
-  gtsam::Values optimizedEstimate;
   gtsam::ISAM2 *isam;
   gtsam::Values isamCurrentEstimate;
 
   ros::NodeHandle& nh;
   bool _loop_closure_enabled;
-  float _scan_period;
 
   float _surrounding_keyframe_search_radius;
   int   _surrounding_keyframe_search_num;
@@ -173,7 +171,6 @@ class MapOptimization {
       downSizeFilterGlobalMapKeyFrames;  // for global map visualization
 
   double timeLaserOdometry;
-  double timeLastGloalMapPublish;
 
   float transformLast[6];
   float transformSum[6];
@@ -181,11 +178,8 @@ class MapOptimization {
   float transformTobeMapped[6];
   float transformBefMapped[6];
   float transformAftMapped[6];
-
-
+  
   std::mutex mtx;
-
-  double timeLastProcessing;
 
   PointType pointOri, pointSel, pointProj, coeff;
 
