@@ -102,8 +102,8 @@ class FeatureAssociation {
 
   nav_msgs::Odometry laserOdometry;
 
-  tf::TransformBroadcaster tfBroadcaster;
-  tf::StampedTransform laserOdometryTrans;
+  tf2_ros::TransformBroadcaster tfBroadcaster;
+  geometry_msgs::TransformStamped laserOdometryTrans;
 
   bool isDegenerate;
 

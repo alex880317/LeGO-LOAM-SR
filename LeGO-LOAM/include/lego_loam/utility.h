@@ -7,6 +7,7 @@
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <nav_msgs/Odometry.h>
+#include <geometry_msgs/TransformStamped.h>
 
 #include "cloud_msgs/cloud_info.h"
 
@@ -20,9 +21,9 @@
 #include <pcl/common/common.h>
 #include <pcl/registration/icp.h>
 
-#include <tf/transform_broadcaster.h>
-#include <tf/transform_datatypes.h>
- 
+#include <tf2/utils.h>
+#include <tf2_ros/transform_broadcaster.h>
+
 #include <vector>
 #include <cmath>
 #include <algorithm>
@@ -48,13 +49,13 @@ typedef Eigen::Vector3f Vector3;
 const double DEG_TO_RAD = M_PI / 180.0;
 
 
-struct smoothness_t{ 
+struct smoothness_t{
     float value;
     size_t ind;
 };
 
-struct by_value{ 
-    bool operator()(smoothness_t const &left, smoothness_t const &right) { 
+struct by_value{
+    bool operator()(smoothness_t const &left, smoothness_t const &right) {
         return left.value < right.value;
     }
 };
@@ -93,7 +94,7 @@ inline void OdometryToTransform(const nav_msgs::Odometry& odometry,
                                 float* transform) {
   double roll, pitch, yaw;
   geometry_msgs::Quaternion geoQuat = odometry.pose.pose.orientation;
-  tf::Matrix3x3(tf::Quaternion(geoQuat.z, -geoQuat.x, -geoQuat.y, geoQuat.w))
+  tf2::Matrix3x3(tf2::Quaternion(geoQuat.z, -geoQuat.x, -geoQuat.y, geoQuat.w))
       .getRPY(roll, pitch, yaw);
 
   transform[0] = -pitch;

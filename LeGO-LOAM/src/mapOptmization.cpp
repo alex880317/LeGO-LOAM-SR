@@ -80,8 +80,8 @@ MapOptimization::MapOptimization(ros::NodeHandle &node,
   odomAftMapped.header.frame_id = "/camera_init";
   odomAftMapped.child_frame_id = "/aft_mapped";
 
-  aftMappedTrans.frame_id_ = "/camera_init";
-  aftMappedTrans.child_frame_id_ = "/aft_mapped";
+  aftMappedTrans.header.frame_id = "/camera_init";
+  aftMappedTrans.child_frame_id = "/aft_mapped";
 
   nh.getParam("/lego_loam/laser/scan_period", _scan_period);
 
@@ -489,8 +489,10 @@ pcl::PointCloud<PointType>::Ptr MapOptimization::transformPointCloud(
 
 
 void MapOptimization::publishTF() {
-  geometry_msgs::Quaternion geoQuat = tf::createQuaternionMsgFromRollPitchYaw(
-      transformAftMapped[2], -transformAftMapped[0], -transformAftMapped[1]);
+  tf2::Quaternion q;
+  geometry_msgs::Quaternion geoQuat;
+  q.setRPY(transformAftMapped[2], -transformAftMapped[0], -transformAftMapped[1]);
+  tf2::convert(q, geoQuat);
 
   odomAftMapped.header.stamp = ros::Time().fromSec(timeLaserOdometry);
   odomAftMapped.pose.pose.orientation.x = -geoQuat.y;
@@ -508,11 +510,14 @@ void MapOptimization::publishTF() {
   odomAftMapped.twist.twist.linear.z = transformBefMapped[5];
   pubOdomAftMapped.publish(odomAftMapped);
 
-  aftMappedTrans.stamp_ = ros::Time().fromSec(timeLaserOdometry);
-  aftMappedTrans.setRotation(
-      tf::Quaternion(-geoQuat.y, -geoQuat.z, geoQuat.x, geoQuat.w));
-  aftMappedTrans.setOrigin(tf::Vector3(
-      transformAftMapped[3], transformAftMapped[4], transformAftMapped[5]));
+  aftMappedTrans.header.stamp = ros::Time().fromSec(timeLaserOdometry);
+  aftMappedTrans.transform.translation.x = transformAftMapped[3];
+  aftMappedTrans.transform.translation.y = transformAftMapped[4];
+  aftMappedTrans.transform.translation.z = transformAftMapped[5];
+  aftMappedTrans.transform.rotation.x = -geoQuat.y;
+  aftMappedTrans.transform.rotation.y = -geoQuat.z;
+  aftMappedTrans.transform.rotation.z = geoQuat.x;
+  aftMappedTrans.transform.rotation.w = geoQuat.w;
   tfBroadcaster.sendTransform(aftMappedTrans);
 }
 

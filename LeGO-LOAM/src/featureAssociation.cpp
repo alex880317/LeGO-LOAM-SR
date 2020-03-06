@@ -138,8 +138,8 @@ void FeatureAssociation::initializationValue() {
   laserOdometry.header.frame_id = "/camera_init";
   laserOdometry.child_frame_id = "/laser_odom";
 
-  laserOdometryTrans.frame_id_ = "/camera_init";
-  laserOdometryTrans.child_frame_id_ = "/laser_odom";
+  laserOdometryTrans.header.frame_id = "/camera_init";
+  laserOdometryTrans.child_frame_id = "/laser_odom";
 
   isDegenerate = false;
 
@@ -787,7 +787,7 @@ bool FeatureAssociation::calculateTransformationSurf(int iterCount) {
     Eigen::Matrix<float,1,3> matE;
     Eigen::Matrix<float,3,3> matV;
     Eigen::Matrix<float,3,3> matV2;
-    
+
     Eigen::SelfAdjointEigenSolver< Eigen::Matrix<float,3,3> > esolver(matAtA);
     matE = esolver.eigenvalues().real();
     matV = esolver.eigenvectors().real();
@@ -1179,8 +1179,10 @@ void FeatureAssociation::adjustOutlierCloud() {
 }
 
 void FeatureAssociation::publishOdometry() {
-  geometry_msgs::Quaternion geoQuat = tf::createQuaternionMsgFromRollPitchYaw(
-      transformSum[2], -transformSum[0], -transformSum[1]);
+  tf2::Quaternion q;
+  geometry_msgs::Quaternion geoQuat;
+  q.setRPY(transformSum[2], -transformSum[0], -transformSum[1]);
+  tf2::convert(q, geoQuat);
 
   laserOdometry.header.stamp = cloudHeader.stamp;
   laserOdometry.pose.pose.orientation.x = -geoQuat.y;
@@ -1192,11 +1194,14 @@ void FeatureAssociation::publishOdometry() {
   laserOdometry.pose.pose.position.z = transformSum[5];
   pubLaserOdometry.publish(laserOdometry);
 
-  laserOdometryTrans.stamp_ = cloudHeader.stamp;
-  laserOdometryTrans.setRotation(
-      tf::Quaternion(-geoQuat.y, -geoQuat.z, geoQuat.x, geoQuat.w));
-  laserOdometryTrans.setOrigin(
-      tf::Vector3(transformSum[3], transformSum[4], transformSum[5]));
+  laserOdometryTrans.header.stamp = cloudHeader.stamp;
+  laserOdometryTrans.transform.translation.x = transformSum[3];
+  laserOdometryTrans.transform.translation.y = transformSum[4];
+  laserOdometryTrans.transform.translation.z = transformSum[5];
+  laserOdometryTrans.transform.rotation.x = -geoQuat.y;
+  laserOdometryTrans.transform.rotation.y = -geoQuat.z;
+  laserOdometryTrans.transform.rotation.z = geoQuat.x;
+  laserOdometryTrans.transform.rotation.w = geoQuat.w;
   tfBroadcaster.sendTransform(laserOdometryTrans);
 }
 

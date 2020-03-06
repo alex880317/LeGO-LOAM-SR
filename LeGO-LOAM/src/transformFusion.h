@@ -11,14 +11,14 @@ class TransformFusion {
   ros::Subscriber subOdomAftMapped;
 
   nav_msgs::Odometry laserOdometry2;
-  tf::StampedTransform laserOdometryTrans2;
-  tf::TransformBroadcaster tfBroadcaster2;
+  geometry_msgs::TransformStamped laserOdometryTrans2;
+  tf2_ros::TransformBroadcaster tfBroadcaster2;
 
-  tf::StampedTransform map_2_camera_init_Trans;
-  tf::TransformBroadcaster tfBroadcasterMap2CameraInit;
+  geometry_msgs::TransformStamped map_2_camera_init_Trans;
+  tf2_ros::TransformBroadcaster tfBroadcasterMap2CameraInit;
 
-  tf::StampedTransform camera_2_base_link_Trans;
-  tf::TransformBroadcaster tfBroadcasterCamera2Baselink;
+  geometry_msgs::TransformStamped camera_2_base_link_Trans;
+  tf2_ros::TransformBroadcaster tfBroadcasterCamera2Baselink;
 
   float transformSum[6];
   float transformIncre[6];

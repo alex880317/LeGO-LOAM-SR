@@ -79,8 +79,8 @@ class MapOptimization {
   ros::Publisher pubRecentKeyFrames;
 
   nav_msgs::Odometry odomAftMapped;
-  tf::StampedTransform aftMappedTrans;
-  tf::TransformBroadcaster tfBroadcaster;
+  geometry_msgs::TransformStamped aftMappedTrans;
+  tf2_ros::TransformBroadcaster tfBroadcaster;
 
   std::vector<pcl::PointCloud<PointType>::Ptr> cornerCloudKeyFrames;
   std::vector<pcl::PointCloud<PointType>::Ptr> surfCloudKeyFrames;
