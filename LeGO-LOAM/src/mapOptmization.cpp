@@ -51,17 +51,17 @@ MapOptimization::MapOptimization(ros::NodeHandle &node,
   parameters.relinearizeSkip = 1;
   isam = new ISAM2(parameters);
 
-  pubKeyPoses = nh.advertise<sensor_msgs::PointCloud2>("/key_pose_origin", 2);
+  pubKeyPoses = nh.advertise<sensor_msgs::msg::PointCloud2>("/key_pose_origin", 2);
   pubLaserCloudSurround =
-      nh.advertise<sensor_msgs::PointCloud2>("/laser_cloud_surround", 2);
-  pubOdomAftMapped = nh.advertise<nav_msgs::Odometry>("/aft_mapped_to_init", 5);
+      nh.advertise<sensor_msgs::msg::PointCloud2>("/laser_cloud_surround", 2);
+  pubOdomAftMapped = nh.advertise<nav_msgs::msg::Odometry>("/aft_mapped_to_init", 5);
 
   pubHistoryKeyFrames =
-      nh.advertise<sensor_msgs::PointCloud2>("/history_cloud", 2);
+      nh.advertise<sensor_msgs::msg::PointCloud2>("/history_cloud", 2);
   pubIcpKeyFrames =
-      nh.advertise<sensor_msgs::PointCloud2>("/corrected_cloud", 2);
+      nh.advertise<sensor_msgs::msg::PointCloud2>("/corrected_cloud", 2);
   pubRecentKeyFrames =
-      nh.advertise<sensor_msgs::PointCloud2>("/recent_cloud", 2);
+      nh.advertise<sensor_msgs::msg::PointCloud2>("/recent_cloud", 2);
 
   downSizeFilterCorner.setLeafSize(0.2, 0.2, 0.2);
   downSizeFilterSurf.setLeafSize(0.4, 0.4, 0.4);
@@ -177,7 +177,7 @@ void MapOptimization::allocateMemory() {
   globalMapKeyFrames.reset(new pcl::PointCloud<PointType>());
   globalMapKeyFramesDS.reset(new pcl::PointCloud<PointType>());
 
-  timeLaserOdometry = ros::Time::now();
+  timeLaserOdometry = rclcpp::Time::now();
 
   for (int i = 0; i < 6; ++i) {
     transformLast[i] = 0;
@@ -216,7 +216,7 @@ void MapOptimization::allocateMemory() {
 
 void MapOptimization::publishGlobalMapThread()
 {
-  while(ros::ok())
+  while(rclcpp::ok())
   {
     bool ready;
     _publish_global_signal.receive(ready);
@@ -228,7 +228,7 @@ void MapOptimization::publishGlobalMapThread()
 
 void MapOptimization::loopClosureThread()
 {
-  while(ros::ok())
+  while(rclcpp::ok())
   {
     bool ready;
     _loop_closure_signal.receive(ready);
@@ -519,7 +519,7 @@ void MapOptimization::publishTF() {
 
 void MapOptimization::publishKeyPosesAndFrames() {
   if (pubKeyPoses.getNumSubscribers() != 0) {
-    sensor_msgs::PointCloud2 cloudMsgTemp;
+    sensor_msgs::msg::PointCloud2 cloudMsgTemp;
     pcl::toROSMsg(*cloudKeyPoses3D, cloudMsgTemp);
     cloudMsgTemp.header.stamp = timeLaserOdometry;
     cloudMsgTemp.header.frame_id = "/camera_init";
@@ -527,7 +527,7 @@ void MapOptimization::publishKeyPosesAndFrames() {
   }
 
   if (pubRecentKeyFrames.getNumSubscribers() != 0) {
-    sensor_msgs::PointCloud2 cloudMsgTemp;
+    sensor_msgs::msg::PointCloud2 cloudMsgTemp;
     pcl::toROSMsg(*laserCloudSurfFromMapDS, cloudMsgTemp);
     cloudMsgTemp.header.stamp = timeLaserOdometry;
     cloudMsgTemp.header.frame_id = "/camera_init";
@@ -571,7 +571,7 @@ void MapOptimization::publishGlobalMap() {
   downSizeFilterGlobalMapKeyFrames.setInputCloud(globalMapKeyFrames);
   downSizeFilterGlobalMapKeyFrames.filter(*globalMapKeyFramesDS);
 
-  sensor_msgs::PointCloud2 cloudMsgTemp;
+  sensor_msgs::msg::PointCloud2 cloudMsgTemp;
   pcl::toROSMsg(*globalMapKeyFramesDS, cloudMsgTemp);
   cloudMsgTemp.header.stamp = timeLaserOdometry;
   cloudMsgTemp.header.frame_id = "/camera_init";
@@ -643,7 +643,7 @@ bool MapOptimization::detectLoopClosure() {
   downSizeFilterHistoryKeyFrames.filter(*nearHistorySurfKeyFrameCloudDS);
   // publish history near key frames
   if (pubHistoryKeyFrames.getNumSubscribers() != 0) {
-    sensor_msgs::PointCloud2 cloudMsgTemp;
+    sensor_msgs::msg::PointCloud2 cloudMsgTemp;
     pcl::toROSMsg(*nearHistorySurfKeyFrameCloudDS, cloudMsgTemp);
     cloudMsgTemp.header.stamp = timeLaserOdometry;
     cloudMsgTemp.header.frame_id = "/camera_init";
@@ -692,7 +692,7 @@ void MapOptimization::performLoopClosure() {
         new pcl::PointCloud<PointType>());
     pcl::transformPointCloud(*latestSurfKeyFrameCloud, *closed_cloud,
                              icp.getFinalTransformation());
-    sensor_msgs::PointCloud2 cloudMsgTemp;
+    sensor_msgs::msg::PointCloud2 cloudMsgTemp;
     pcl::toROSMsg(*closed_cloud, cloudMsgTemp);
     cloudMsgTemp.header.stamp = timeLaserOdometry;
     cloudMsgTemp.header.frame_id = "/camera_init";
@@ -1378,10 +1378,10 @@ void MapOptimization::clearCloud() {
 void MapOptimization::run() {
   size_t cycle_count = 0;
 
-  while (ros::ok()) {
+  while (rclcpp::ok()) {
     AssociationOut association;
     _input_channel.receive(association);
-    if( !ros::ok() ) break;
+    if( !rclcpp::ok() ) break;
 
     {
       std::lock_guard<std::mutex> lock(mtx);

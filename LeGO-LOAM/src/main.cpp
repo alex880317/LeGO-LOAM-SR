@@ -9,7 +9,7 @@
 #include <rosgraph_msgs/Clock.h>
 
 int main(int argc, char** argv) {
-  ros::init(argc, argv, "lego_loam");
+  rclcpp::init(argc, argv, "lego_loam");
 
   ros::NodeHandle nh("~");
   std::string rosbag;
@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
 
     for(const rosbag::MessageInstance& m: view)
     {
-      const sensor_msgs::PointCloud2ConstPtr &cloud = m.instantiate<sensor_msgs::PointCloud2>();
+      const sensor_msgs::msg::PointCloud2ConstPtr &cloud = m.instantiate<sensor_msgs::msg::PointCloud2>();
       if (cloud != NULL){
         IP.cloudHandler(cloud);
         //ROS_INFO("cloud");
@@ -101,7 +101,7 @@ int main(int argc, char** argv) {
 
 
   // must be called to cleanup threads
-  ros::shutdown();
+  rclcpp::shutdown();
 
   return 0;
 }

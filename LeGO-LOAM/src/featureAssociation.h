@@ -53,7 +53,7 @@ class FeatureAssociation {
 
   pcl::VoxelGrid<PointType> downSizeFilter;
 
-  cloud_msgs::CloudInfo segInfo;
+  cloud_msgs::msg::CloudInfo segInfo;
   std_msgs::Header cloudHeader;
 
   std::vector<smoothness_t> cloudSmoothness;
@@ -93,10 +93,10 @@ class FeatureAssociation {
   std::vector<int> pointSearchInd;
   std::vector<float> pointSearchSqDis;
 
-  nav_msgs::Odometry laserOdometry;
+  nav_msgs::msg::Odometry laserOdometry;
 
   tf2_ros::TransformBroadcaster tfBroadcaster;
-  geometry_msgs::TransformStamped laserOdometryTrans;
+  geometry_msgs::msg::TransformStamped laserOdometryTrans;
 
   bool isDegenerate;
 

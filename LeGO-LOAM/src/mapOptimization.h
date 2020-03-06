@@ -76,8 +76,8 @@ class MapOptimization {
   ros::Publisher pubIcpKeyFrames;
   ros::Publisher pubRecentKeyFrames;
 
-  nav_msgs::Odometry odomAftMapped;
-  geometry_msgs::TransformStamped aftMappedTrans;
+  nav_msgs::msg::Odometry odomAftMapped;
+  geometry_msgs::msg::TransformStamped aftMappedTrans;
   tf2_ros::TransformBroadcaster tfBroadcaster;
 
   std::vector<pcl::PointCloud<PointType>::Ptr> cornerCloudKeyFrames;
@@ -170,7 +170,7 @@ class MapOptimization {
   pcl::VoxelGrid<PointType>
       downSizeFilterGlobalMapKeyFrames;  // for global map visualization
 
-  ros::Time timeLaserOdometry;
+  rclcpp::Time timeLaserOdometry;
 
   float transformLast[6];
   float transformSum[6];

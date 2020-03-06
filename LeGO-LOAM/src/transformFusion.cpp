@@ -34,10 +34,10 @@
 
 TransformFusion::TransformFusion(ros::NodeHandle& node) : nh(node) {
   pubLaserOdometry2 =
-      nh.advertise<nav_msgs::Odometry>("/integrated_to_init", 5);
-  subLaserOdometry = nh.subscribe<nav_msgs::Odometry>(
+      nh.advertise<nav_msgs::msg::Odometry>("/integrated_to_init", 5);
+  subLaserOdometry = nh.subscribe<nav_msgs::msg::Odometry>(
       "/laser_odom_to_init", 5, &TransformFusion::laserOdometryHandler, this);
-  subOdomAftMapped = nh.subscribe<nav_msgs::Odometry>(
+  subOdomAftMapped = nh.subscribe<nav_msgs::msg::Odometry>(
       "/aft_mapped_to_init", 5, &TransformFusion::odomAftMappedHandler, this);
 
   laserOdometry2.header.frame_id = "/camera_init";
@@ -179,7 +179,7 @@ void TransformFusion::transformAssociateToMap() {
 }
 
 void TransformFusion::laserOdometryHandler(
-    const nav_msgs::Odometry::ConstPtr& laserOdometry) {
+    const nav_msgs::msg::Odometry::ConstPtr& laserOdometry) {
   OdometryToTransform(*laserOdometry, transformSum);
 
   transformAssociateToMap();
@@ -211,7 +211,7 @@ void TransformFusion::laserOdometryHandler(
 }
 
 void TransformFusion::odomAftMappedHandler(
-    const nav_msgs::Odometry::ConstPtr& odomAftMapped) {
+    const nav_msgs::msg::Odometry::ConstPtr& odomAftMapped) {
   double roll, pitch, yaw;
   geometry_msgs::Quaternion geoQuat = odomAftMapped->pose.pose.orientation;
   tf2::Matrix3x3(tf2::Quaternion(geoQuat.z, -geoQuat.x, -geoQuat.y, geoQuat.w))

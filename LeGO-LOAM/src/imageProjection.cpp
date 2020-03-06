@@ -34,22 +34,22 @@ ImageProjection::ImageProjection(ros::NodeHandle& nh,
     : _nh(nh),
       _output_channel(output_channel)
 {
-  _sub_laser_cloud = nh.subscribe<sensor_msgs::PointCloud2>(
+  _sub_laser_cloud = nh.subscribe<sensor_msgs::msg::PointCloud2>(
       "/lidar_points", 1, &ImageProjection::cloudHandler, this);
 
   _pub_full_cloud =
-      nh.advertise<sensor_msgs::PointCloud2>("/full_cloud_projected", 1);
+      nh.advertise<sensor_msgs::msg::PointCloud2>("/full_cloud_projected", 1);
   _pub_full_info_cloud =
-      nh.advertise<sensor_msgs::PointCloud2>("/full_cloud_info", 1);
+      nh.advertise<sensor_msgs::msg::PointCloud2>("/full_cloud_info", 1);
 
-  _pub_ground_cloud = nh.advertise<sensor_msgs::PointCloud2>("/ground_cloud", 1);
+  _pub_ground_cloud = nh.advertise<sensor_msgs::msg::PointCloud2>("/ground_cloud", 1);
   _pub_segmented_cloud =
-      nh.advertise<sensor_msgs::PointCloud2>("/segmented_cloud", 1);
+      nh.advertise<sensor_msgs::msg::PointCloud2>("/segmented_cloud", 1);
   _pub_segmented_cloud_pure =
-      nh.advertise<sensor_msgs::PointCloud2>("/segmented_cloud_pure", 1);
+      nh.advertise<sensor_msgs::msg::PointCloud2>("/segmented_cloud_pure", 1);
   _pub_segmented_cloud_info =
-      nh.advertise<cloud_msgs::CloudInfo>("/segmented_cloud_info", 1);
-  _pub_outlier_cloud = nh.advertise<sensor_msgs::PointCloud2>("/outlier_cloud", 1);
+      nh.advertise<cloud_msgs::msg::CloudInfo>("/segmented_cloud_info", 1);
+  _pub_outlier_cloud = nh.advertise<sensor_msgs::msg::PointCloud2>("/outlier_cloud", 1);
 
   nh.getParam("/lego_loam/laser/num_vertical_scans", _vertical_scans);
   nh.getParam("/lego_loam/laser/num_horizontal_scans", _horizontal_scans);
@@ -128,7 +128,7 @@ void ImageProjection::resetParameters() {
 }
 
 void ImageProjection::cloudHandler(
-    const sensor_msgs::PointCloud2ConstPtr& laserCloudMsg) {
+    const sensor_msgs::msg::PointCloud2ConstPtr& laserCloudMsg) {
   // Reset parameters
   resetParameters();
 
@@ -417,11 +417,11 @@ void ImageProjection::labelComponents(int row, int col) {
 
 void ImageProjection::publishClouds() {
 
-  sensor_msgs::PointCloud2 temp;
+  sensor_msgs::msg::PointCloud2 temp;
   temp.header.stamp = _seg_msg.header.stamp;
   temp.header.frame_id = "base_link";
 
-  auto PublishCloud = [](ros::Publisher& pub, sensor_msgs::PointCloud2& temp,
+  auto PublishCloud = [](ros::Publisher& pub, sensor_msgs::msg::PointCloud2& temp,
                           const pcl::PointCloud<PointType>::Ptr& cloud) {
     if (pub.getNumSubscribers() != 0) {
       pcl::toROSMsg(*cloud, temp);

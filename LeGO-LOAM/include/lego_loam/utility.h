@@ -2,14 +2,12 @@
 #define _UTILITY_LIDAR_ODOMETRY_H_
 
 
-#include <ros/ros.h>
+#include "rclcpp/rclcpp.hpp"
+#include "sensor_msgs/msg/point_cloud2.hpp"
+#include "nav_msgs/msg/odometry.hpp"
+#include "geometry_msgs/msg/TransformStamped.hpp"
 
-#include <sensor_msgs/Imu.h>
-#include <sensor_msgs/PointCloud2.h>
-#include <nav_msgs/Odometry.h>
-#include <geometry_msgs/TransformStamped.h>
-
-#include "cloud_msgs/CloudInfo.h"
+#include "cloud_msgs/msg/cloud_info.hpp"
 
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
@@ -24,6 +22,7 @@
 #include <tf2/utils.h>
 #include <tf2_ros/transform_broadcaster.h>
 
+#include <Eigen/Dense>
 #include <vector>
 #include <cmath>
 #include <algorithm>
@@ -64,7 +63,7 @@ struct ProjectionOut
 {
   pcl::PointCloud<PointType>::Ptr segmented_cloud;
   pcl::PointCloud<PointType>::Ptr outlier_cloud;
-  cloud_msgs::CloudInfo seg_msg;
+  cloud_msgs::msg::CloudInfo seg_msg;
 };
 
 
@@ -73,7 +72,7 @@ struct AssociationOut
   pcl::PointCloud<PointType>::Ptr cloud_outlier_last;
   pcl::PointCloud<PointType>::Ptr cloud_corner_last;
   pcl::PointCloud<PointType>::Ptr cloud_surf_last;
-  nav_msgs::Odometry laser_odometry;
+  nav_msgs::msg::Odometry laser_odometry;
 };
 
 struct RollPitchYaw{
@@ -90,7 +89,7 @@ struct Transform
   RollPitchYaw rot;
 };
 
-inline void OdometryToTransform(const nav_msgs::Odometry& odometry,
+inline void OdometryToTransform(const nav_msgs::msg::Odometry& odometry,
                                 float* transform) {
   double roll, pitch, yaw;
   geometry_msgs::Quaternion geoQuat = odometry.pose.pose.orientation;

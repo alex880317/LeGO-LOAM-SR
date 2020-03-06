@@ -10,8 +10,8 @@ class TransformFusion {
   ros::Subscriber subLaserOdometry;
   ros::Subscriber subOdomAftMapped;
 
-  nav_msgs::Odometry laserOdometry2;
-  geometry_msgs::TransformStamped laserOdometryTrans2;
+  nav_msgs::msg::Odometry laserOdometry2;
+  geometry_msgs::msg::TransformStamped laserOdometryTrans2;
   tf2_ros::TransformBroadcaster tfBroadcaster2;
 
   float transformSum[6];
@@ -24,8 +24,8 @@ class TransformFusion {
   TransformFusion(ros::NodeHandle& node);
 
   void transformAssociateToMap();
-  void laserOdometryHandler(const nav_msgs::Odometry::ConstPtr& laserOdometry);
-  void odomAftMappedHandler(const nav_msgs::Odometry::ConstPtr& odomAftMapped);
+  void laserOdometryHandler(const nav_msgs::msg::Odometry::ConstPtr& laserOdometry);
+  void odomAftMappedHandler(const nav_msgs::msg::Odometry::ConstPtr& odomAftMapped);
 };
 
 

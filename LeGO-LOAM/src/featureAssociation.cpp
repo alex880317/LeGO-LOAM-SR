@@ -46,21 +46,21 @@ FeatureAssociation::FeatureAssociation(ros::NodeHandle &node,
       _output_channel(output_channel) {
 
   pubCornerPointsSharp =
-      nh.advertise<sensor_msgs::PointCloud2>("/laser_cloud_sharp", 1);
+      nh.advertise<sensor_msgs::msg::PointCloud2>("/laser_cloud_sharp", 1);
   pubCornerPointsLessSharp =
-      nh.advertise<sensor_msgs::PointCloud2>("/laser_cloud_less_sharp", 1);
+      nh.advertise<sensor_msgs::msg::PointCloud2>("/laser_cloud_less_sharp", 1);
   pubSurfPointsFlat =
-      nh.advertise<sensor_msgs::PointCloud2>("/laser_cloud_flat", 1);
+      nh.advertise<sensor_msgs::msg::PointCloud2>("/laser_cloud_flat", 1);
   pubSurfPointsLessFlat =
-      nh.advertise<sensor_msgs::PointCloud2>("/laser_cloud_less_flat", 1);
+      nh.advertise<sensor_msgs::msg::PointCloud2>("/laser_cloud_less_flat", 1);
 
   _pub_cloud_corner_last =
-      nh.advertise<sensor_msgs::PointCloud2>("/laser_cloud_corner_last", 2);
+      nh.advertise<sensor_msgs::msg::PointCloud2>("/laser_cloud_corner_last", 2);
   _pub_cloud_surf_last =
-      nh.advertise<sensor_msgs::PointCloud2>("/laser_cloud_surf_last", 2);
+      nh.advertise<sensor_msgs::msg::PointCloud2>("/laser_cloud_surf_last", 2);
   _pub_outlier_cloudLast =
-      nh.advertise<sensor_msgs::PointCloud2>("/outlier_cloud_last", 2);
-  pubLaserOdometry = nh.advertise<nav_msgs::Odometry>("/laser_odom_to_init", 5);
+      nh.advertise<sensor_msgs::msg::PointCloud2>("/outlier_cloud_last", 2);
+  pubLaserOdometry = nh.advertise<nav_msgs::msg::Odometry>("/laser_odom_to_init", 5);
 
   _cycle_count = 0;
 
@@ -1092,13 +1092,13 @@ void FeatureAssociation::checkSystemInitialization() {
   laserCloudCornerLastNum = laserCloudCornerLast->points.size();
   laserCloudSurfLastNum = laserCloudSurfLast->points.size();
 
-  sensor_msgs::PointCloud2 laserCloudCornerLast2;
+  sensor_msgs::msg::PointCloud2 laserCloudCornerLast2;
   pcl::toROSMsg(*laserCloudCornerLast, laserCloudCornerLast2);
   laserCloudCornerLast2.header.stamp = cloudHeader.stamp;
   laserCloudCornerLast2.header.frame_id = "/camera";
   _pub_cloud_corner_last.publish(laserCloudCornerLast2);
 
-  sensor_msgs::PointCloud2 laserCloudSurfLast2;
+  sensor_msgs::msg::PointCloud2 laserCloudSurfLast2;
   pcl::toROSMsg(*laserCloudSurfLast, laserCloudSurfLast2);
   laserCloudSurfLast2.header.stamp = cloudHeader.stamp;
   laserCloudSurfLast2.header.frame_id = "/camera";
@@ -1199,7 +1199,7 @@ void FeatureAssociation::publishOdometry() {
 }
 
 void FeatureAssociation::publishCloud() {
-  sensor_msgs::PointCloud2 laserCloudOutMsg;
+  sensor_msgs::msg::PointCloud2 laserCloudOutMsg;
 
   auto Publish = [&](ros::Publisher &pub,
                      const pcl::PointCloud<PointType>::Ptr &cloud) {
@@ -1252,7 +1252,7 @@ void FeatureAssociation::publishCloudsLast() {
 
   if (frameCount >= skipFrameNum + 1) {
     frameCount = 0;
-    sensor_msgs::PointCloud2 cloudTemp;
+    sensor_msgs::msg::PointCloud2 cloudTemp;
 
     auto Publish = [&](ros::Publisher &pub,
                        const pcl::PointCloud<PointType>::Ptr &cloud) {
@@ -1271,11 +1271,11 @@ void FeatureAssociation::publishCloudsLast() {
 }
 
 void FeatureAssociation::runFeatureAssociation() {
-  while (ros::ok()) {
+  while (rclcpp::ok()) {
     ProjectionOut projection;
     _input_channel.receive(projection);
 
-    if( !ros::ok() ) break;
+    if( !rclcpp::ok() ) break;
 
     //--------------
     outlierCloud = projection.outlier_cloud;

@@ -13,7 +13,7 @@ class ImageProjection {
 
   ~ImageProjection() = default;
 
-  void cloudHandler(const sensor_msgs::PointCloud2ConstPtr &laserCloudMsg);
+  void cloudHandler(const sensor_msgs::msg::PointCloud2ConstPtr &laserCloudMsg);
 
  private:
   void findStartEndAngle();
@@ -59,7 +59,7 @@ class ImageProjection {
   ros::Publisher _pub_segmented_cloud_info;
   ros::Publisher _pub_outlier_cloud;
 
-  cloud_msgs::CloudInfo _seg_msg;
+  cloud_msgs::msg::CloudInfo _seg_msg;
 
   int _label_count;
 
