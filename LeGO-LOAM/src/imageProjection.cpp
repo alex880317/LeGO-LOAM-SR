@@ -44,45 +44,45 @@ ImageProjection::ImageProjection(const std::string &name, Channel<ProjectionOut>
   _pub_outlier_cloud = this->create_publisher<sensor_msgs::msg::PointCloud2>("/outlier_cloud", 1);
 
   // Declare parameters
-  this->declare_parameter("/lego_loam/laser/num_vertical_scans");
-  this->declare_parameter("/lego_loam/laser/num_horizontal_scans");
-  this->declare_parameter("/lego_loam/laser/vertical_angle_bottom");
-  this->declare_parameter("/lego_loam/laser/vertical_angle_top");
-  this->declare_parameter("/lego_loam/imageProjection/segment_theta");
-  this->declare_parameter("/lego_loam/imageProjection/segment_valid_point_num");
-  this->declare_parameter("/lego_loam/imageProjection/segment_valid_line_num");
-  this->declare_parameter("/lego_loam/laser/ground_scan_index");
-  this->declare_parameter("/lego_loam/laser/sensor_mount_angle");
+  this->declare_parameter("laser.num_vertical_scans");
+  this->declare_parameter("laser.num_horizontal_scans");
+  this->declare_parameter("laser.vertical_angle_bottom");
+  this->declare_parameter("laser.vertical_angle_top");
+  this->declare_parameter("imageProjection.segment_theta");
+  this->declare_parameter("imageProjection.segment_valid_point_num");
+  this->declare_parameter("imageProjection.segment_valid_line_num");
+  this->declare_parameter("laser.ground_scan_index");
+  this->declare_parameter("laser.sensor_mount_angle");
 
   float vertical_angle_top;
 
   // Read parameters
-  if (!this->get_parameter("/lego_loam/laser/num_vertical_scans", _vertical_scans)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  if (!this->get_parameter("laser.num_vertical_scans", _vertical_scans)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter laser.num_vertical_scans not found");
   }
-  if (!this->get_parameter("/lego_loam/laser/num_horizontal_scans", _horizontal_scans)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  if (!this->get_parameter("laser.num_horizontal_scans", _horizontal_scans)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter laser.num_horizontal_scans not found");
   }
-  if (!this->get_parameter("/lego_loam/laser/vertical_angle_bottom", _ang_bottom)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  if (!this->get_parameter("laser.vertical_angle_bottom", _ang_bottom)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter laser.vertical_angle_bottom not found");
   }
-  if (!this->get_parameter("/lego_loam/laser/vertical_angle_top", vertical_angle_top)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  if (!this->get_parameter("laser.vertical_angle_top", vertical_angle_top)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter laser.vertical_angle_top not found");
   }
-  if (!this->get_parameter("/lego_loam/imageProjection/segment_theta", _segment_theta)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  if (!this->get_parameter("imageProjection.segment_theta", _segment_theta)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter imageProjection.segment_theta not found");
   }
-  if (!this->get_parameter("/lego_loam/imageProjection/segment_valid_point_num", _segment_valid_point_num)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  if (!this->get_parameter("imageProjection.segment_valid_point_num", _segment_valid_point_num)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter imageProjection.segment_valid_point_num not found");
   }
-  if (!this->get_parameter("/lego_loam/imageProjection/segment_valid_line_num", _segment_valid_line_num)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  if (!this->get_parameter("imageProjection.segment_valid_line_num", _segment_valid_line_num)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter imageProjection.segment_valid_line_num not found");
   }
-  if (!this->get_parameter("/lego_loam/laser/ground_scan_index", _ground_scan_index)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  if (!this->get_parameter("laser.ground_scan_index", _ground_scan_index)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter laser.ground_scan_inde not found");
   }
-  if (!this->get_parameter("/lego_loam/laser/sensor_mount_angle", _sensor_mount_angle)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  if (!this->get_parameter("laser.sensor_mount_angle", _sensor_mount_angle)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter laser.sensor_mount_angle not found");
   }
 
   _ang_resolution_X = (M_PI*2) / (_horizontal_scans);

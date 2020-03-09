@@ -75,36 +75,36 @@ MapOptimization::MapOptimization(const std::string &name, Channel<AssociationOut
   aftMappedTrans.child_frame_id = "/aft_mapped";
 
   // Declare parameters
-  this->declare_parameter("/lego_loam/laser/scan_period");
-  this->declare_parameter("/lego_loam/mapping/enable_loop_closure");
-  this->declare_parameter("/lego_loam/mapping/history_keyframe_search_radius");
-  this->declare_parameter("/lego_loam/mapping/history_keyframe_search_num");
-  this->declare_parameter("/lego_loam/mapping/history_keyframe_fitness_score");
-  this->declare_parameter("/lego_loam/mapping/surrounding_keyframe_search_radius");
-  this->declare_parameter("/lego_loam/mapping/surrounding_keyframe_search_num");
-  this->declare_parameter("/lego_loam/mapping/global_map_visualization_search_radius");
+  this->declare_parameter("laser.scan_period");
+  this->declare_parameter("mapping.enable_loop_closure");
+  this->declare_parameter("mapping.history_keyframe_search_radius");
+  this->declare_parameter("mapping.history_keyframe_search_num");
+  this->declare_parameter("mapping.history_keyframe_fitness_score");
+  this->declare_parameter("mapping.surrounding_keyframe_search_radius");
+  this->declare_parameter("mapping.surrounding_keyframe_search_num");
+  this->declare_parameter("mapping.global_map_visualization_search_radius");
 
   // Read parameters
-  if (!this->get_parameter("/lego_loam/mapping/enable_loop_closure", _loop_closure_enabled)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  if (!this->get_parameter("mapping.enable_loop_closure", _loop_closure_enabled)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter mapping.enable_loop_closure not found");
   }
-  if (!this->get_parameter("/lego_loam/mapping/history_keyframe_search_radius", _history_keyframe_search_radius)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  if (!this->get_parameter("mapping.history_keyframe_search_radius", _history_keyframe_search_radius)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter mapping.history_keyframe_search_radius not found");
   }
-  if (!this->get_parameter("/lego_loam/mapping/history_keyframe_search_num", _history_keyframe_search_num)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  if (!this->get_parameter("mapping.history_keyframe_search_num", _history_keyframe_search_num)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter mapping.history_keyframe_search_num not found");
   }
-  if (!this->get_parameter("/lego_loam/mapping/history_keyframe_fitness_score", _history_keyframe_fitness_score)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  if (!this->get_parameter("mapping.history_keyframe_fitness_score", _history_keyframe_fitness_score)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter mapping.history_keyframe_fitness_score not found");
   }
-  if (!this->get_parameter("/lego_loam/mapping/surrounding_keyframe_search_radius", _surrounding_keyframe_search_radius)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  if (!this->get_parameter("mapping.surrounding_keyframe_search_radius", _surrounding_keyframe_search_radius)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter mapping.surrounding_keyframe_search_radius not found");
   }
-  if (!this->get_parameter("/lego_loam/mapping/surrounding_keyframe_search_num", _surrounding_keyframe_search_num)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  if (!this->get_parameter("mapping.surrounding_keyframe_search_num", _surrounding_keyframe_search_num)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter mapping.surrounding_keyframe_search_num not found");
   }
-  if (!this->get_parameter("/lego_loam/mapping/global_map_visualization_search_radius", _global_map_visualization_search_radius)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  if (!this->get_parameter("mapping.global_map_visualization_search_radius", _global_map_visualization_search_radius)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter mapping.global_map_visualization_search_radius not found");
   }
 
   allocateMemory();

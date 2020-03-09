@@ -25,9 +25,10 @@ find_package(cloud_msgs REQUIRED)
 find_package(eigen3_cmake_module REQUIRED)
 find_package(Eigen3 REQUIRED)
 
-include_directories(
-  include
-)
+find_package(PCL REQUIRED)
+find_package(GTSAM REQUIRED QUIET)
+
+include_directories(include)
 ament_export_include_directories(include)
 
 set(dependencies
@@ -42,17 +43,19 @@ set(dependencies
   cloud_msgs
 )
 
-#add_executable(${PROJECT_NAME} src/imageProjection.cpp src/featureAssociation.cpp src/mapOptmization.cpp src/transformFusion.cpp src/main.cpp)
-#ament_target_dependencies(${PROJECT_NAME} ${dependencies} Eigen3)
+add_executable(${PROJECT_NAME} src/imageProjection.cpp src/featureAssociation.cpp src/mapOptmization.cpp src/transformFusion.cpp src/main.cpp)
+target_link_libraries(${PROJECT_NAME} ${PCL_LIBRARIES} gtsam)
+ament_target_dependencies(${PROJECT_NAME} ${dependencies} Eigen3)
 
 install(TARGETS
-#  ${PROJECT_NAME}
+  ${PROJECT_NAME}
   DESTINATION lib/${PROJECT_NAME}
 )
 
 install(DIRECTORY
-  launch
   config
+  launch
+  rviz
   DESTINATION share/${PROJECT_NAME}
 )
 

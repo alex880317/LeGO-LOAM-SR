@@ -55,37 +55,37 @@ FeatureAssociation::FeatureAssociation(const std::string &name, Channel<Projecti
   _cycle_count = 0;
 
   // Declare parameters
-  this->declare_parameter("/lego_loam/laser/num_vertical_scans");
-  this->declare_parameter("/lego_loam/laser/num_horizontal_scans");
-  this->declare_parameter("/lego_loam/laser/scan_period");
-  this->declare_parameter("/lego_loam/featureAssociation/edge_threshold");
-  this->declare_parameter("/lego_loam/featureAssociation/surf_threshold");
-  this->declare_parameter("/lego_loam/mapping/mapping_frequency_divider");
-  this->declare_parameter("/lego_loam/featureAssociation/nearest_feature_search_distance");
+  this->declare_parameter("laser.num_vertical_scans");
+  this->declare_parameter("laser.num_horizontal_scans");
+  this->declare_parameter("laser.scan_period");
+  this->declare_parameter("featureAssociation.edge_threshold");
+  this->declare_parameter("featureAssociation.surf_threshold");
+  this->declare_parameter("mapping.mapping_frequency_divider");
+  this->declare_parameter("featureAssociation.nearest_feature_search_distance");
 
   float nearest_dist;
 
   // Read parameters
-  if (!this->get_parameter("/lego_loam/laser/num_vertical_scans", _vertical_scans)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  if (!this->get_parameter("laser.num_vertical_scans", _vertical_scans)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter laser.num_vertical_scans not found");
   }
-  if (!this->get_parameter("/lego_loam/laser/num_horizontal_scans", _horizontal_scans)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  if (!this->get_parameter("laser.num_horizontal_scans", _horizontal_scans)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter laser.num_horizontal_scans not found");
   }
-  if (!this->get_parameter("/lego_loam/laser/scan_period", _scan_period)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  if (!this->get_parameter("laser.scan_period", _scan_period)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter laser.scan_period not found");
   }
-  if (!this->get_parameter("/lego_loam/featureAssociation/edge_threshold", _edge_threshold)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  if (!this->get_parameter("featureAssociation.edge_threshold", _edge_threshold)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter featureAssociation.edge_threshold not found");
   }
-  if (!this->get_parameter("/lego_loam/featureAssociation/surf_threshold", _surf_threshold)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  if (!this->get_parameter("featureAssociation.surf_threshold", _surf_threshold)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter featureAssociation.surf_threshold not found");
   }
-  if (!this->get_parameter("/lego_loam/mapping/mapping_frequency_divider", _mapping_frequency_div)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  if (!this->get_parameter("mapping.mapping_frequency_divider", _mapping_frequency_div)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter mapping.mapping_frequency_divider not found");
   }
-  if (!this->get_parameter("/lego_loam/featureAssociation/nearest_feature_search_distance", nearest_dist)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter not found");
+  if (!this->get_parameter("featureAssociation.nearest_feature_search_distance", nearest_dist)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter featureAssociation.nearest_feature_search_distance not found");
   }
 
   _nearest_feature_dist_sqr = nearest_dist*nearest_dist;
