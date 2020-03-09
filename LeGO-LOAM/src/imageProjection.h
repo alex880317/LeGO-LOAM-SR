@@ -12,7 +12,7 @@ class ImageProjection : public rclcpp::Node {
 
   ~ImageProjection() = default;
 
-  void cloudHandler(const sensor_msgs::msg::PointCloud2ConstPtr &laserCloudMsg);
+  void cloudHandler(const sensor_msgs::msg::PointCloud2::SharedPtr laserCloudMsg);
 
  private:
   void findStartEndAngle();

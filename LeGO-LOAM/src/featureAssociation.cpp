@@ -40,7 +40,7 @@ const float RAD2DEG = 180.0 / M_PI;
 
 FeatureAssociation::FeatureAssociation(const std::string &name, Channel<ProjectionOut> &input_channel,
                                        Channel<AssociationOut> &output_channel)
-    : Node(name), _input_channel(input_channel), _output_channel(output_channel) {
+    : Node(name), _input_channel(input_channel), _output_channel(output_channel), tfBroadcaster(this) {
 
   pubCornerPointsSharp = this->create_publisher<sensor_msgs::msg::PointCloud2>("/laser_cloud_sharp", 1);
   pubCornerPointsLessSharp = this->create_publisher<sensor_msgs::msg::PointCloud2>("/laser_cloud_less_sharp", 1);
@@ -66,25 +66,25 @@ FeatureAssociation::FeatureAssociation(const std::string &name, Channel<Projecti
   float nearest_dist;
 
   // Read parameters
-  if (!this->get_parameter("/lego_loam/laser/num_vertical_scans", _vertical_scans) {
+  if (!this->get_parameter("/lego_loam/laser/num_vertical_scans", _vertical_scans)) {
     RCLCPP_WARN(this->get_logger(), "Parameter not found");
   }
-  if (!this->get_parameter("/lego_loam/laser/num_horizontal_scans", _horizontal_scans) {
+  if (!this->get_parameter("/lego_loam/laser/num_horizontal_scans", _horizontal_scans)) {
     RCLCPP_WARN(this->get_logger(), "Parameter not found");
   }
-  if (!this->get_parameter("/lego_loam/laser/scan_period", _scan_period) {
+  if (!this->get_parameter("/lego_loam/laser/scan_period", _scan_period)) {
     RCLCPP_WARN(this->get_logger(), "Parameter not found");
   }
-  if (!this->get_parameter("/lego_loam/featureAssociation/edge_threshold", _edge_threshold) {
+  if (!this->get_parameter("/lego_loam/featureAssociation/edge_threshold", _edge_threshold)) {
     RCLCPP_WARN(this->get_logger(), "Parameter not found");
   }
-  if (!this->get_parameter("/lego_loam/featureAssociation/surf_threshold", _surf_threshold) {
+  if (!this->get_parameter("/lego_loam/featureAssociation/surf_threshold", _surf_threshold)) {
     RCLCPP_WARN(this->get_logger(), "Parameter not found");
   }
-  if (!this->get_parameter("/lego_loam/mapping/mapping_frequency_divider", _mapping_frequency_div) {
+  if (!this->get_parameter("/lego_loam/mapping/mapping_frequency_divider", _mapping_frequency_div)) {
     RCLCPP_WARN(this->get_logger(), "Parameter not found");
   }
-  if (!this->get_parameter("/lego_loam/featureAssociation/nearest_feature_search_distance", nearest_dist) {
+  if (!this->get_parameter("/lego_loam/featureAssociation/nearest_feature_search_distance", nearest_dist)) {
     RCLCPP_WARN(this->get_logger(), "Parameter not found");
   }
 
@@ -1109,13 +1109,13 @@ void FeatureAssociation::checkSystemInitialization() {
   pcl::toROSMsg(*laserCloudCornerLast, laserCloudCornerLast2);
   laserCloudCornerLast2.header.stamp = cloudHeader.stamp;
   laserCloudCornerLast2.header.frame_id = "/camera";
-  _pub_cloud_corner_last.publish(laserCloudCornerLast2);
+  _pub_cloud_corner_last->publish(laserCloudCornerLast2);
 
   sensor_msgs::msg::PointCloud2 laserCloudSurfLast2;
   pcl::toROSMsg(*laserCloudSurfLast, laserCloudSurfLast2);
   laserCloudSurfLast2.header.stamp = cloudHeader.stamp;
   laserCloudSurfLast2.header.frame_id = "/camera";
-  _pub_cloud_surf_last.publish(laserCloudSurfLast2);
+  _pub_cloud_surf_last->publish(laserCloudSurfLast2);
 
   systemInitedLM = true;
 }
@@ -1186,9 +1186,9 @@ void FeatureAssociation::adjustOutlierCloud() {
 
 void FeatureAssociation::publishOdometry() {
   tf2::Quaternion q;
-  geometry_msgs::Quaternion geoQuat;
+  geometry_msgs::msg::Quaternion geoQuat;
   q.setRPY(transformSum[2], -transformSum[0], -transformSum[1]);
-  tf2::convert(q, geoQuat);
+  geoQuat = tf2::toMsg(q);
 
   laserOdometry.header.stamp = cloudHeader.stamp;
   laserOdometry.pose.pose.orientation.x = -geoQuat.y;
@@ -1198,7 +1198,7 @@ void FeatureAssociation::publishOdometry() {
   laserOdometry.pose.pose.position.x = transformSum[3];
   laserOdometry.pose.pose.position.y = transformSum[4];
   laserOdometry.pose.pose.position.z = transformSum[5];
-  pubLaserOdometry.publish(laserOdometry);
+  pubLaserOdometry->publish(laserOdometry);
 
   laserOdometryTrans.header.stamp = cloudHeader.stamp;
   laserOdometryTrans.transform.translation.x = transformSum[3];
@@ -1214,13 +1214,13 @@ void FeatureAssociation::publishOdometry() {
 void FeatureAssociation::publishCloud() {
   sensor_msgs::msg::PointCloud2 laserCloudOutMsg;
 
-  auto Publish = [&](ros::Publisher &pub,
+  auto Publish = [&](rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pub,
                      const pcl::PointCloud<PointType>::Ptr &cloud) {
-    if (pub.getNumSubscribers() != 0) {
+    if (pub->get_subscription_count() != 0) {
       pcl::toROSMsg(*cloud, laserCloudOutMsg);
       laserCloudOutMsg.header.stamp = cloudHeader.stamp;
       laserCloudOutMsg.header.frame_id = "/camera";
-      pub.publish(laserCloudOutMsg);
+      pub->publish(laserCloudOutMsg);
     }
   };
 
@@ -1267,13 +1267,13 @@ void FeatureAssociation::publishCloudsLast() {
     frameCount = 0;
     sensor_msgs::msg::PointCloud2 cloudTemp;
 
-    auto Publish = [&](ros::Publisher &pub,
+    auto Publish = [&](rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pub,
                        const pcl::PointCloud<PointType>::Ptr &cloud) {
-      if (pub.getNumSubscribers() != 0) {
+      if (pub->get_subscription_count() != 0) {
         pcl::toROSMsg(*cloud, cloudTemp);
         cloudTemp.header.stamp = cloudHeader.stamp;
         cloudTemp.header.frame_id = "/camera";
-        pub.publish(cloudTemp);
+        pub->publish(cloudTemp);
       }
     };
 

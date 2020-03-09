@@ -5,7 +5,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/point_cloud2.hpp"
 #include "nav_msgs/msg/odometry.hpp"
-#include "geometry_msgs/msg/TransformStamped.hpp"
+#include "geometry_msgs/msg/transform_stamped.hpp"
 
 #include "cloud_msgs/msg/cloud_info.hpp"
 
@@ -92,7 +92,7 @@ struct Transform
 inline void OdometryToTransform(const nav_msgs::msg::Odometry& odometry,
                                 float* transform) {
   double roll, pitch, yaw;
-  geometry_msgs::Quaternion geoQuat = odometry.pose.pose.orientation;
+  geometry_msgs::msg::Quaternion geoQuat = odometry.pose.pose.orientation;
   tf2::Matrix3x3(tf2::Quaternion(geoQuat.z, -geoQuat.x, -geoQuat.y, geoQuat.w))
       .getRPY(roll, pitch, yaw);
 

@@ -51,7 +51,7 @@ class FeatureAssociation : public rclcpp::Node {
   pcl::VoxelGrid<PointType> downSizeFilter;
 
   cloud_msgs::msg::CloudInfo segInfo;
-  std_msgs::Header cloudHeader;
+  std_msgs::msg::Header cloudHeader;
 
   std::vector<smoothness_t> cloudSmoothness;
   std::vector<float> cloudCurvature;

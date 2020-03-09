@@ -23,8 +23,8 @@ class TransformFusion : public rclcpp::Node {
   TransformFusion(const std::string &name);
 
   void transformAssociateToMap();
-  void laserOdometryHandler(const nav_msgs::msg::Odometry::ConstPtr& laserOdometry);
-  void odomAftMappedHandler(const nav_msgs::msg::Odometry::ConstPtr& odomAftMapped);
+  void laserOdometryHandler(const nav_msgs::msg::Odometry::SharedPtr laserOdometry);
+  void odomAftMappedHandler(const nav_msgs::msg::Odometry::SharedPtr odomAftMapped);
 };
 
 

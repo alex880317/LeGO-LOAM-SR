@@ -23,6 +23,7 @@
   <exec_depend>nav_msgs</exec_depend>
   <exec_depend>tf2</exec_depend>
   <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>pcl_conversions</exec_depend>
   <exec_depend>cloud_msgs</exec_depend>
 
   <export>

@@ -40,7 +40,7 @@
 using namespace gtsam;
 
 MapOptimization::MapOptimization(const std::string &name, Channel<AssociationOut> &input_channel)
-    : Node(name), _input_channel(input_channel), _publish_global_signal(false), _loop_closure_signal(false)
+    : Node(name), _input_channel(input_channel), _publish_global_signal(false), _loop_closure_signal(false), tfBroadcaster(this)
 {
   ISAM2Params parameters;
   parameters.relinearizeThreshold = 0.01;
@@ -88,22 +88,22 @@ MapOptimization::MapOptimization(const std::string &name, Channel<AssociationOut
   if (!this->get_parameter("/lego_loam/mapping/enable_loop_closure", _loop_closure_enabled)) {
     RCLCPP_WARN(this->get_logger(), "Parameter not found");
   }
-  if (!this->get_parameter("/lego_loam/mapping/history_keyframe_search_radius", _history_keyframe_search_radius) {
+  if (!this->get_parameter("/lego_loam/mapping/history_keyframe_search_radius", _history_keyframe_search_radius)) {
     RCLCPP_WARN(this->get_logger(), "Parameter not found");
   }
-  if (!this->get_parameter("/lego_loam/mapping/history_keyframe_search_num", _history_keyframe_search_num) {
+  if (!this->get_parameter("/lego_loam/mapping/history_keyframe_search_num", _history_keyframe_search_num)) {
     RCLCPP_WARN(this->get_logger(), "Parameter not found");
   }
-  if (!this->get_parameter("/lego_loam/mapping/history_keyframe_fitness_score", _history_keyframe_fitness_score) {
+  if (!this->get_parameter("/lego_loam/mapping/history_keyframe_fitness_score", _history_keyframe_fitness_score)) {
     RCLCPP_WARN(this->get_logger(), "Parameter not found");
   }
-  if (!this->get_parameter("/lego_loam/mapping/surrounding_keyframe_search_radius", _surrounding_keyframe_search_radius) {
+  if (!this->get_parameter("/lego_loam/mapping/surrounding_keyframe_search_radius", _surrounding_keyframe_search_radius)) {
     RCLCPP_WARN(this->get_logger(), "Parameter not found");
   }
-  if (!this->get_parameter("/lego_loam/mapping/surrounding_keyframe_search_num", _surrounding_keyframe_search_num) {
+  if (!this->get_parameter("/lego_loam/mapping/surrounding_keyframe_search_num", _surrounding_keyframe_search_num)) {
     RCLCPP_WARN(this->get_logger(), "Parameter not found");
   }
-  if (!this->get_parameter("/lego_loam/mapping/global_map_visualization_search_radius", _global_map_visualization_search_radius) {
+  if (!this->get_parameter("/lego_loam/mapping/global_map_visualization_search_radius", _global_map_visualization_search_radius)) {
     RCLCPP_WARN(this->get_logger(), "Parameter not found");
   }
 
@@ -181,7 +181,7 @@ void MapOptimization::allocateMemory() {
   globalMapKeyFrames.reset(new pcl::PointCloud<PointType>());
   globalMapKeyFramesDS.reset(new pcl::PointCloud<PointType>());
 
-  timeLaserOdometry = rclcpp::Time::now();
+  timeLaserOdometry = this->now();
 
   for (int i = 0; i < 6; ++i) {
     transformLast[i] = 0;
@@ -490,9 +490,9 @@ pcl::PointCloud<PointType>::Ptr MapOptimization::transformPointCloud(
 
 void MapOptimization::publishTF() {
   tf2::Quaternion q;
-  geometry_msgs::Quaternion geoQuat;
+  geometry_msgs::msg::Quaternion geoQuat;
   q.setRPY(transformAftMapped[2], -transformAftMapped[0], -transformAftMapped[1]);
-  tf2::convert(q, geoQuat);
+  geoQuat = tf2::toMsg(q);
 
   odomAftMapped.header.stamp = timeLaserOdometry;
   odomAftMapped.pose.pose.orientation.x = -geoQuat.y;
@@ -508,7 +508,7 @@ void MapOptimization::publishTF() {
   odomAftMapped.twist.twist.linear.x = transformBefMapped[3];
   odomAftMapped.twist.twist.linear.y = transformBefMapped[4];
   odomAftMapped.twist.twist.linear.z = transformBefMapped[5];
-  pubOdomAftMapped.publish(odomAftMapped);
+  pubOdomAftMapped->publish(odomAftMapped);
 
   aftMappedTrans.header.stamp = timeLaserOdometry;
   aftMappedTrans.transform.translation.x = transformAftMapped[3];
@@ -522,25 +522,25 @@ void MapOptimization::publishTF() {
 }
 
 void MapOptimization::publishKeyPosesAndFrames() {
-  if (pubKeyPoses.getNumSubscribers() != 0) {
+  if (pubKeyPoses->get_subscription_count() != 0) {
     sensor_msgs::msg::PointCloud2 cloudMsgTemp;
     pcl::toROSMsg(*cloudKeyPoses3D, cloudMsgTemp);
     cloudMsgTemp.header.stamp = timeLaserOdometry;
     cloudMsgTemp.header.frame_id = "/camera_init";
-    pubKeyPoses.publish(cloudMsgTemp);
+    pubKeyPoses->publish(cloudMsgTemp);
   }
 
-  if (pubRecentKeyFrames.getNumSubscribers() != 0) {
+  if (pubRecentKeyFrames->get_subscription_count() != 0) {
     sensor_msgs::msg::PointCloud2 cloudMsgTemp;
     pcl::toROSMsg(*laserCloudSurfFromMapDS, cloudMsgTemp);
     cloudMsgTemp.header.stamp = timeLaserOdometry;
     cloudMsgTemp.header.frame_id = "/camera_init";
-    pubRecentKeyFrames.publish(cloudMsgTemp);
+    pubRecentKeyFrames->publish(cloudMsgTemp);
   }
 }
 
 void MapOptimization::publishGlobalMap() {
-  if (pubLaserCloudSurround.getNumSubscribers() == 0) return;
+  if (pubLaserCloudSurround->get_subscription_count() == 0) return;
 
   if (cloudKeyPoses3D->points.empty() == true) return;
   // kd-tree to find near key frames to visualize
@@ -579,7 +579,7 @@ void MapOptimization::publishGlobalMap() {
   pcl::toROSMsg(*globalMapKeyFramesDS, cloudMsgTemp);
   cloudMsgTemp.header.stamp = timeLaserOdometry;
   cloudMsgTemp.header.frame_id = "/camera_init";
-  pubLaserCloudSurround.publish(cloudMsgTemp);
+  pubLaserCloudSurround->publish(cloudMsgTemp);
 
   globalMapKeyPoses->clear();
   globalMapKeyPosesDS->clear();
@@ -604,7 +604,7 @@ bool MapOptimization::detectLoopClosure() {
   closestHistoryFrameID = -1;
   for (size_t i = 0; i < pointSearchIndLoop.size(); ++i) {
     int id = pointSearchIndLoop[i];
-    if (abs(cloudKeyPoses6D->points[id].time - timeLaserOdometry.toSec()) > 30.0) {
+    if (abs(cloudKeyPoses6D->points[id].time - timeLaserOdometry.seconds()) > 30.0) {
       closestHistoryFrameID = id;
       break;
     }
@@ -646,12 +646,12 @@ bool MapOptimization::detectLoopClosure() {
   downSizeFilterHistoryKeyFrames.setInputCloud(nearHistorySurfKeyFrameCloud);
   downSizeFilterHistoryKeyFrames.filter(*nearHistorySurfKeyFrameCloudDS);
   // publish history near key frames
-  if (pubHistoryKeyFrames.getNumSubscribers() != 0) {
+  if (pubHistoryKeyFrames->get_subscription_count() != 0) {
     sensor_msgs::msg::PointCloud2 cloudMsgTemp;
     pcl::toROSMsg(*nearHistorySurfKeyFrameCloudDS, cloudMsgTemp);
     cloudMsgTemp.header.stamp = timeLaserOdometry;
     cloudMsgTemp.header.frame_id = "/camera_init";
-    pubHistoryKeyFrames.publish(cloudMsgTemp);
+    pubHistoryKeyFrames->publish(cloudMsgTemp);
   }
 
   return true;
@@ -691,7 +691,7 @@ void MapOptimization::performLoopClosure() {
       icp.getFitnessScore() > _history_keyframe_fitness_score)
     return;
   // publish corrected cloud
-  if (pubIcpKeyFrames.getNumSubscribers() != 0) {
+  if (pubIcpKeyFrames->get_subscription_count() != 0) {
     pcl::PointCloud<PointType>::Ptr closed_cloud(
         new pcl::PointCloud<PointType>());
     pcl::transformPointCloud(*latestSurfKeyFrameCloud, *closed_cloud,
@@ -700,7 +700,7 @@ void MapOptimization::performLoopClosure() {
     pcl::toROSMsg(*closed_cloud, cloudMsgTemp);
     cloudMsgTemp.header.stamp = timeLaserOdometry;
     cloudMsgTemp.header.frame_id = "/camera_init";
-    pubIcpKeyFrames.publish(cloudMsgTemp);
+    pubIcpKeyFrames->publish(cloudMsgTemp);
   }
   /*
           get pose constraint
@@ -1306,7 +1306,7 @@ void MapOptimization::saveKeyFramesAndFactor() {
   thisPose6D.roll = latestEstimate.rotation().pitch();
   thisPose6D.pitch = latestEstimate.rotation().yaw();
   thisPose6D.yaw = latestEstimate.rotation().roll();  // in camera frame
-  thisPose6D.time = timeLaserOdometry.toSec();
+  thisPose6D.time = timeLaserOdometry.seconds();
   cloudKeyPoses6D->push_back(thisPose6D);
   /**
    * save updated transform

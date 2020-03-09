@@ -32,7 +32,7 @@
 
 #include "transformFusion.h"
 
-TransformFusion::TransformFusion(const std::string &name, ) : Node(name) {
+TransformFusion::TransformFusion(const std::string &name) : Node(name), tfBroadcaster2(this) {
   pubLaserOdometry2 = this->create_publisher<nav_msgs::msg::Odometry>("/integrated_to_init", 5);
   subLaserOdometry = this->create_subscription<nav_msgs::msg::Odometry>(
       "/laser_odom_to_init", 5, std::bind(&TransformFusion::laserOdometryHandler, this, std::placeholders::_1));
@@ -178,15 +178,15 @@ void TransformFusion::transformAssociateToMap() {
 }
 
 void TransformFusion::laserOdometryHandler(
-    const nav_msgs::msg::Odometry::ConstPtr& laserOdometry) {
+    const nav_msgs::msg::Odometry::SharedPtr laserOdometry) {
   OdometryToTransform(*laserOdometry, transformSum);
 
   transformAssociateToMap();
 
   tf2::Quaternion q;
-  geometry_msgs::Quaternion geoQuat;
+  geometry_msgs::msg::Quaternion geoQuat;
   q.setRPY(transformMapped[2], -transformMapped[0], -transformMapped[1]);
-  tf2::convert(q, geoQuat);
+  geoQuat = tf2::toMsg(q);
 
   laserOdometry2.header.stamp = laserOdometry->header.stamp;
   laserOdometry2.pose.pose.orientation.x = -geoQuat.y;
@@ -196,7 +196,7 @@ void TransformFusion::laserOdometryHandler(
   laserOdometry2.pose.pose.position.x = transformMapped[3];
   laserOdometry2.pose.pose.position.y = transformMapped[4];
   laserOdometry2.pose.pose.position.z = transformMapped[5];
-  pubLaserOdometry2.publish(laserOdometry2);
+  pubLaserOdometry2->publish(laserOdometry2);
 
   laserOdometryTrans2.header.stamp = laserOdometry->header.stamp;
   laserOdometryTrans2.transform.translation.x = transformMapped[3];
@@ -210,9 +210,9 @@ void TransformFusion::laserOdometryHandler(
 }
 
 void TransformFusion::odomAftMappedHandler(
-    const nav_msgs::msg::Odometry::ConstPtr& odomAftMapped) {
+    const nav_msgs::msg::Odometry::SharedPtr odomAftMapped) {
   double roll, pitch, yaw;
-  geometry_msgs::Quaternion geoQuat = odomAftMapped->pose.pose.orientation;
+  geometry_msgs::msg::Quaternion geoQuat = odomAftMapped->pose.pose.orientation;
   tf2::Matrix3x3(tf2::Quaternion(geoQuat.z, -geoQuat.x, -geoQuat.y, geoQuat.w))
       .getRPY(roll, pitch, yaw);
 

@@ -57,31 +57,31 @@ ImageProjection::ImageProjection(const std::string &name, Channel<ProjectionOut>
   float vertical_angle_top;
 
   // Read parameters
-  if (!this->get_parameter("/lego_loam/laser/num_vertical_scans", _vertical_scans) {
+  if (!this->get_parameter("/lego_loam/laser/num_vertical_scans", _vertical_scans)) {
     RCLCPP_WARN(this->get_logger(), "Parameter not found");
   }
-  if (!this->get_parameter("/lego_loam/laser/num_horizontal_scans", _horizontal_scans) {
+  if (!this->get_parameter("/lego_loam/laser/num_horizontal_scans", _horizontal_scans)) {
     RCLCPP_WARN(this->get_logger(), "Parameter not found");
   }
-  if (!this->get_parameter("/lego_loam/laser/vertical_angle_bottom", _ang_bottom) {
+  if (!this->get_parameter("/lego_loam/laser/vertical_angle_bottom", _ang_bottom)) {
     RCLCPP_WARN(this->get_logger(), "Parameter not found");
   }
-  if (!this->get_parameter("/lego_loam/laser/vertical_angle_top", vertical_angle_top) {
+  if (!this->get_parameter("/lego_loam/laser/vertical_angle_top", vertical_angle_top)) {
     RCLCPP_WARN(this->get_logger(), "Parameter not found");
   }
-  if (!this->get_parameter("/lego_loam/imageProjection/segment_theta", _segment_theta) {
+  if (!this->get_parameter("/lego_loam/imageProjection/segment_theta", _segment_theta)) {
     RCLCPP_WARN(this->get_logger(), "Parameter not found");
   }
-  if (!this->get_parameter("/lego_loam/imageProjection/segment_valid_point_num", _segment_valid_point_num) {
+  if (!this->get_parameter("/lego_loam/imageProjection/segment_valid_point_num", _segment_valid_point_num)) {
     RCLCPP_WARN(this->get_logger(), "Parameter not found");
   }
-  if (!this->get_parameter("/lego_loam/imageProjection/segment_valid_line_num", _segment_valid_line_num) {
+  if (!this->get_parameter("/lego_loam/imageProjection/segment_valid_line_num", _segment_valid_line_num)) {
     RCLCPP_WARN(this->get_logger(), "Parameter not found");
   }
-  if (!this->get_parameter("/lego_loam/laser/ground_scan_index", _ground_scan_index) {
+  if (!this->get_parameter("/lego_loam/laser/ground_scan_index", _ground_scan_index)) {
     RCLCPP_WARN(this->get_logger(), "Parameter not found");
   }
-  if (!this->get_parameter("/lego_loam/laser/sensor_mount_angle", _sensor_mount_angle) {
+  if (!this->get_parameter("/lego_loam/laser/sensor_mount_angle", _sensor_mount_angle)) {
     RCLCPP_WARN(this->get_logger(), "Parameter not found");
   }
 
@@ -143,7 +143,7 @@ void ImageProjection::resetParameters() {
 }
 
 void ImageProjection::cloudHandler(
-    const sensor_msgs::msg::PointCloud2ConstPtr& laserCloudMsg) {
+    const sensor_msgs::msg::PointCloud2::SharedPtr laserCloudMsg) {
   // Reset parameters
   resetParameters();
 
@@ -436,11 +436,11 @@ void ImageProjection::publishClouds() {
   temp.header.stamp = _seg_msg.header.stamp;
   temp.header.frame_id = "base_link";
 
-  auto PublishCloud = [](ros::Publisher& pub, sensor_msgs::msg::PointCloud2& temp,
+  auto PublishCloud = [](rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pub, sensor_msgs::msg::PointCloud2& temp,
                           const pcl::PointCloud<PointType>::Ptr& cloud) {
-    if (pub.getNumSubscribers() != 0) {
+    if (pub->get_subscription_count() != 0) {
       pcl::toROSMsg(*cloud, temp);
-      pub.publish(temp);
+      pub->publish(temp);
     }
   };
 
@@ -451,8 +451,8 @@ void ImageProjection::publishClouds() {
   PublishCloud(_pub_segmented_cloud_pure, temp, _segmented_cloud_pure);
   PublishCloud(_pub_full_info_cloud, temp, _full_info_cloud);
 
-  if (_pub_segmented_cloud_info.getNumSubscribers() != 0) {
-    _pub_segmented_cloud_info.publish(_seg_msg);
+  if (_pub_segmented_cloud_info->get_subscription_count() != 0) {
+    _pub_segmented_cloud_info->publish(_seg_msg);
   }
 
   //--------------------
