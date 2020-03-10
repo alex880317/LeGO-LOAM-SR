@@ -39,11 +39,11 @@ TransformFusion::TransformFusion(const std::string &name) : Node(name) {
   subOdomAftMapped = this->create_subscription<nav_msgs::msg::Odometry>(
       "/aft_mapped_to_init", 5, std::bind(&TransformFusion::odomAftMappedHandler, this, std::placeholders::_1));
 
-  laserOdometry2.header.frame_id = "/camera_init";
-  laserOdometry2.child_frame_id = "/camera";
+  laserOdometry2.header.frame_id = "camera_init";
+  laserOdometry2.child_frame_id = "camera";
 
-  laserOdometryTrans.header.frame_id = "/camera_init";
-  laserOdometryTrans.child_frame_id = "/camera";
+  laserOdometryTrans.header.frame_id = "camera_init";
+  laserOdometryTrans.child_frame_id = "camera";
 
   tfBroadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(this);
 
