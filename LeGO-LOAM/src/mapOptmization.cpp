@@ -39,9 +39,16 @@
 
 using namespace gtsam;
 
+const std::string PARAM_ENABLE_LOOP = "mapping.enable_loop_closure";
+const std::string PARAM_SEARCH_RADIUS = "mapping.surrounding_keyframe_search_radius";
+const std::string PARAM_SEARCH_NUM = "mapping.surrounding_keyframe_search_num";
+const std::string PARAM_HISTORY_SEARCH_RADIUS = "mapping.history_keyframe_search_radius";
+const std::string PARAM_HISTORY_SEARCH_NUM = "mapping.history_keyframe_search_num";
+const std::string PARAM_HISTORY_SCORE = "mapping.history_keyframe_fitness_score";
+const std::string PARAM_GLOBAL_SEARCH_RADIUS = "mapping.global_map_visualization_search_radius";
+
 MapOptimization::MapOptimization(const std::string &name, Channel<AssociationOut> &input_channel)
-    : Node(name), _input_channel(input_channel), _publish_global_signal(false), _loop_closure_signal(false), tfBroadcaster(this)
-{
+    : Node(name), _input_channel(input_channel), _publish_global_signal(false), _loop_closure_signal(false) {
   ISAM2Params parameters;
   parameters.relinearizeThreshold = 0.01;
   parameters.relinearizeSkip = 1;
@@ -53,6 +60,8 @@ MapOptimization::MapOptimization(const std::string &name, Channel<AssociationOut
   pubHistoryKeyFrames = this->create_publisher<sensor_msgs::msg::PointCloud2>("/history_cloud", 2);
   pubIcpKeyFrames = this->create_publisher<sensor_msgs::msg::PointCloud2>("/corrected_cloud", 2);
   pubRecentKeyFrames = this->create_publisher<sensor_msgs::msg::PointCloud2>("/recent_cloud", 2);
+
+  tfBroadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(this);
 
   downSizeFilterCorner.setLeafSize(0.2, 0.2, 0.2);
   downSizeFilterSurf.setLeafSize(0.4, 0.4, 0.4);
@@ -75,36 +84,35 @@ MapOptimization::MapOptimization(const std::string &name, Channel<AssociationOut
   aftMappedTrans.child_frame_id = "/aft_mapped";
 
   // Declare parameters
-  this->declare_parameter("laser.scan_period");
-  this->declare_parameter("mapping.enable_loop_closure");
-  this->declare_parameter("mapping.history_keyframe_search_radius");
-  this->declare_parameter("mapping.history_keyframe_search_num");
-  this->declare_parameter("mapping.history_keyframe_fitness_score");
-  this->declare_parameter("mapping.surrounding_keyframe_search_radius");
-  this->declare_parameter("mapping.surrounding_keyframe_search_num");
-  this->declare_parameter("mapping.global_map_visualization_search_radius");
+  this->declare_parameter(PARAM_ENABLE_LOOP);
+  this->declare_parameter(PARAM_SEARCH_RADIUS);
+  this->declare_parameter(PARAM_SEARCH_NUM);
+  this->declare_parameter(PARAM_HISTORY_SEARCH_RADIUS);
+  this->declare_parameter(PARAM_HISTORY_SEARCH_NUM);
+  this->declare_parameter(PARAM_HISTORY_SCORE);
+  this->declare_parameter(PARAM_GLOBAL_SEARCH_RADIUS);
 
   // Read parameters
-  if (!this->get_parameter("mapping.enable_loop_closure", _loop_closure_enabled)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter mapping.enable_loop_closure not found");
+  if (!this->get_parameter(PARAM_ENABLE_LOOP, _loop_closure_enabled)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PARAM_ENABLE_LOOP.c_str());
   }
-  if (!this->get_parameter("mapping.history_keyframe_search_radius", _history_keyframe_search_radius)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter mapping.history_keyframe_search_radius not found");
+  if (!this->get_parameter(PARAM_SEARCH_RADIUS, _surrounding_keyframe_search_radius)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PARAM_SEARCH_RADIUS.c_str());
   }
-  if (!this->get_parameter("mapping.history_keyframe_search_num", _history_keyframe_search_num)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter mapping.history_keyframe_search_num not found");
+  if (!this->get_parameter(PARAM_SEARCH_NUM, _surrounding_keyframe_search_num)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PARAM_SEARCH_NUM.c_str());
   }
-  if (!this->get_parameter("mapping.history_keyframe_fitness_score", _history_keyframe_fitness_score)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter mapping.history_keyframe_fitness_score not found");
+  if (!this->get_parameter(PARAM_HISTORY_SEARCH_RADIUS, _history_keyframe_search_radius)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PARAM_HISTORY_SEARCH_RADIUS.c_str());
   }
-  if (!this->get_parameter("mapping.surrounding_keyframe_search_radius", _surrounding_keyframe_search_radius)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter mapping.surrounding_keyframe_search_radius not found");
+  if (!this->get_parameter(PARAM_HISTORY_SEARCH_NUM, _history_keyframe_search_num)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PARAM_HISTORY_SEARCH_NUM.c_str());
   }
-  if (!this->get_parameter("mapping.surrounding_keyframe_search_num", _surrounding_keyframe_search_num)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter mapping.surrounding_keyframe_search_num not found");
+  if (!this->get_parameter(PARAM_HISTORY_SCORE, _history_keyframe_fitness_score)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PARAM_HISTORY_SCORE.c_str());
   }
-  if (!this->get_parameter("mapping.global_map_visualization_search_radius", _global_map_visualization_search_radius)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter mapping.global_map_visualization_search_radius not found");
+  if (!this->get_parameter(PARAM_GLOBAL_SEARCH_RADIUS, _global_map_visualization_search_radius)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PARAM_GLOBAL_SEARCH_RADIUS.c_str());
   }
 
   allocateMemory();
@@ -518,7 +526,7 @@ void MapOptimization::publishTF() {
   aftMappedTrans.transform.rotation.y = -geoQuat.z;
   aftMappedTrans.transform.rotation.z = geoQuat.x;
   aftMappedTrans.transform.rotation.w = geoQuat.w;
-  tfBroadcaster.sendTransform(aftMappedTrans);
+  tfBroadcaster->sendTransform(aftMappedTrans);
 }
 
 void MapOptimization::publishKeyPosesAndFrames() {

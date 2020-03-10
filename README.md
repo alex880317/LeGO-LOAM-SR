@@ -2,6 +2,31 @@
 
 LeGO-LOAM migrated to ROS2
 
+## 1. Run code with Rosbag
+
+Shell 1:
+
+```
+source /opt/ros/melodic/setup.bash
+roscore &
+rosbag play *.bag --clock --topic /velodyne_points
+```
+
+Shell 2:
+```
+source /opt/ros/melodic/setup.bash
+source /opt/ros/dashing/setup.bash
+export ROS_MASTER_URI=http://localhost:11311
+ros2 run ros1_bridge dynamic_bridge
+```
+
+Shell 3:
+```
+source /opt/ros/dashing/setup.bash
+source ~/dev_ws/install/setup.bash
+ros2 launch lego_loam_sr run.launch.py
+```
+
 # LeGO-LOAM-BOR
 
 This is a fork of the original [LeGO-LOAM](https://github.com/RobustFieldAutonomyLab/LeGO-LOAM).

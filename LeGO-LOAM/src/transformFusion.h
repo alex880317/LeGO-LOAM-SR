@@ -10,8 +10,8 @@ class TransformFusion : public rclcpp::Node {
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr subOdomAftMapped;
 
   nav_msgs::msg::Odometry laserOdometry2;
-  geometry_msgs::msg::TransformStamped laserOdometryTrans2;
-  tf2_ros::TransformBroadcaster tfBroadcaster2;
+  geometry_msgs::msg::TransformStamped laserOdometryTrans;
+  std::shared_ptr<tf2_ros::TransformBroadcaster> tfBroadcaster;
 
   float transformSum[6];
   float transformIncre[6];

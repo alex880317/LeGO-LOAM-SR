@@ -32,7 +32,7 @@
 
 #include "transformFusion.h"
 
-TransformFusion::TransformFusion(const std::string &name) : Node(name), tfBroadcaster2(this) {
+TransformFusion::TransformFusion(const std::string &name) : Node(name) {
   pubLaserOdometry2 = this->create_publisher<nav_msgs::msg::Odometry>("/integrated_to_init", 5);
   subLaserOdometry = this->create_subscription<nav_msgs::msg::Odometry>(
       "/laser_odom_to_init", 5, std::bind(&TransformFusion::laserOdometryHandler, this, std::placeholders::_1));
@@ -42,8 +42,10 @@ TransformFusion::TransformFusion(const std::string &name) : Node(name), tfBroadc
   laserOdometry2.header.frame_id = "/camera_init";
   laserOdometry2.child_frame_id = "/camera";
 
-  laserOdometryTrans2.header.frame_id = "/camera_init";
-  laserOdometryTrans2.child_frame_id = "/camera";
+  laserOdometryTrans.header.frame_id = "/camera_init";
+  laserOdometryTrans.child_frame_id = "/camera";
+
+  tfBroadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(this);
 
   for (int i = 0; i < 6; ++i) {
     transformSum[i] = 0;
@@ -198,15 +200,15 @@ void TransformFusion::laserOdometryHandler(
   laserOdometry2.pose.pose.position.z = transformMapped[5];
   pubLaserOdometry2->publish(laserOdometry2);
 
-  laserOdometryTrans2.header.stamp = laserOdometry->header.stamp;
-  laserOdometryTrans2.transform.translation.x = transformMapped[3];
-  laserOdometryTrans2.transform.translation.y = transformMapped[4];
-  laserOdometryTrans2.transform.translation.z = transformMapped[5];
-  laserOdometryTrans2.transform.rotation.x = -geoQuat.y;
-  laserOdometryTrans2.transform.rotation.y = -geoQuat.z;
-  laserOdometryTrans2.transform.rotation.z = geoQuat.x;
-  laserOdometryTrans2.transform.rotation.w = geoQuat.w;
-  tfBroadcaster2.sendTransform(laserOdometryTrans2);
+  laserOdometryTrans.header.stamp = laserOdometry->header.stamp;
+  laserOdometryTrans.transform.translation.x = transformMapped[3];
+  laserOdometryTrans.transform.translation.y = transformMapped[4];
+  laserOdometryTrans.transform.translation.z = transformMapped[5];
+  laserOdometryTrans.transform.rotation.x = -geoQuat.y;
+  laserOdometryTrans.transform.rotation.y = -geoQuat.z;
+  laserOdometryTrans.transform.rotation.z = geoQuat.x;
+  laserOdometryTrans.transform.rotation.w = geoQuat.w;
+  tfBroadcaster->sendTransform(laserOdometryTrans);
 }
 
 void TransformFusion::odomAftMappedHandler(

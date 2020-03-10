@@ -36,11 +36,19 @@
 
 #include "featureAssociation.h"
 
+const std::string PARAM_VERTICAL_SCANS = "laser.num_vertical_scans";
+const std::string PARAM_HORIZONTAL_SCANS = "laser.num_horizontal_scans";
+const std::string PARAM_SCAN_PERIOD = "laser.scan_period";
+const std::string PARAM_FREQ_DIVIDER = "mapping.mapping_frequency_divider";
+const std::string PARAM_EDGE_THRESHOLD = "featureAssociation.edge_threshold";
+const std::string PARAM_SURF_THRESHOLD = "featureAssociation.surf_threshold";
+const std::string PARAM_DISTANCE = "featureAssociation.nearest_feature_search_distance";
+
 const float RAD2DEG = 180.0 / M_PI;
 
 FeatureAssociation::FeatureAssociation(const std::string &name, Channel<ProjectionOut> &input_channel,
                                        Channel<AssociationOut> &output_channel)
-    : Node(name), _input_channel(input_channel), _output_channel(output_channel), tfBroadcaster(this) {
+    : Node(name), _input_channel(input_channel), _output_channel(output_channel) {
 
   pubCornerPointsSharp = this->create_publisher<sensor_msgs::msg::PointCloud2>("/laser_cloud_sharp", 1);
   pubCornerPointsLessSharp = this->create_publisher<sensor_msgs::msg::PointCloud2>("/laser_cloud_less_sharp", 1);
@@ -52,40 +60,42 @@ FeatureAssociation::FeatureAssociation(const std::string &name, Channel<Projecti
   _pub_outlier_cloudLast = this->create_publisher<sensor_msgs::msg::PointCloud2>("/outlier_cloud_last", 2);
   pubLaserOdometry = this->create_publisher<nav_msgs::msg::Odometry>("/laser_odom_to_init", 5);
 
+  tfBroadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(this);
+
   _cycle_count = 0;
 
   // Declare parameters
-  this->declare_parameter("laser.num_vertical_scans");
-  this->declare_parameter("laser.num_horizontal_scans");
-  this->declare_parameter("laser.scan_period");
-  this->declare_parameter("featureAssociation.edge_threshold");
-  this->declare_parameter("featureAssociation.surf_threshold");
-  this->declare_parameter("mapping.mapping_frequency_divider");
-  this->declare_parameter("featureAssociation.nearest_feature_search_distance");
+  this->declare_parameter(PARAM_VERTICAL_SCANS);
+  this->declare_parameter(PARAM_HORIZONTAL_SCANS);
+  this->declare_parameter(PARAM_SCAN_PERIOD);
+  this->declare_parameter(PARAM_FREQ_DIVIDER);
+  this->declare_parameter(PARAM_EDGE_THRESHOLD);
+  this->declare_parameter(PARAM_SURF_THRESHOLD);
+  this->declare_parameter(PARAM_DISTANCE);
 
   float nearest_dist;
 
   // Read parameters
-  if (!this->get_parameter("laser.num_vertical_scans", _vertical_scans)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter laser.num_vertical_scans not found");
+  if (!this->get_parameter(PARAM_VERTICAL_SCANS, _vertical_scans)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PARAM_VERTICAL_SCANS.c_str());
   }
-  if (!this->get_parameter("laser.num_horizontal_scans", _horizontal_scans)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter laser.num_horizontal_scans not found");
+  if (!this->get_parameter(PARAM_HORIZONTAL_SCANS, _horizontal_scans)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PARAM_HORIZONTAL_SCANS.c_str());
   }
-  if (!this->get_parameter("laser.scan_period", _scan_period)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter laser.scan_period not found");
+  if (!this->get_parameter(PARAM_SCAN_PERIOD, _scan_period)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PARAM_SCAN_PERIOD.c_str());
   }
-  if (!this->get_parameter("featureAssociation.edge_threshold", _edge_threshold)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter featureAssociation.edge_threshold not found");
+  if (!this->get_parameter(PARAM_FREQ_DIVIDER, _mapping_frequency_div)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PARAM_FREQ_DIVIDER.c_str());
   }
-  if (!this->get_parameter("featureAssociation.surf_threshold", _surf_threshold)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter featureAssociation.surf_threshold not found");
+  if (!this->get_parameter(PARAM_EDGE_THRESHOLD, _edge_threshold)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PARAM_EDGE_THRESHOLD.c_str());
   }
-  if (!this->get_parameter("mapping.mapping_frequency_divider", _mapping_frequency_div)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter mapping.mapping_frequency_divider not found");
+  if (!this->get_parameter(PARAM_SURF_THRESHOLD, _surf_threshold)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PARAM_SURF_THRESHOLD.c_str());
   }
-  if (!this->get_parameter("featureAssociation.nearest_feature_search_distance", nearest_dist)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter featureAssociation.nearest_feature_search_distance not found");
+  if (!this->get_parameter(PARAM_DISTANCE, nearest_dist)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PARAM_DISTANCE.c_str());
   }
 
   _nearest_feature_dist_sqr = nearest_dist*nearest_dist;
@@ -1208,7 +1218,7 @@ void FeatureAssociation::publishOdometry() {
   laserOdometryTrans.transform.rotation.y = -geoQuat.z;
   laserOdometryTrans.transform.rotation.z = geoQuat.x;
   laserOdometryTrans.transform.rotation.w = geoQuat.w;
-  tfBroadcaster.sendTransform(laserOdometryTrans);
+  tfBroadcaster->sendTransform(laserOdometryTrans);
 }
 
 void FeatureAssociation::publishCloud() {

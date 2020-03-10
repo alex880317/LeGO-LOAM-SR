@@ -92,9 +92,9 @@ class FeatureAssociation : public rclcpp::Node {
 
   nav_msgs::msg::Odometry laserOdometry;
 
-  tf2_ros::TransformBroadcaster tfBroadcaster;
   geometry_msgs::msg::TransformStamped laserOdometryTrans;
-
+  std::shared_ptr<tf2_ros::TransformBroadcaster> tfBroadcaster;
+  
   bool isDegenerate;
 
   int frameCount;

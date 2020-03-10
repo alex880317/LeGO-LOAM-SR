@@ -77,7 +77,7 @@ class MapOptimization : public rclcpp::Node {
 
   nav_msgs::msg::Odometry odomAftMapped;
   geometry_msgs::msg::TransformStamped aftMappedTrans;
-  tf2_ros::TransformBroadcaster tfBroadcaster;
+  std::shared_ptr<tf2_ros::TransformBroadcaster> tfBroadcaster;
 
   std::vector<pcl::PointCloud<PointType>::Ptr> cornerCloudKeyFrames;
   std::vector<pcl::PointCloud<PointType>::Ptr> surfCloudKeyFrames;

@@ -29,6 +29,16 @@
 #include <boost/circular_buffer.hpp>
 #include "imageProjection.h"
 
+const std::string PARAM_VERTICAL_SCANS = "laser.num_vertical_scans";
+const std::string PARAM_HORIZONTAL_SCANS = "laser.num_horizontal_scans";
+const std::string PARAM_ANGLE_BOTTOM = "laser.vertical_angle_bottom";
+const std::string PARAM_ANGLE_TOP = "laser.vertical_angle_top";
+const std::string PARAM_GROUND_INDEX = "laser.ground_scan_index";
+const std::string PARAM_SENSOR_ANGLE = "laser.sensor_mount_angle";
+const std::string PARAM_SEGMENT_THETA = "image_projection.segment_theta";
+const std::string PARAM_SEGMENT_POINT = "image_projection.segment_valid_point_num";
+const std::string PARAM_SEGMENT_LINE = "image_projection.segment_valid_line_num";
+
 ImageProjection::ImageProjection(const std::string &name, Channel<ProjectionOut>& output_channel)
     : Node(name),  _output_channel(output_channel)
 {
@@ -44,45 +54,45 @@ ImageProjection::ImageProjection(const std::string &name, Channel<ProjectionOut>
   _pub_outlier_cloud = this->create_publisher<sensor_msgs::msg::PointCloud2>("/outlier_cloud", 1);
 
   // Declare parameters
-  this->declare_parameter("laser.num_vertical_scans");
-  this->declare_parameter("laser.num_horizontal_scans");
-  this->declare_parameter("laser.vertical_angle_bottom");
-  this->declare_parameter("laser.vertical_angle_top");
-  this->declare_parameter("imageProjection.segment_theta");
-  this->declare_parameter("imageProjection.segment_valid_point_num");
-  this->declare_parameter("imageProjection.segment_valid_line_num");
-  this->declare_parameter("laser.ground_scan_index");
-  this->declare_parameter("laser.sensor_mount_angle");
+  this->declare_parameter(PARAM_VERTICAL_SCANS);
+  this->declare_parameter(PARAM_HORIZONTAL_SCANS);
+  this->declare_parameter(PARAM_ANGLE_BOTTOM);
+  this->declare_parameter(PARAM_ANGLE_TOP);
+  this->declare_parameter(PARAM_GROUND_INDEX);
+  this->declare_parameter(PARAM_SENSOR_ANGLE);
+  this->declare_parameter(PARAM_SEGMENT_THETA);
+  this->declare_parameter(PARAM_SEGMENT_POINT);
+  this->declare_parameter(PARAM_SEGMENT_LINE);
 
   float vertical_angle_top;
 
   // Read parameters
-  if (!this->get_parameter("laser.num_vertical_scans", _vertical_scans)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter laser.num_vertical_scans not found");
+  if (!this->get_parameter(PARAM_VERTICAL_SCANS, _vertical_scans)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PARAM_VERTICAL_SCANS.c_str());
   }
-  if (!this->get_parameter("laser.num_horizontal_scans", _horizontal_scans)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter laser.num_horizontal_scans not found");
+  if (!this->get_parameter(PARAM_HORIZONTAL_SCANS, _horizontal_scans)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PARAM_HORIZONTAL_SCANS.c_str());
   }
-  if (!this->get_parameter("laser.vertical_angle_bottom", _ang_bottom)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter laser.vertical_angle_bottom not found");
+  if (!this->get_parameter(PARAM_ANGLE_BOTTOM, _ang_bottom)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PARAM_ANGLE_BOTTOM.c_str());
   }
-  if (!this->get_parameter("laser.vertical_angle_top", vertical_angle_top)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter laser.vertical_angle_top not found");
+  if (!this->get_parameter(PARAM_ANGLE_TOP, vertical_angle_top)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PARAM_ANGLE_TOP.c_str());
   }
-  if (!this->get_parameter("imageProjection.segment_theta", _segment_theta)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter imageProjection.segment_theta not found");
+  if (!this->get_parameter(PARAM_GROUND_INDEX, _ground_scan_index)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s found", PARAM_GROUND_INDEX.c_str());
   }
-  if (!this->get_parameter("imageProjection.segment_valid_point_num", _segment_valid_point_num)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter imageProjection.segment_valid_point_num not found");
+  if (!this->get_parameter(PARAM_SENSOR_ANGLE, _sensor_mount_angle)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PARAM_SENSOR_ANGLE.c_str());
   }
-  if (!this->get_parameter("imageProjection.segment_valid_line_num", _segment_valid_line_num)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter imageProjection.segment_valid_line_num not found");
+  if (!this->get_parameter(PARAM_SEGMENT_THETA, _segment_theta)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PARAM_SEGMENT_THETA.c_str());
   }
-  if (!this->get_parameter("laser.ground_scan_index", _ground_scan_index)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter laser.ground_scan_inde not found");
+  if (!this->get_parameter(PARAM_SEGMENT_POINT, _segment_valid_point_num)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PARAM_SEGMENT_POINT.c_str());
   }
-  if (!this->get_parameter("laser.sensor_mount_angle", _sensor_mount_angle)) {
-    RCLCPP_WARN(this->get_logger(), "Parameter laser.sensor_mount_angle not found");
+  if (!this->get_parameter(PARAM_SEGMENT_LINE, _segment_valid_line_num)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PARAM_SEGMENT_LINE.c_str());
   }
 
   _ang_resolution_X = (M_PI*2) / (_horizontal_scans);
