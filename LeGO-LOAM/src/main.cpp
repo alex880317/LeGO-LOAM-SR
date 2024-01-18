@@ -11,6 +11,7 @@ int main(int argc, char** argv) {
   rclcpp::init(argc, argv);
 
   // Create nodes
+  //test
   auto IP = std::make_shared<ImageProjection>("image_projection", projection_out_channel);
   auto FA = std::make_shared<FeatureAssociation>("feature_association", projection_out_channel, association_out_channel);
   auto MO = std::make_shared<MapOptimization>("map_optimization", association_out_channel);
@@ -22,7 +23,7 @@ int main(int argc, char** argv) {
   RCLCPP_INFO(TF->get_logger(), "\033[1;32m---->\033[0m Started.");
 
   // Use 4 threads
-  rclcpp::executors::MultiThreadedExecutor executor(rclcpp::executor::create_default_executor_arguments(), 4);
+  rclcpp::executors::MultiThreadedExecutor executor(rclcpp::ExecutorOptions(), 4);
   executor.add_node(IP);
   executor.add_node(FA);
   executor.add_node(MO);

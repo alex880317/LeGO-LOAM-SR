@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
 project(lego_loam_sr)
 
-# Default to C++14
+# Default to C++17
 if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 14)
+  set(CMAKE_CXX_STANDARD 17)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -43,6 +43,8 @@ set(dependencies
   pcl_conversions
   cloud_msgs
 )
+
+# rosidl_generate_interfaces(${PROJECT_NAME} "srv/SaveMap.srv" DEPENDENCIES std_msgs sensor_msgs)
 
 add_executable(${PROJECT_NAME} src/imageProjection.cpp src/featureAssociation.cpp src/mapOptmization.cpp src/transformFusion.cpp src/main.cpp)
 target_link_libraries(${PROJECT_NAME} ${PCL_LIBRARIES} gtsam)

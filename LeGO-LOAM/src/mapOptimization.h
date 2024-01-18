@@ -14,6 +14,12 @@
 #include <gtsam/slam/BetweenFactor.h>
 #include <gtsam/slam/PriorFactor.h>
 #include <gtsam/nonlinear/ISAM2.h>
+#include "lego_loam/tictoc.h"
+#include <stdio.h>
+#include <termios.h>
+#include <iostream>
+#include <string>
+#include <vector>
 
 inline gtsam::Pose3 pclPointTogtsamPose3(PointTypePose thisPoint) {
   // camera frame to lidar frame
@@ -31,6 +37,24 @@ inline Eigen::Affine3f pclPointToAffine3fCameraToLidar(
                                 thisPoint.yaw, thisPoint.roll, thisPoint.pitch);
 }
 
+inline void mapLidarFrameToLoamFrame(pcl::PointCloud<PointType>::Ptr  inputCloud, pcl::PointCloud<PointType>::Ptr outputCloud)
+{
+	Eigen::Affine3f transPose = Eigen::Translation3f(0, 0, 0)
+														* Eigen::AngleAxisf(M_PI/2, Eigen::Vector3f::UnitX())
+														* Eigen::AngleAxisf(M_PI, Eigen::Vector3f::UnitY())
+														* Eigen::AngleAxisf(M_PI/2, Eigen::Vector3f::UnitZ());
+  pcl::transformPointCloud(*inputCloud, *outputCloud, transPose);
+}
+
+inline void mapLoamFrameToLiDARFrame(pcl::PointCloud<PointType>::Ptr  inputCloud, pcl::PointCloud<PointType>::Ptr outputCloud)
+{
+	Eigen::Affine3f transPose = Eigen::Translation3f(0, 0, 0)
+														* Eigen::AngleAxisf(-M_PI/2, Eigen::Vector3f::UnitZ())
+														* Eigen::AngleAxisf(-M_PI, Eigen::Vector3f::UnitY())
+														* Eigen::AngleAxisf(-M_PI/2, Eigen::Vector3f::UnitX());
+  pcl::transformPointCloud(*inputCloud, *outputCloud, transPose);
+}
+
 
 class MapOptimization : public rclcpp::Node {
 
@@ -40,21 +64,32 @@ class MapOptimization : public rclcpp::Node {
   ~MapOptimization();
 
   void run();
+  void cloudHandlerMap(const sensor_msgs::msg::PointCloud2::SharedPtr laserCloudMsg);
+  void visualcloudHandler(const sensor_msgs::msg::PointCloud2::SharedPtr laserCloudMsg);
 
  private:
+
   gtsam::NonlinearFactorGraph gtSAMgraph;
   gtsam::Values initialEstimate;
   gtsam::ISAM2 *isam;
   gtsam::Values isamCurrentEstimate;
 
   bool _loop_closure_enabled;
-
+  bool _save_key_feature_pcd;
+  std::string fileSaveDirectory;
   float _surrounding_keyframe_search_radius;
   int   _surrounding_keyframe_search_num;
   float _history_keyframe_search_radius;
   int   _history_keyframe_search_num;
   float _history_keyframe_fitness_score;
   float _global_map_visualization_search_radius;
+  int mapping_count;
+  std::vector <double> time;
+
+  pcl::PointCloud<PointType>::Ptr _laser_cloud_input;
+  pcl::PointCloud<PointType>::Ptr visualCloud;
+
+//   rclcpp::Service<lego_loam_sr::srv::SaveMap>::SharedPtr srvSaveMap;
 
   Channel<AssociationOut>& _input_channel;
   std::thread _run_thread;
@@ -67,21 +102,38 @@ class MapOptimization : public rclcpp::Node {
   std::thread _loop_closure_thread;
   void loopClosureThread();
 
+  rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr _sub_laser_cloud_map;
+  rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr _sub_visual_cloud;
+  rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr subSaveMap;
+  rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr subInitalPose;
+  void saveMapService(
+    const geometry_msgs::msg::Twist::SharedPtr msg);
+  void callbackInitalPose(
+    const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg);
+
   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pubLaserCloudSurround;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pubEdgeFeatureMap;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pubPlanarFeatureMap;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pubEdgeFeatureRegistered;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pubPlanarFeatureRegistered;
   rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr pubOdomAftMapped;
   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pubKeyPoses;
 
   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pubHistoryKeyFrames;
   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pubIcpKeyFrames;
+  rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pubIcpKeyFramesFalse;
   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pubRecentKeyFrames;
 
   nav_msgs::msg::Odometry odomAftMapped;
   geometry_msgs::msg::TransformStamped aftMappedTrans;
   std::shared_ptr<tf2_ros::TransformBroadcaster> tfBroadcaster;
 
+  std::vector<pcl::PointCloud<PointType>::Ptr> mapCloudKeyFrames;
+
   std::vector<pcl::PointCloud<PointType>::Ptr> cornerCloudKeyFrames;
   std::vector<pcl::PointCloud<PointType>::Ptr> surfCloudKeyFrames;
   std::vector<pcl::PointCloud<PointType>::Ptr> outlierCloudKeyFrames;
+  std::vector<pcl::PointCloud<PointType>::Ptr> visualCloudList;
 
   std::deque<pcl::PointCloud<PointType>::Ptr> recentCornerCloudKeyFrames;
   std::deque<pcl::PointCloud<PointType>::Ptr> recentSurfCloudKeyFrames;
@@ -98,6 +150,7 @@ class MapOptimization : public rclcpp::Node {
 
   pcl::PointCloud<PointType>::Ptr cloudKeyPoses3D;
   pcl::PointCloud<PointTypePose>::Ptr cloudKeyPoses6D;
+  pcl::PointCloud<PointTypePose>::Ptr lidarKeyPoses6D;
 
   pcl::PointCloud<PointType>::Ptr surroundingKeyPoses;
   pcl::PointCloud<PointType>::Ptr surroundingKeyPosesDS;
@@ -111,6 +164,16 @@ class MapOptimization : public rclcpp::Node {
       // odoOptimization
   pcl::PointCloud<PointType>::Ptr
       laserCloudSurfLastDS;  // downsampled surf featuer set from
+      // odoOptimization
+  pcl::PointCloud<PointType>::Ptr
+      laserCloudCornerScan;  // corner feature set from odoOptimization
+  pcl::PointCloud<PointType>::Ptr
+      laserCloudSurfScan;  // surf feature set from odoOptimization
+  pcl::PointCloud<PointType>::Ptr
+      laserCloudCornerScanDS;  // downsampled corner featuer set from
+      // odoOptimization
+  pcl::PointCloud<PointType>::Ptr
+      laserCloudSurfScanDS;  // downsampled surf featuer set from
       // odoOptimization
 
   pcl::PointCloud<PointType>::Ptr
@@ -152,9 +215,16 @@ class MapOptimization : public rclcpp::Node {
   pcl::PointCloud<PointType>::Ptr globalMapKeyPosesDS;
   pcl::PointCloud<PointType>::Ptr globalMapKeyFrames;
   pcl::PointCloud<PointType>::Ptr globalMapKeyFramesDS;
+  pcl::PointCloud<PointType>::Ptr edgeMapKeyFrames;
+  pcl::PointCloud<PointType>::Ptr edgeMapKeyFramesDS;
+  pcl::PointCloud<PointType>::Ptr planarMapKeyFrames;
+  pcl::PointCloud<PointType>::Ptr registeredEdgeFeature;
+  pcl::PointCloud<PointType>::Ptr registeredPlanarFeature;
+  pcl::PointCloud<PointType>::Ptr localInfo;
 
   std::vector<int> pointSearchInd;
   std::vector<float> pointSearchSqDis;
+  std::vector<float> loop_icp_score;
 
   pcl::VoxelGrid<PointType> downSizeFilterCorner;
   pcl::VoxelGrid<PointType> downSizeFilterSurf;
@@ -177,6 +247,20 @@ class MapOptimization : public rclcpp::Node {
   float transformTobeMapped[6];
   float transformBefMapped[6];
   float transformAftMapped[6];
+  float CF_all;
+  float CF_mean;
+  float min_lambda;
+  int frame_idx;
+  int loop_idx;
+  bool newInitalPoseFlag;
+  double period_frame_pre = 0;
+  std::vector<double> gseg_runtime_list3;
+  std::vector<double> timestamp_diff;
+  std::vector<double> MapIterTimes; // Bii
+  int _iter_count_thres;
+  float step_size;
+  float stop_thres;
+  std::chrono::steady_clock::time_point time_pre;
 
   std::mutex mtx;
 
@@ -185,6 +269,7 @@ class MapOptimization : public rclcpp::Node {
   Eigen::Matrix<float, 5, 3> matA0;
   Eigen::Matrix<float, 5, 1> matB0;
   Eigen::Vector3f matX0;
+  Eigen::Matrix<float, 1, 6> Pose6DOF;
 
   Eigen::Matrix3f matA1;
   Eigen::Matrix<float, 1, 3> matD1;
@@ -198,12 +283,19 @@ class MapOptimization : public rclcpp::Node {
   int laserCloudSurfFromMapDSNum;
   int laserCloudCornerLastDSNum;
   int laserCloudSurfLastDSNum;
+  int laserCloudCornerScanDSNum;
+  int laserCloudSurfScanDSNum;
   int laserCloudOutlierLastDSNum;
   int laserCloudSurfTotalLastDSNum;
+  int frame_idx3 = 0;
+//   double accumulated_run_time3 = 0;
+  std::vector<double> accumulated_run_time3;
 
   bool potentialLoopFlag;
   int closestHistoryFrameID;
   int latestFrameIDLoopCloure;
+  int latestFrameIDRegisteredFeature;
+  int iter_num;
 
   bool aLoopIsClosed;
 
@@ -243,6 +335,9 @@ class MapOptimization : public rclcpp::Node {
   void correctPoses();
 
   void clearCloud();
+  void savePcd();
+  void savePose();
+  void savePcdInfo();
 };
 
 #endif // MAPOPTIMIZATION_H
