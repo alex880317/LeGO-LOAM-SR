@@ -1,0 +1,3 @@
+<launch>
+  <executable cmd="ros2 bag record /odom /imu/data /racebot/joint_states /laser_odom_to_init" output="screen" />
+</launch>
