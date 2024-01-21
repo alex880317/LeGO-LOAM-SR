@@ -1781,7 +1781,7 @@ bool FeatureAssociation::calculateTransformationCorner(int iterCount) {
   imuPitchPreCorner = imuPitch[imuPointerLast];
   imuRollPreCorner = imuYaw[imuPointerLast];
   
-  // std::cout << "Precompensation"   << imuRoll[imuPointerLast] << "," << imuPitch[imuPointerLast] << "," << imuYaw[imuPointerLast] << std::endl; //Alex debug
+  std::cout << "Precompensation"   << imuRoll[imuPointerLast] << "," << imuPitch[imuPointerLast] << "," << imuYaw[imuPointerLast] << std::endl; //Alex debug
   //TODO
   float srx = sin(transformCur[0]);
   float crx = cos(transformCur[0]);
@@ -2073,11 +2073,11 @@ void FeatureAssociation::updateInitialGuess(){
     imuVeloFromStartY = imuVeloFromStartYCur;
     imuVeloFromStartZ = imuVeloFromStartZCur;
 
-    // if (imuAngularFromStartX != 0 || imuAngularFromStartY != 0 || imuAngularFromStartZ != 0){
-    //     transformCur[0] = - imuAngularFromStartY;
-    //     transformCur[1] = - imuAngularFromStartZ;
-    //     transformCur[2] = - imuAngularFromStartX;
-    // }
+    if (imuAngularFromStartX != 0 || imuAngularFromStartY != 0 || imuAngularFromStartZ != 0){
+        transformCur[0] = - imuAngularFromStartY;
+        transformCur[1] = - imuAngularFromStartZ;
+        transformCur[2] = - imuAngularFromStartX;
+    }
     
     if (imuVeloFromStartX != 0 || imuVeloFromStartY != 0 || imuVeloFromStartZ != 0){
         transformCur[3] -= imuVeloFromStartX * _scan_period;
@@ -2104,6 +2104,9 @@ void FeatureAssociation::updateInitialGuess(){
                            Eigen::AngleAxisd(transformSum[0], Eigen::Vector3d::UnitY()) *
                            Eigen::AngleAxisd(transformSum[2], Eigen::Vector3d::UnitX());
     Eigen::Matrix3d rotationFromStartToEnd = rotation_matrix_last.transpose() * rotation_matrix_now;
+    rotationFromStartToEnd.transposeInPlace();
+    // // 打印矩陣
+    // std::cout << "Here is the matrix 3x3:\n" << a << std::endl;
     // Eigen::Matrix3d rotationFromStartToEnd = rotation_matrix_now;
     // singular                       
     // Eigen::Vector3d eulerFromStartToEnd = rotation_matrix_now.eulerAngles(2, 1, 0);
@@ -2112,26 +2115,24 @@ void FeatureAssociation::updateInitialGuess(){
     // odomZ = eulerFromStartToEnd[2];
     // odomZ = eulerFromStartToEnd[2];
 
-    double s = 1;
-
     // without singular //https://blog.csdn.net/WillWinston/article/details/125746107
     odomX = std::atan2(rotationFromStartToEnd(2, 1), rotationFromStartToEnd(2, 2)); //odomRoll
     odomY = std::atan2(-rotationFromStartToEnd(2, 0), std::sqrt(rotationFromStartToEnd(2, 1) * rotationFromStartToEnd(2, 1) + rotationFromStartToEnd(2, 2) * rotationFromStartToEnd(2, 2)));  //odomPitch
     odomZ = std::atan2(rotationFromStartToEnd(1, 0), rotationFromStartToEnd(0, 0)); //odomYaw
     
-    transformCur[0] = -odomY; //odomRoll
-    transformCur[1] = -odomZ; //odomPitch
-    transformCur[2] = -odomX; //odomYaw
+    transformCur[0] = odomY; //odomRoll
+    transformCur[1] = odomZ; //odomPitch
+    transformCur[2] = odomX; //odomYaw
 
     Eigen::Vector3d transVector;
     Eigen::Vector3d outer_param_body;
-    outer_param_body << 0.08, 0, 0.035;
+    outer_param_body << 0.08, 0, 0.0377;
     Eigen::Vector3d outer_param_global = rotation_matrix_now * outer_param_body;
-    transVector << (odomPosX[odomPointerLast] + outer_param_global[0] - transformSum[5]), (odomPosY[odomPointerLast] + outer_param_global[1] - transformSum[3]), (odomPosZ[odomPointerLast] + outer_param_global[2] - transformSum[4]);
-    // Eigen::Vector3d transVectorBody = rotation_matrix_last * transVector;
-    // transformCur[5] = transVector[0];
-    // transformCur[3] = transVector[1];
-    // transformCur[4] = transVector[2];
+    transVector << (transformSum[5] - (odomPosX[odomPointerLast] + outer_param_global[0])), (transformSum[3] - (odomPosY[odomPointerLast] + outer_param_global[1])), (transformSum[4] - (odomPosZ[odomPointerLast] + outer_param_global[2]));
+    Eigen::Vector3d transVectorBody = rotation_matrix_now.transpose() * transVector;
+    transformCur[5] = transVectorBody[0];
+    transformCur[3] = transVectorBody[1];
+    transformCur[4] = transVectorBody[2];
     
     // odomX = std::atan2(-rotationFromStartToEnd(1, 2), std::sqrt(rotationFromStartToEnd(1, 1) * rotationFromStartToEnd(1, 1) + rotationFromStartToEnd(1, 0) * rotationFromStartToEnd(1, 0))) - transformSum[0]; //odomRoll
     // odomY = std::atan2(rotationFromStartToEnd(0, 2), rotationFromStartToEnd(2, 2)) - transformSum[1];  //odomPitch
@@ -2163,9 +2164,9 @@ void FeatureAssociation::updateInitialGuess(){
     // pubRotateMsgs->publish(message2);
 
     auto message2 = geometry_msgs::msg::Vector3();
-    message2.x = transformSum[5];
-    message2.y = transformSum[3];
-    message2.z = transformSum[4];
+    message2.x = transVector[0];
+    message2.y = transVector[1];
+    message2.z = transVector[2];
     pubRotateMsgs->publish(message2);
 
 }

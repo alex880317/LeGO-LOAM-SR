@@ -1,0 +1,207 @@
+[1.229s] DEBUG:colcon:Command line arguments: ['/usr/bin/colcon', 'build']
+[1.229s] DEBUG:colcon:Parsed command line arguments: Namespace(allow_overriding=[], ament_cmake_args=None, base_paths=['.'], build_base='build', catkin_cmake_args=None, catkin_skip_building_tests=False, cmake_args=None, cmake_clean_cache=False, cmake_clean_first=False, cmake_force_configure=False, cmake_target=None, cmake_target_skip_unavailable=False, continue_on_error=False, event_handlers=None, executor='parallel', ignore_user_meta=False, install_base='install', log_base=None, log_level=None, main=<bound method BuildVerb.main of <colcon_core.verb.build.BuildVerb object at 0x7f90bcdc2c70>>, merge_install=False, metas=['./colcon.meta'], packages_above=None, packages_above_and_dependencies=None, packages_above_depth=None, packages_end=None, packages_ignore=None, packages_ignore_regex=None, packages_select=None, packages_select_build_failed=False, packages_select_by_dep=None, packages_select_regex=None, packages_select_test_failures=False, packages_skip=None, packages_skip_build_finished=False, packages_skip_by_dep=None, packages_skip_regex=None, packages_skip_test_passed=False, packages_skip_up_to=None, packages_start=None, packages_up_to=None, packages_up_to_regex=None, parallel_workers=16, paths=None, symlink_install=False, test_result_base=None, verb_extension=<colcon_core.verb.build.BuildVerb object at 0x7f90bcdc2c70>, verb_name='build', verb_parser=<colcon_defaults.argument_parser.defaults.DefaultArgumentsDecorator object at 0x7f90bc9c4cd0>)
+[1.282s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) check parameters
+[1.283s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) check parameters
+[1.283s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) check parameters
+[1.283s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) check parameters
+[1.283s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) discover
+[1.283s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) discover
+[1.283s] INFO:colcon.colcon_core.package_discovery:Crawling recursively for packages in '/home/iec/colcon_ws/src/LeGO-LOAM-SR'
+[1.283s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ignore', 'ignore_ament_install']
+[1.283s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore'
+[1.283s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore_ament_install'
+[1.283s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_pkg']
+[1.283s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_pkg'
+[1.283s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_meta']
+[1.283s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_meta'
+[1.283s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ros']
+[1.283s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ros'
+[1.289s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['cmake', 'python']
+[1.289s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'cmake'
+[1.289s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python'
+[1.289s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['python_setup_py']
+[1.289s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'python_setup_py'
+[1.289s] Level 1:colcon.colcon_core.package_identification:_identify(LeGO-LOAM) by extensions ['ignore', 'ignore_ament_install']
+[1.289s] Level 1:colcon.colcon_core.package_identification:_identify(LeGO-LOAM) by extension 'ignore'
+[1.289s] Level 1:colcon.colcon_core.package_identification:_identify(LeGO-LOAM) by extension 'ignore_ament_install'
+[1.290s] Level 1:colcon.colcon_core.package_identification:_identify(LeGO-LOAM) by extensions ['colcon_pkg']
+[1.290s] Level 1:colcon.colcon_core.package_identification:_identify(LeGO-LOAM) by extension 'colcon_pkg'
+[1.290s] Level 1:colcon.colcon_core.package_identification:_identify(LeGO-LOAM) by extensions ['colcon_meta']
+[1.290s] Level 1:colcon.colcon_core.package_identification:_identify(LeGO-LOAM) by extension 'colcon_meta'
+[1.290s] Level 1:colcon.colcon_core.package_identification:_identify(LeGO-LOAM) by extensions ['ros']
+[1.290s] Level 1:colcon.colcon_core.package_identification:_identify(LeGO-LOAM) by extension 'ros'
+[1.291s] DEBUG:colcon.colcon_core.package_identification:Package 'LeGO-LOAM' with type 'ros.ament_cmake' and name 'lego_loam_sr'
+[1.291s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extensions ['ignore', 'ignore_ament_install']
+[1.291s] Level 1:colcon.colcon_core.package_identification:_identify(build) by extension 'ignore'
+[1.291s] Level 1:colcon.colcon_core.package_identification:_identify(build) ignored
+[1.291s] Level 1:colcon.colcon_core.package_identification:_identify(cloud_msgs) by extensions ['ignore', 'ignore_ament_install']
+[1.291s] Level 1:colcon.colcon_core.package_identification:_identify(cloud_msgs) by extension 'ignore'
+[1.291s] Level 1:colcon.colcon_core.package_identification:_identify(cloud_msgs) by extension 'ignore_ament_install'
+[1.291s] Level 1:colcon.colcon_core.package_identification:_identify(cloud_msgs) by extensions ['colcon_pkg']
+[1.291s] Level 1:colcon.colcon_core.package_identification:_identify(cloud_msgs) by extension 'colcon_pkg'
+[1.291s] Level 1:colcon.colcon_core.package_identification:_identify(cloud_msgs) by extensions ['colcon_meta']
+[1.291s] Level 1:colcon.colcon_core.package_identification:_identify(cloud_msgs) by extension 'colcon_meta'
+[1.291s] Level 1:colcon.colcon_core.package_identification:_identify(cloud_msgs) by extensions ['ros']
+[1.291s] Level 1:colcon.colcon_core.package_identification:_identify(cloud_msgs) by extension 'ros'
+[1.292s] DEBUG:colcon.colcon_core.package_identification:Package 'cloud_msgs' with type 'ros.ament_cmake' and name 'cloud_msgs'
+[1.292s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extensions ['ignore', 'ignore_ament_install']
+[1.292s] Level 1:colcon.colcon_core.package_identification:_identify(install) by extension 'ignore'
+[1.292s] Level 1:colcon.colcon_core.package_identification:_identify(install) ignored
+[1.292s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extensions ['ignore', 'ignore_ament_install']
+[1.292s] Level 1:colcon.colcon_core.package_identification:_identify(log) by extension 'ignore'
+[1.292s] Level 1:colcon.colcon_core.package_identification:_identify(log) ignored
+[1.292s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) using defaults
+[1.292s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) discover
+[1.292s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) using defaults
+[1.292s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) discover
+[1.292s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) using defaults
+[1.415s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) check parameters
+[1.415s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) discover
+[1.458s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 2 installed packages in /home/iec/colcon_ws/src/LeGO-LOAM-SR/install
+[1.480s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 268 installed packages in /opt/ros/galactic
+[1.480s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) using defaults
+[1.565s] Level 5:colcon.colcon_core.verb:set package 'cloud_msgs' build argument 'cmake_args' from command line to 'None'
+[1.565s] Level 5:colcon.colcon_core.verb:set package 'cloud_msgs' build argument 'cmake_target' from command line to 'None'
+[1.565s] Level 5:colcon.colcon_core.verb:set package 'cloud_msgs' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[1.565s] Level 5:colcon.colcon_core.verb:set package 'cloud_msgs' build argument 'cmake_clean_cache' from command line to 'False'
+[1.565s] Level 5:colcon.colcon_core.verb:set package 'cloud_msgs' build argument 'cmake_clean_first' from command line to 'False'
+[1.565s] Level 5:colcon.colcon_core.verb:set package 'cloud_msgs' build argument 'cmake_force_configure' from command line to 'False'
+[1.565s] Level 5:colcon.colcon_core.verb:set package 'cloud_msgs' build argument 'ament_cmake_args' from command line to 'None'
+[1.565s] Level 5:colcon.colcon_core.verb:set package 'cloud_msgs' build argument 'catkin_cmake_args' from command line to 'None'
+[1.565s] Level 5:colcon.colcon_core.verb:set package 'cloud_msgs' build argument 'catkin_skip_building_tests' from command line to 'False'
+[1.566s] DEBUG:colcon.colcon_core.verb:Building package 'cloud_msgs' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/cloud_msgs', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs', 'merge_install': False, 'path': '/home/iec/colcon_ws/src/LeGO-LOAM-SR/cloud_msgs', 'symlink_install': False, 'test_result_base': None}
+[1.593s] Level 5:colcon.colcon_core.verb:set package 'lego_loam_sr' build argument 'cmake_args' from command line to 'None'
+[1.593s] Level 5:colcon.colcon_core.verb:set package 'lego_loam_sr' build argument 'cmake_target' from command line to 'None'
+[1.593s] Level 5:colcon.colcon_core.verb:set package 'lego_loam_sr' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[1.593s] Level 5:colcon.colcon_core.verb:set package 'lego_loam_sr' build argument 'cmake_clean_cache' from command line to 'False'
+[1.593s] Level 5:colcon.colcon_core.verb:set package 'lego_loam_sr' build argument 'cmake_clean_first' from command line to 'False'
+[1.593s] Level 5:colcon.colcon_core.verb:set package 'lego_loam_sr' build argument 'cmake_force_configure' from command line to 'False'
+[1.593s] Level 5:colcon.colcon_core.verb:set package 'lego_loam_sr' build argument 'ament_cmake_args' from command line to 'None'
+[1.593s] Level 5:colcon.colcon_core.verb:set package 'lego_loam_sr' build argument 'catkin_cmake_args' from command line to 'None'
+[1.593s] Level 5:colcon.colcon_core.verb:set package 'lego_loam_sr' build argument 'catkin_skip_building_tests' from command line to 'False'
+[1.594s] DEBUG:colcon.colcon_core.verb:Building package 'lego_loam_sr' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr', 'merge_install': False, 'path': '/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM', 'symlink_install': False, 'test_result_base': None}
+[1.614s] INFO:colcon.colcon_core.executor:Executing jobs using 'parallel' executor
+[1.636s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete
+[1.636s] INFO:colcon.colcon_ros.task.ament_cmake.build:Building ROS package in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/cloud_msgs' with build type 'ament_cmake'
+[1.636s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/cloud_msgs'
+[1.658s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_core.shell.bat': Not used on non-Windows systems
+[1.659s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[1.659s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[1.731s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/cloud_msgs': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake --build /home/iec/colcon_ws/src/LeGO-LOAM-SR/build/cloud_msgs -- -j16 -l16
+[1.869s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/cloud_msgs' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake --build /home/iec/colcon_ws/src/LeGO-LOAM-SR/build/cloud_msgs -- -j16 -l16
+[1.912s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/cloud_msgs': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake --install /home/iec/colcon_ws/src/LeGO-LOAM-SR/build/cloud_msgs
+[1.947s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(cloud_msgs)
+[1.947s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/cloud_msgs' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake --install /home/iec/colcon_ws/src/LeGO-LOAM-SR/build/cloud_msgs
+[1.972s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs' for CMake module files
+[1.972s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs' for CMake config files
+[1.973s] Level 1:colcon.colcon_core.shell:create_environment_hook('cloud_msgs', 'cmake_prefix_path')
+[1.998s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/hook/cmake_prefix_path.ps1'
+[1.999s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/hook/cmake_prefix_path.dsv'
+[1.999s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/hook/cmake_prefix_path.sh'
+[1.999s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib'
+[2.000s] Level 1:colcon.colcon_core.shell:create_environment_hook('cloud_msgs', 'ld_library_path_lib')
+[2.022s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/hook/ld_library_path_lib.ps1'
+[2.022s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/hook/ld_library_path_lib.dsv'
+[2.022s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/hook/ld_library_path_lib.sh'
+[2.023s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/bin'
+[2.023s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/pkgconfig/cloud_msgs.pc'
+[2.023s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/python3.8/site-packages'
+[2.023s] Level 1:colcon.colcon_core.shell:create_environment_hook('cloud_msgs', 'pythonpath')
+[2.045s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/hook/pythonpath.ps1'
+[2.045s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/hook/pythonpath.dsv'
+[2.045s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/hook/pythonpath.sh'
+[2.046s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/bin'
+[2.067s] INFO:colcon.colcon_core.shell:Creating package script '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/package.ps1'
+[2.068s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/package.dsv'
+[2.068s] INFO:colcon.colcon_core.shell:Creating package script '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/package.sh'
+[2.069s] INFO:colcon.colcon_core.shell:Creating package script '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/package.bash'
+[2.069s] INFO:colcon.colcon_core.shell:Creating package script '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/package.zsh'
+[2.070s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/colcon-core/packages/cloud_msgs)
+[2.124s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(cloud_msgs)
+[2.147s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs' for CMake module files
+[2.147s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs' for CMake config files
+[2.147s] Level 1:colcon.colcon_core.shell:create_environment_hook('cloud_msgs', 'cmake_prefix_path')
+[2.169s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/hook/cmake_prefix_path.ps1'
+[2.170s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/hook/cmake_prefix_path.dsv'
+[2.170s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/hook/cmake_prefix_path.sh'
+[2.171s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib'
+[2.171s] Level 1:colcon.colcon_core.shell:create_environment_hook('cloud_msgs', 'ld_library_path_lib')
+[2.193s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/hook/ld_library_path_lib.ps1'
+[2.193s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/hook/ld_library_path_lib.dsv'
+[2.193s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/hook/ld_library_path_lib.sh'
+[2.193s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/bin'
+[2.193s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/pkgconfig/cloud_msgs.pc'
+[2.194s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/python3.8/site-packages'
+[2.194s] Level 1:colcon.colcon_core.shell:create_environment_hook('cloud_msgs', 'pythonpath')
+[2.216s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/hook/pythonpath.ps1'
+[2.216s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/hook/pythonpath.dsv'
+[2.216s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/hook/pythonpath.sh'
+[2.217s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/bin'
+[2.240s] INFO:colcon.colcon_core.shell:Creating package script '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/package.ps1'
+[2.240s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/package.dsv'
+[2.240s] INFO:colcon.colcon_core.shell:Creating package script '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/package.sh'
+[2.241s] INFO:colcon.colcon_core.shell:Creating package script '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/package.bash'
+[2.241s] INFO:colcon.colcon_core.shell:Creating package script '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/package.zsh'
+[2.241s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/colcon-core/packages/cloud_msgs)
+[2.241s] INFO:colcon.colcon_ros.task.ament_cmake.build:Building ROS package in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM' with build type 'ament_cmake'
+[2.241s] INFO:colcon.colcon_cmake.task.cmake.build:Building CMake package in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM'
+[2.266s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[2.266s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[2.341s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr': CMAKE_PREFIX_PATH=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs:/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr:/opt/ros/galactic /usr/bin/cmake --build /home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr -- -j16 -l16
+[34.662s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr' returned '0': CMAKE_PREFIX_PATH=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs:/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr:/opt/ros/galactic /usr/bin/cmake --build /home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr -- -j16 -l16
+[34.683s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr': CMAKE_PREFIX_PATH=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs:/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr:/opt/ros/galactic /usr/bin/cmake --install /home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr
+[34.693s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(lego_loam_sr)
+[34.694s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr' returned '0': CMAKE_PREFIX_PATH=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs:/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr:/opt/ros/galactic /usr/bin/cmake --install /home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr
+[34.716s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr' for CMake module files
+[34.716s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr' for CMake config files
+[34.716s] Level 1:colcon.colcon_core.shell:create_environment_hook('lego_loam_sr', 'cmake_prefix_path')
+[34.738s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/hook/cmake_prefix_path.ps1'
+[34.738s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/hook/cmake_prefix_path.dsv'
+[34.738s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/hook/cmake_prefix_path.sh'
+[34.739s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/lib'
+[34.739s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/bin'
+[34.739s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/lib/pkgconfig/lego_loam_sr.pc'
+[34.739s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/lib/python3.8/site-packages'
+[34.739s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/bin'
+[34.760s] INFO:colcon.colcon_core.shell:Creating package script '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/package.ps1'
+[34.761s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/package.dsv'
+[34.761s] INFO:colcon.colcon_core.shell:Creating package script '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/package.sh'
+[34.761s] INFO:colcon.colcon_core.shell:Creating package script '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/package.bash'
+[34.761s] INFO:colcon.colcon_core.shell:Creating package script '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/package.zsh'
+[34.761s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/colcon-core/packages/lego_loam_sr)
+[34.802s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(lego_loam_sr)
+[34.830s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr' for CMake module files
+[34.830s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr' for CMake config files
+[34.830s] Level 1:colcon.colcon_core.shell:create_environment_hook('lego_loam_sr', 'cmake_prefix_path')
+[34.852s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/hook/cmake_prefix_path.ps1'
+[34.852s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/hook/cmake_prefix_path.dsv'
+[34.852s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/hook/cmake_prefix_path.sh'
+[34.852s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/lib'
+[34.852s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/bin'
+[34.852s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/lib/pkgconfig/lego_loam_sr.pc'
+[34.853s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/lib/python3.8/site-packages'
+[34.853s] Level 1:colcon.colcon_core.environment:checking '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/bin'
+[34.876s] INFO:colcon.colcon_core.shell:Creating package script '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/package.ps1'
+[34.876s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/package.dsv'
+[34.876s] INFO:colcon.colcon_core.shell:Creating package script '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/package.sh'
+[34.877s] INFO:colcon.colcon_core.shell:Creating package script '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/package.bash'
+[34.877s] INFO:colcon.colcon_core.shell:Creating package script '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/package.zsh'
+[34.877s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/colcon-core/packages/lego_loam_sr)
+[34.877s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:closing loop
+[34.877s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:loop closed
+[34.877s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete finished with '0'
+[34.878s] DEBUG:colcon.colcon_core.event_reactor:joining thread
+[34.906s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.terminal_notifier': Not used on non-Darwin systems
+[34.906s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.win32': Not used on non-Windows systems
+[34.906s] INFO:colcon.colcon_notification.desktop_notification:Sending desktop notification using 'notify2'
+[34.920s] DEBUG:colcon.colcon_core.event_reactor:joined thread
+[34.946s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/local_setup.ps1'
+[34.947s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/_local_setup_util_ps1.py'
+[34.949s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/setup.ps1'
+[34.975s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/local_setup.sh'
+[34.976s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/_local_setup_util_sh.py'
+[34.976s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/setup.sh'
+[35.001s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/local_setup.bash'
+[35.001s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/setup.bash'
+[35.025s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/local_setup.zsh'
+[35.026s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/setup.zsh'
