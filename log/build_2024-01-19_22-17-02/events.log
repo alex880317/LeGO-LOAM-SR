@@ -1,0 +1,717 @@
+[0.000000] (-) TimerEvent: {}
+[0.000253] (cloud_msgs) JobQueued: {'identifier': 'cloud_msgs', 'dependencies': OrderedDict()}
+[0.000300] (lego_loam_sr) JobQueued: {'identifier': 'lego_loam_sr', 'dependencies': OrderedDict([('cloud_msgs', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs')])}
+[0.000316] (cloud_msgs) JobStarted: {'identifier': 'cloud_msgs'}
+[0.091860] (cloud_msgs) JobProgress: {'identifier': 'cloud_msgs', 'progress': 'cmake'}
+[0.092265] (cloud_msgs) JobProgress: {'identifier': 'cloud_msgs', 'progress': 'build'}
+[0.092870] (cloud_msgs) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/cloud_msgs', '--', '-j16', '-l16'], 'cwd': '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/cloud_msgs', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'iec'), ('SSH_AGENT_PID', '2402'), ('XDG_SESSION_TYPE', 'x11'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib:/opt/ros/galactic/opt/yaml_cpp_vendor/lib:/opt/ros/galactic/opt/rviz_ogre_vendor/lib:/opt/ros/galactic/lib/x86_64-linux-gnu:/opt/ros/galactic/lib'), ('HOME', '/home/iec'), ('DESKTOP_SESSION', 'ubuntu'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('MANAGERPID', '2219'), ('DBUS_STARTER_BUS_TYPE', 'session'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus,guid=f861fcc10768c8676a27535765a168bc'), ('COLORTERM', 'truecolor'), ('IM_CONFIG_PHASE', '1'), ('COLCON_PREFIX_PATH', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install'), ('ROS_DISTRO', 'galactic'), ('LOGNAME', 'iec'), ('JOURNAL_STREAM', '8:46889'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'iec'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('WINDOWPATH', '2'), ('PATH', '/opt/ros/galactic/bin:/home/iec/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'), ('SESSION_MANAGER', 'local/iec-slave:@/tmp/.ICE-unix/2440,unix/iec-slave:/tmp/.ICE-unix/2440'), ('INVOCATION_ID', '64e6587337e849b78b04388b83c490e9'), ('XDG_MENU_PREFIX', 'gnome-'), ('GNOME_TERMINAL_SCREEN', '/org/gnome/Terminal/screen/17716af1_2ffe_43aa_a609_5cdd2999a132'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('DISPLAY', ':0'), ('LANG', 'en_US.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/gdm/Xauthority'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('GNOME_TERMINAL_SERVICE', ':1.103'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('AMENT_PREFIX_PATH', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr:/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs:/opt/ros/galactic'), ('SHELL', '/bin/bash'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('GPG_AGENT_INFO', '/run/user/1000/gnupg/S.gpg-agent:0:1'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/cloud_msgs'), ('LC_ALL', 'en_US.UTF-8'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('DBUS_STARTER_ADDRESS', 'unix:path=/run/user/1000/bus,guid=f861fcc10768c8676a27535765a168bc'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/python3.8/site-packages:/opt/ros/galactic/lib/python3.8/site-packages'), ('COLCON', '1'), ('VTE_VERSION', '6003'), ('CMAKE_PREFIX_PATH', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr:/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs:/opt/ros/galactic')]), 'shell': False}
+[0.099732] (-) TimerEvent: {}
+[0.125006] (cloud_msgs) StdoutLine: {'line': b'[  3%] Built target cloud_msgs__cpp\n'}
+[0.125591] (cloud_msgs) StdoutLine: {'line': b'[ 12%] Built target cloud_msgs__rosidl_generator_c\n'}
+[0.140643] (cloud_msgs) StdoutLine: {'line': b'[ 51%] Built target cloud_msgs__rosidl_typesupport_c\n'}
+[0.140815] (cloud_msgs) StdoutLine: {'line': b'[ 51%] Built target cloud_msgs__rosidl_typesupport_introspection_c\n'}
+[0.140860] (cloud_msgs) StdoutLine: {'line': b'[ 51%] Built target cloud_msgs__rosidl_typesupport_introspection_cpp\n'}
+[0.140900] (cloud_msgs) StdoutLine: {'line': b'[ 51%] Built target cloud_msgs__rosidl_typesupport_cpp\n'}
+[0.142464] (cloud_msgs) StdoutLine: {'line': b'[ 61%] Built target cloud_msgs__rosidl_typesupport_fastrtps_cpp\n'}
+[0.158033] (cloud_msgs) StdoutLine: {'line': b'[ 70%] Built target cloud_msgs__rosidl_typesupport_fastrtps_c\n'}
+[0.170677] (cloud_msgs) StdoutLine: {'line': b'[ 70%] Built target cloud_msgs\n'}
+[0.191443] (cloud_msgs) StdoutLine: {'line': b'[ 74%] Built target cloud_msgs__py\n'}
+[0.199919] (-) TimerEvent: {}
+[0.215435] (cloud_msgs) StdoutLine: {'line': b'[ 80%] Built target cloud_msgs__python\n'}
+[0.232895] (cloud_msgs) StdoutLine: {'line': b'[100%] Built target cloud_msgs__rosidl_typesupport_c__pyext\n'}
+[0.233053] (cloud_msgs) StdoutLine: {'line': b'[100%] Built target cloud_msgs__rosidl_typesupport_introspection_c__pyext\n'}
+[0.233096] (cloud_msgs) StdoutLine: {'line': b'[100%] Built target cloud_msgs__rosidl_typesupport_fastrtps_c__pyext\n'}
+[0.240556] (cloud_msgs) CommandEnded: {'returncode': 0}
+[0.266890] (cloud_msgs) JobProgress: {'identifier': 'cloud_msgs', 'progress': 'install'}
+[0.272409] (cloud_msgs) Command: {'cmd': ['/usr/bin/cmake', '--install', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/cloud_msgs'], 'cwd': '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/cloud_msgs', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'iec'), ('SSH_AGENT_PID', '2402'), ('XDG_SESSION_TYPE', 'x11'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib:/opt/ros/galactic/opt/yaml_cpp_vendor/lib:/opt/ros/galactic/opt/rviz_ogre_vendor/lib:/opt/ros/galactic/lib/x86_64-linux-gnu:/opt/ros/galactic/lib'), ('HOME', '/home/iec'), ('DESKTOP_SESSION', 'ubuntu'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('MANAGERPID', '2219'), ('DBUS_STARTER_BUS_TYPE', 'session'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus,guid=f861fcc10768c8676a27535765a168bc'), ('COLORTERM', 'truecolor'), ('IM_CONFIG_PHASE', '1'), ('COLCON_PREFIX_PATH', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install'), ('ROS_DISTRO', 'galactic'), ('LOGNAME', 'iec'), ('JOURNAL_STREAM', '8:46889'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'iec'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('WINDOWPATH', '2'), ('PATH', '/opt/ros/galactic/bin:/home/iec/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'), ('SESSION_MANAGER', 'local/iec-slave:@/tmp/.ICE-unix/2440,unix/iec-slave:/tmp/.ICE-unix/2440'), ('INVOCATION_ID', '64e6587337e849b78b04388b83c490e9'), ('XDG_MENU_PREFIX', 'gnome-'), ('GNOME_TERMINAL_SCREEN', '/org/gnome/Terminal/screen/17716af1_2ffe_43aa_a609_5cdd2999a132'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('DISPLAY', ':0'), ('LANG', 'en_US.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/gdm/Xauthority'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('GNOME_TERMINAL_SERVICE', ':1.103'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('AMENT_PREFIX_PATH', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr:/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs:/opt/ros/galactic'), ('SHELL', '/bin/bash'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('GPG_AGENT_INFO', '/run/user/1000/gnupg/S.gpg-agent:0:1'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/cloud_msgs'), ('LC_ALL', 'en_US.UTF-8'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('DBUS_STARTER_ADDRESS', 'unix:path=/run/user/1000/bus,guid=f861fcc10768c8676a27535765a168bc'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/python3.8/site-packages:/opt/ros/galactic/lib/python3.8/site-packages'), ('COLCON', '1'), ('VTE_VERSION', '6003'), ('CMAKE_PREFIX_PATH', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr:/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs:/opt/ros/galactic')]), 'shell': False}
+[0.278212] (cloud_msgs) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[0.278386] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/ament_index/resource_index/rosidl_interfaces/cloud_msgs\n'}
+[0.278444] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs\n'}
+[0.278482] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg\n'}
+[0.278531] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/rosidl_generator_c__visibility_control.h\n'}
+[0.278572] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/detail\n'}
+[0.278608] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/detail/cloud_info__type_support.h\n'}
+[0.278652] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/detail/cloud_info__functions.h\n'}
+[0.278696] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/detail/cloud_info__functions.c\n'}
+[0.278739] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/detail/cloud_info__struct.h\n'}
+[0.278783] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/cloud_info.h\n'}
+[0.278844] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/environment/library_path.sh\n'}
+[0.278880] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/environment/library_path.dsv\n'}
+[0.278970] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/libcloud_msgs__rosidl_generator_c.so\n'}
+[0.279007] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs\n'}
+[0.279041] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg\n'}
+[0.279085] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/rosidl_typesupport_fastrtps_c__visibility_control.h\n'}
+[0.279130] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/detail\n'}
+[0.279172] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/detail/cloud_info__rosidl_typesupport_fastrtps_c.h\n'}
+[0.279250] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/libcloud_msgs__rosidl_typesupport_fastrtps_c.so\n'}
+[0.279286] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs\n'}
+[0.279324] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg\n'}
+[0.279378] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h\n'}
+[0.279414] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/detail\n'}
+[0.279448] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/detail/dds_fastrtps\n'}
+[0.279483] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/detail/cloud_info__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[0.279530] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/libcloud_msgs__rosidl_typesupport_fastrtps_cpp.so\n'}
+[0.279565] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs\n'}
+[0.279602] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg\n'}
+[0.279692] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/rosidl_typesupport_introspection_c__visibility_control.h\n'}
+[0.279781] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/detail\n'}
+[0.279817] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/detail/cloud_info__rosidl_typesupport_introspection_c.h\n'}
+[0.279854] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/detail/cloud_info__type_support.c\n'}
+[0.279893] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/libcloud_msgs__rosidl_typesupport_introspection_c.so\n'}
+[0.279938] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/libcloud_msgs__rosidl_typesupport_c.so\n'}
+[0.279989] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs\n'}
+[0.280025] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg\n'}
+[0.280067] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/cloud_info.hpp\n'}
+[0.280111] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/detail\n'}
+[0.280155] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/detail/cloud_info__traits.hpp\n'}
+[0.280233] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/detail/cloud_info__builder.hpp\n'}
+[0.280271] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/detail/cloud_info__struct.hpp\n'}
+[0.280307] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs\n'}
+[0.280342] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg\n'}
+[0.280377] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/detail\n'}
+[0.280412] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/detail/cloud_info__rosidl_typesupport_introspection_cpp.hpp\n'}
+[0.280447] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/cloud_msgs/msg/detail/cloud_info__type_support.cpp\n'}
+[0.280482] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/libcloud_msgs__rosidl_typesupport_introspection_cpp.so\n'}
+[0.280517] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/libcloud_msgs__rosidl_typesupport_cpp.so\n'}
+[0.280552] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/environment/pythonpath.sh\n'}
+[0.280587] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/environment/pythonpath.dsv\n'}
+[0.280622] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/python3.8/site-packages/cloud_msgs/__init__.py\n'}
+[0.299999] (-) TimerEvent: {}
+[0.300130] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/python3.8/site-packages/cloud_msgs/msg\n'}
+[0.300214] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/python3.8/site-packages/cloud_msgs/msg/_cloud_info.py\n'}
+[0.300273] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/python3.8/site-packages/cloud_msgs/msg/_cloud_info_s.c\n'}
+[0.300309] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/python3.8/site-packages/cloud_msgs/msg/__init__.py\n'}
+[0.300345] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/python3.8/site-packages/cloud_msgs/cloud_msgs_s__rosidl_typesupport_fastrtps_c.cpython-38-x86_64-linux-gnu.so\n'}
+[0.300581] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/python3.8/site-packages/cloud_msgs/cloud_msgs_s__rosidl_typesupport_introspection_c.cpython-38-x86_64-linux-gnu.so\n'}
+[0.301039] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/python3.8/site-packages/cloud_msgs/cloud_msgs_s__rosidl_typesupport_c.cpython-38-x86_64-linux-gnu.so\n'}
+[0.301241] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/libcloud_msgs__python.so\n'}
+[0.301332] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/msg/CloudInfo.idl\n'}
+[0.301390] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/msg/CloudInfo.msg\n'}
+[0.301457] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/ament_index/resource_index/package_run_dependencies/cloud_msgs\n'}
+[0.301520] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/ament_index/resource_index/parent_prefix_path/cloud_msgs\n'}
+[0.301586] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/environment/ament_prefix_path.sh\n'}
+[0.301647] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/environment/ament_prefix_path.dsv\n'}
+[0.301698] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/environment/path.sh\n'}
+[0.301734] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/environment/path.dsv\n'}
+[0.301775] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/local_setup.bash\n'}
+[0.301817] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/local_setup.sh\n'}
+[0.301859] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/local_setup.zsh\n'}
+[0.301901] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/local_setup.dsv\n'}
+[0.301943] (cloud_msgs) StdoutLine: {'line': b'-- Installing: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/package.dsv\n'}
+[0.301999] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/ament_index/resource_index/packages/cloud_msgs\n'}
+[0.302052] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/cmake/cloud_msgs__rosidl_generator_cExport.cmake\n'}
+[0.302108] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/cmake/cloud_msgs__rosidl_generator_cExport-noconfig.cmake\n'}
+[0.302144] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/cmake/cloud_msgs__rosidl_typesupport_introspection_cExport.cmake\n'}
+[0.302192] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/cmake/cloud_msgs__rosidl_typesupport_introspection_cExport-noconfig.cmake\n'}
+[0.302226] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/cmake/cloud_msgs__rosidl_typesupport_cExport.cmake\n'}
+[0.302283] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/cmake/cloud_msgs__rosidl_typesupport_cExport-noconfig.cmake\n'}
+[0.302319] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/cmake/cloud_msgs__rosidl_generator_cppExport.cmake\n'}
+[0.302360] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/cmake/cloud_msgs__rosidl_typesupport_introspection_cppExport.cmake\n'}
+[0.302420] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/cmake/cloud_msgs__rosidl_typesupport_introspection_cppExport-noconfig.cmake\n'}
+[0.302489] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/cmake/cloud_msgs__rosidl_typesupport_cppExport.cmake\n'}
+[0.302556] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/cmake/cloud_msgs__rosidl_typesupport_cppExport-noconfig.cmake\n'}
+[0.302615] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/cmake/rosidl_cmake-extras.cmake\n'}
+[0.302658] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/cmake/ament_cmake_export_dependencies-extras.cmake\n'}
+[0.302701] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/cmake/ament_cmake_export_libraries-extras.cmake\n'}
+[0.302744] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/cmake/ament_cmake_export_targets-extras.cmake\n'}
+[0.302790] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/cmake/ament_cmake_export_include_directories-extras.cmake\n'}
+[0.302824] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/cmake/rosidl_cmake_export_typesupport_libraries-extras.cmake\n'}
+[0.302858] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/cmake/rosidl_cmake_export_typesupport_targets-extras.cmake\n'}
+[0.302891] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/cmake/cloud_msgsConfig.cmake\n'}
+[0.302924] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/cmake/cloud_msgsConfig-version.cmake\n'}
+[0.302961] (cloud_msgs) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/share/cloud_msgs/package.xml\n'}
+[0.304124] (cloud_msgs) CommandEnded: {'returncode': 0}
+[0.400267] (-) TimerEvent: {}
+[0.501209] (-) TimerEvent: {}
+[0.592382] (cloud_msgs) JobEnded: {'identifier': 'cloud_msgs', 'rc': 0}
+[0.592842] (lego_loam_sr) JobStarted: {'identifier': 'lego_loam_sr'}
+[0.601903] (-) TimerEvent: {}
+[0.685359] (lego_loam_sr) JobProgress: {'identifier': 'lego_loam_sr', 'progress': 'cmake'}
+[0.686715] (lego_loam_sr) JobProgress: {'identifier': 'lego_loam_sr', 'progress': 'build'}
+[0.686839] (lego_loam_sr) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr', '--', '-j16', '-l16'], 'cwd': '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'iec'), ('SSH_AGENT_PID', '2402'), ('XDG_SESSION_TYPE', 'x11'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib:/opt/ros/galactic/opt/yaml_cpp_vendor/lib:/opt/ros/galactic/opt/rviz_ogre_vendor/lib:/opt/ros/galactic/lib/x86_64-linux-gnu:/opt/ros/galactic/lib'), ('HOME', '/home/iec'), ('DESKTOP_SESSION', 'ubuntu'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('MANAGERPID', '2219'), ('DBUS_STARTER_BUS_TYPE', 'session'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus,guid=f861fcc10768c8676a27535765a168bc'), ('COLORTERM', 'truecolor'), ('IM_CONFIG_PHASE', '1'), ('COLCON_PREFIX_PATH', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install'), ('ROS_DISTRO', 'galactic'), ('LOGNAME', 'iec'), ('JOURNAL_STREAM', '8:46889'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'iec'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('WINDOWPATH', '2'), ('PATH', '/opt/ros/galactic/bin:/home/iec/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'), ('SESSION_MANAGER', 'local/iec-slave:@/tmp/.ICE-unix/2440,unix/iec-slave:/tmp/.ICE-unix/2440'), ('INVOCATION_ID', '64e6587337e849b78b04388b83c490e9'), ('XDG_MENU_PREFIX', 'gnome-'), ('GNOME_TERMINAL_SCREEN', '/org/gnome/Terminal/screen/17716af1_2ffe_43aa_a609_5cdd2999a132'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('DISPLAY', ':0'), ('LANG', 'en_US.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/gdm/Xauthority'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('GNOME_TERMINAL_SERVICE', ':1.103'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('AMENT_PREFIX_PATH', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr:/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs:/opt/ros/galactic'), ('SHELL', '/bin/bash'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('GPG_AGENT_INFO', '/run/user/1000/gnupg/S.gpg-agent:0:1'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr'), ('LC_ALL', 'en_US.UTF-8'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('DBUS_STARTER_ADDRESS', 'unix:path=/run/user/1000/bus,guid=f861fcc10768c8676a27535765a168bc'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/python3.8/site-packages:/opt/ros/galactic/lib/python3.8/site-packages'), ('COLCON', '1'), ('VTE_VERSION', '6003'), ('CMAKE_PREFIX_PATH', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs:/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr:/opt/ros/galactic')]), 'shell': False}
+[0.702006] (-) TimerEvent: {}
+[0.729866] (lego_loam_sr) StdoutLine: {'line': b'\x1b[35m\x1b[1mScanning dependencies of target lego_loam_sr\x1b[0m\n'}
+[0.779773] (lego_loam_sr) StdoutLine: {'line': b'[ 16%] \x1b[32mBuilding CXX object CMakeFiles/lego_loam_sr.dir/src/featureAssociation.cpp.o\x1b[0m\n'}
+[0.802149] (-) TimerEvent: {}
+[0.902447] (-) TimerEvent: {}
+[1.002782] (-) TimerEvent: {}
+[1.103067] (-) TimerEvent: {}
+[1.203376] (-) TimerEvent: {}
+[1.303749] (-) TimerEvent: {}
+[1.404013] (-) TimerEvent: {}
+[1.504307] (-) TimerEvent: {}
+[1.604631] (-) TimerEvent: {}
+[1.705023] (-) TimerEvent: {}
+[1.805285] (-) TimerEvent: {}
+[1.905538] (-) TimerEvent: {}
+[2.005783] (-) TimerEvent: {}
+[2.106080] (-) TimerEvent: {}
+[2.206387] (-) TimerEvent: {}
+[2.306685] (-) TimerEvent: {}
+[2.406980] (-) TimerEvent: {}
+[2.507283] (-) TimerEvent: {}
+[2.607578] (-) TimerEvent: {}
+[2.707820] (-) TimerEvent: {}
+[2.808131] (-) TimerEvent: {}
+[2.908381] (-) TimerEvent: {}
+[3.008692] (-) TimerEvent: {}
+[3.108930] (-) TimerEvent: {}
+[3.209184] (-) TimerEvent: {}
+[3.309432] (-) TimerEvent: {}
+[3.409746] (-) TimerEvent: {}
+[3.511255] (-) TimerEvent: {}
+[3.611558] (-) TimerEvent: {}
+[3.711861] (-) TimerEvent: {}
+[3.812158] (-) TimerEvent: {}
+[3.912471] (-) TimerEvent: {}
+[4.012719] (-) TimerEvent: {}
+[4.113000] (-) TimerEvent: {}
+[4.213261] (-) TimerEvent: {}
+[4.313518] (-) TimerEvent: {}
+[4.413776] (-) TimerEvent: {}
+[4.514083] (-) TimerEvent: {}
+[4.614367] (-) TimerEvent: {}
+[4.714613] (-) TimerEvent: {}
+[4.814929] (-) TimerEvent: {}
+[4.915235] (-) TimerEvent: {}
+[5.015604] (-) TimerEvent: {}
+[5.115921] (-) TimerEvent: {}
+[5.195033] (lego_loam_sr) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/usr/include/boost/preprocessor/tuple/elem.hpp:23\x1b[m\x1b[K,\n'}
+[5.195190] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/usr/include/boost/preprocessor/arithmetic/add.hpp:21\x1b[m\x1b[K,\n'}
+[5.195367] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/usr/include/boost/mpl/aux_/preprocessor/def_params_tail.hpp:66\x1b[m\x1b[K,\n'}
+[5.195411] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/usr/include/boost/mpl/aux_/na_spec.hpp:28\x1b[m\x1b[K,\n'}
+[5.195446] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/usr/include/boost/mpl/not.hpp:20\x1b[m\x1b[K,\n'}
+[5.195481] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/usr/include/boost/mpl/assert.hpp:17\x1b[m\x1b[K,\n'}
+[5.195514] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/usr/include/pcl-1.10/pcl/point_traits.h:48\x1b[m\x1b[K,\n'}
+[5.195547] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/usr/include/pcl-1.10/pcl/point_cloud.h:50\x1b[m\x1b[K,\n'}
+[5.195580] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:12\x1b[m\x1b[K,\n'}
+[5.195616] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4\x1b[m\x1b[K,\n'}
+[5.195649] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37\x1b[m\x1b[K:\n'}
+[5.195682] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:151:36:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[Kusing uint16_t = uint16_t\x1b[m\x1b[K\xe2\x80\x99 is deprecated: use std::uint16_t instead of pcl::uint16_t [\x1b[01;35m\x1b[K-Wdeprecated-declarations\x1b[m\x1b[K]\n'}
+[5.195723] (lego_loam_sr) StderrLine: {'line': b'  151 |                                   (\x1b[01;35m\x1b[Kuint16_t\x1b[m\x1b[K, label, label)\n'}
+[5.195756] (lego_loam_sr) StderrLine: {'line': b'      |                                    \x1b[01;35m\x1b[K^~~~~~~~\x1b[m\x1b[K\n'}
+[5.195789] (lego_loam_sr) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/usr/include/pcl-1.10/pcl/PCLHeader.h:10\x1b[m\x1b[K,\n'}
+[5.195821] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/usr/include/pcl-1.10/pcl/point_cloud.h:47\x1b[m\x1b[K,\n'}
+[5.195854] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:12\x1b[m\x1b[K,\n'}
+[5.195886] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4\x1b[m\x1b[K,\n'}
+[5.195918] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37\x1b[m\x1b[K:\n'}
+[5.195950] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/usr/include/pcl-1.10/pcl/pcl_macros.h:94:9:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kdeclared here\n'}
+[5.195983] (lego_loam_sr) StderrLine: {'line': b'   94 |   using \x1b[01;36m\x1b[Kuint16_t\x1b[m\x1b[K [[deprecated("use std::uint16_t instead of pcl::uint16_t")]] = std::uint16_t;\n'}
+[5.196015] (lego_loam_sr) StderrLine: {'line': b'      |         \x1b[01;36m\x1b[K^~~~~~~~\x1b[m\x1b[K\n'}
+[5.196048] (lego_loam_sr) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/usr/include/boost/preprocessor/tuple/elem.hpp:23\x1b[m\x1b[K,\n'}
+[5.196080] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/usr/include/boost/preprocessor/arithmetic/add.hpp:21\x1b[m\x1b[K,\n'}
+[5.196111] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/usr/include/boost/mpl/aux_/preprocessor/def_params_tail.hpp:66\x1b[m\x1b[K,\n'}
+[5.196143] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/usr/include/boost/mpl/aux_/na_spec.hpp:28\x1b[m\x1b[K,\n'}
+[5.196175] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/usr/include/boost/mpl/not.hpp:20\x1b[m\x1b[K,\n'}
+[5.196207] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/usr/include/boost/mpl/assert.hpp:17\x1b[m\x1b[K,\n'}
+[5.196239] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/usr/include/pcl-1.10/pcl/point_traits.h:48\x1b[m\x1b[K,\n'}
+[5.196271] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/usr/include/pcl-1.10/pcl/point_cloud.h:50\x1b[m\x1b[K,\n'}
+[5.196303] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:12\x1b[m\x1b[K,\n'}
+[5.196335] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4\x1b[m\x1b[K,\n'}
+[5.196367] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37\x1b[m\x1b[K:\n'}
+[5.196397] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:152:36:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[Kusing uint16_t = uint16_t\x1b[m\x1b[K\xe2\x80\x99 is deprecated: use std::uint16_t instead of pcl::uint16_t [\x1b[01;35m\x1b[K-Wdeprecated-declarations\x1b[m\x1b[K]\n'}
+[5.196434] (lego_loam_sr) StderrLine: {'line': b'  152 |                                   (\x1b[01;35m\x1b[Kuint16_t\x1b[m\x1b[K, id, id))\n'}
+[5.196466] (lego_loam_sr) StderrLine: {'line': b'      |                                    \x1b[01;35m\x1b[K^~~~~~~~\x1b[m\x1b[K\n'}
+[5.196499] (lego_loam_sr) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/usr/include/pcl-1.10/pcl/PCLHeader.h:10\x1b[m\x1b[K,\n'}
+[5.196533] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/usr/include/pcl-1.10/pcl/point_cloud.h:47\x1b[m\x1b[K,\n'}
+[5.196565] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:12\x1b[m\x1b[K,\n'}
+[5.196598] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4\x1b[m\x1b[K,\n'}
+[5.196639] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37\x1b[m\x1b[K:\n'}
+[5.196681] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/usr/include/pcl-1.10/pcl/pcl_macros.h:94:9:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kdeclared here\n'}
+[5.196718] (lego_loam_sr) StderrLine: {'line': b'   94 |   using \x1b[01;36m\x1b[Kuint16_t\x1b[m\x1b[K [[deprecated("use std::uint16_t instead of pcl::uint16_t")]] = std::uint16_t;\n'}
+[5.196752] (lego_loam_sr) StderrLine: {'line': b'      |         \x1b[01;36m\x1b[K^~~~~~~~\x1b[m\x1b[K\n'}
+[5.216004] (-) TimerEvent: {}
+[5.316305] (-) TimerEvent: {}
+[5.366832] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:\x1b[m\x1b[K In constructor \xe2\x80\x98\x1b[01m\x1b[KFeatureAssociation::FeatureAssociation(const string&, Channel<ProjectionOut>&, Channel<AssociationOut>&)\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[5.367292] (lego_loam_sr) StderrLine: {'line': b"\x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:94:47:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)\x1b[m\x1b[K\xe2\x80\x99 is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\\nIf you want to declare a parameter that won't change type without a default value use:\\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\\n\\nIf you want to declare a parameter that can dynamically change type use:\\n```\\nrcl_interfaces::msg::ParameterDescriptor descriptor;\\ndescriptor.dynamic_typing = true;\\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\\n``` [\x1b[01;35m\x1b[K-Wdeprecated-declarations\x1b[m\x1b[K]\n"}
+[5.367342] (lego_loam_sr) StderrLine: {'line': b'   94 |   this->declare_parameter(PARAM_VERTICAL_SCANS\x1b[01;35m\x1b[K)\x1b[m\x1b[K;\n'}
+[5.367380] (lego_loam_sr) StderrLine: {'line': b'      |                                               \x1b[01;35m\x1b[K^\x1b[m\x1b[K\n'}
+[5.367415] (lego_loam_sr) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28\x1b[m\x1b[K,\n'}
+[5.367450] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors.hpp:22\x1b[m\x1b[K,\n'}
+[5.367484] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156\x1b[m\x1b[K,\n'}
+[5.367517] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5\x1b[m\x1b[K,\n'}
+[5.367550] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4\x1b[m\x1b[K,\n'}
+[5.367583] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37\x1b[m\x1b[K:\n'}
+[5.367616] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kdeclared here\n'}
+[5.367649] (lego_loam_sr) StderrLine: {'line': b'  422 |   \x1b[01;36m\x1b[Kdeclare_parameter\x1b[m\x1b[K(const std::string & name);\n'}
+[5.367686] (lego_loam_sr) StderrLine: {'line': b'      |   \x1b[01;36m\x1b[K^~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[5.367719] (lego_loam_sr) StderrLine: {'line': b"\x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:95:49:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)\x1b[m\x1b[K\xe2\x80\x99 is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\\nIf you want to declare a parameter that won't change type without a default value use:\\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\\n\\nIf you want to declare a parameter that can dynamically change type use:\\n```\\nrcl_interfaces::msg::ParameterDescriptor descriptor;\\ndescriptor.dynamic_typing = true;\\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\\n``` [\x1b[01;35m\x1b[K-Wdeprecated-declarations\x1b[m\x1b[K]\n"}
+[5.367756] (lego_loam_sr) StderrLine: {'line': b'   95 |   this->declare_parameter(PARAM_HORIZONTAL_SCANS\x1b[01;35m\x1b[K)\x1b[m\x1b[K;\n'}
+[5.367791] (lego_loam_sr) StderrLine: {'line': b'      |                                                 \x1b[01;35m\x1b[K^\x1b[m\x1b[K\n'}
+[5.367825] (lego_loam_sr) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28\x1b[m\x1b[K,\n'}
+[5.367858] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors.hpp:22\x1b[m\x1b[K,\n'}
+[5.367892] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156\x1b[m\x1b[K,\n'}
+[5.367924] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5\x1b[m\x1b[K,\n'}
+[5.367957] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4\x1b[m\x1b[K,\n'}
+[5.367997] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37\x1b[m\x1b[K:\n'}
+[5.368029] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kdeclared here\n'}
+[5.368061] (lego_loam_sr) StderrLine: {'line': b'  422 |   \x1b[01;36m\x1b[Kdeclare_parameter\x1b[m\x1b[K(const std::string & name);\n'}
+[5.368095] (lego_loam_sr) StderrLine: {'line': b'      |   \x1b[01;36m\x1b[K^~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[5.368128] (lego_loam_sr) StderrLine: {'line': b"\x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:96:44:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)\x1b[m\x1b[K\xe2\x80\x99 is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\\nIf you want to declare a parameter that won't change type without a default value use:\\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\\n\\nIf you want to declare a parameter that can dynamically change type use:\\n```\\nrcl_interfaces::msg::ParameterDescriptor descriptor;\\ndescriptor.dynamic_typing = true;\\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\\n``` [\x1b[01;35m\x1b[K-Wdeprecated-declarations\x1b[m\x1b[K]\n"}
+[5.368165] (lego_loam_sr) StderrLine: {'line': b'   96 |   this->declare_parameter(PARAM_SCAN_PERIOD\x1b[01;35m\x1b[K)\x1b[m\x1b[K;\n'}
+[5.368198] (lego_loam_sr) StderrLine: {'line': b'      |                                            \x1b[01;35m\x1b[K^\x1b[m\x1b[K\n'}
+[5.368230] (lego_loam_sr) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28\x1b[m\x1b[K,\n'}
+[5.368265] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors.hpp:22\x1b[m\x1b[K,\n'}
+[5.368297] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156\x1b[m\x1b[K,\n'}
+[5.368329] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5\x1b[m\x1b[K,\n'}
+[5.368360] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4\x1b[m\x1b[K,\n'}
+[5.368392] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37\x1b[m\x1b[K:\n'}
+[5.368424] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kdeclared here\n'}
+[5.368456] (lego_loam_sr) StderrLine: {'line': b'  422 |   \x1b[01;36m\x1b[Kdeclare_parameter\x1b[m\x1b[K(const std::string & name);\n'}
+[5.368487] (lego_loam_sr) StderrLine: {'line': b'      |   \x1b[01;36m\x1b[K^~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[5.368518] (lego_loam_sr) StderrLine: {'line': b"\x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:97:53:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)\x1b[m\x1b[K\xe2\x80\x99 is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\\nIf you want to declare a parameter that won't change type without a default value use:\\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\\n\\nIf you want to declare a parameter that can dynamically change type use:\\n```\\nrcl_interfaces::msg::ParameterDescriptor descriptor;\\ndescriptor.dynamic_typing = true;\\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\\n``` [\x1b[01;35m\x1b[K-Wdeprecated-declarations\x1b[m\x1b[K]\n"}
+[5.368553] (lego_loam_sr) StderrLine: {'line': b'   97 |   this->declare_parameter(PARAM_USE_IMU_UNDISTORTION\x1b[01;35m\x1b[K)\x1b[m\x1b[K;\n'}
+[5.368585] (lego_loam_sr) StderrLine: {'line': b'      |                                                     \x1b[01;35m\x1b[K^\x1b[m\x1b[K\n'}
+[5.368616] (lego_loam_sr) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28\x1b[m\x1b[K,\n'}
+[5.368657] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors.hpp:22\x1b[m\x1b[K,\n'}
+[5.368693] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156\x1b[m\x1b[K,\n'}
+[5.368730] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5\x1b[m\x1b[K,\n'}
+[5.368765] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4\x1b[m\x1b[K,\n'}
+[5.368800] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37\x1b[m\x1b[K:\n'}
+[5.368838] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kdeclared here\n'}
+[5.368870] (lego_loam_sr) StderrLine: {'line': b'  422 |   \x1b[01;36m\x1b[Kdeclare_parameter\x1b[m\x1b[K(const std::string & name);\n'}
+[5.368901] (lego_loam_sr) StderrLine: {'line': b'      |   \x1b[01;36m\x1b[K^~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[5.368933] (lego_loam_sr) StderrLine: {'line': b"\x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:98:45:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)\x1b[m\x1b[K\xe2\x80\x99 is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\\nIf you want to declare a parameter that won't change type without a default value use:\\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\\n\\nIf you want to declare a parameter that can dynamically change type use:\\n```\\nrcl_interfaces::msg::ParameterDescriptor descriptor;\\ndescriptor.dynamic_typing = true;\\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\\n``` [\x1b[01;35m\x1b[K-Wdeprecated-declarations\x1b[m\x1b[K]\n"}
+[5.368975] (lego_loam_sr) StderrLine: {'line': b'   98 |   this->declare_parameter(PARAM_FREQ_DIVIDER\x1b[01;35m\x1b[K)\x1b[m\x1b[K;\n'}
+[5.369008] (lego_loam_sr) StderrLine: {'line': b'      |                                             \x1b[01;35m\x1b[K^\x1b[m\x1b[K\n'}
+[5.369040] (lego_loam_sr) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28\x1b[m\x1b[K,\n'}
+[5.369072] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors.hpp:22\x1b[m\x1b[K,\n'}
+[5.369104] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156\x1b[m\x1b[K,\n'}
+[5.369136] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5\x1b[m\x1b[K,\n'}
+[5.369167] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4\x1b[m\x1b[K,\n'}
+[5.369199] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37\x1b[m\x1b[K:\n'}
+[5.369231] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kdeclared here\n'}
+[5.369263] (lego_loam_sr) StderrLine: {'line': b'  422 |   \x1b[01;36m\x1b[Kdeclare_parameter\x1b[m\x1b[K(const std::string & name);\n'}
+[5.369295] (lego_loam_sr) StderrLine: {'line': b'      |   \x1b[01;36m\x1b[K^~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[5.369327] (lego_loam_sr) StderrLine: {'line': b"\x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:99:47:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)\x1b[m\x1b[K\xe2\x80\x99 is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\\nIf you want to declare a parameter that won't change type without a default value use:\\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\\n\\nIf you want to declare a parameter that can dynamically change type use:\\n```\\nrcl_interfaces::msg::ParameterDescriptor descriptor;\\ndescriptor.dynamic_typing = true;\\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\\n``` [\x1b[01;35m\x1b[K-Wdeprecated-declarations\x1b[m\x1b[K]\n"}
+[5.369361] (lego_loam_sr) StderrLine: {'line': b'   99 |   this->declare_parameter(PARAM_EDGE_THRESHOLD\x1b[01;35m\x1b[K)\x1b[m\x1b[K;\n'}
+[5.369393] (lego_loam_sr) StderrLine: {'line': b'      |                                               \x1b[01;35m\x1b[K^\x1b[m\x1b[K\n'}
+[5.369426] (lego_loam_sr) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28\x1b[m\x1b[K,\n'}
+[5.369459] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors.hpp:22\x1b[m\x1b[K,\n'}
+[5.369491] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156\x1b[m\x1b[K,\n'}
+[5.369523] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5\x1b[m\x1b[K,\n'}
+[5.369557] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4\x1b[m\x1b[K,\n'}
+[5.369589] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37\x1b[m\x1b[K:\n'}
+[5.369622] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kdeclared here\n'}
+[5.369655] (lego_loam_sr) StderrLine: {'line': b'  422 |   \x1b[01;36m\x1b[Kdeclare_parameter\x1b[m\x1b[K(const std::string & name);\n'}
+[5.369687] (lego_loam_sr) StderrLine: {'line': b'      |   \x1b[01;36m\x1b[K^~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[5.369719] (lego_loam_sr) StderrLine: {'line': b"\x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:100:47:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)\x1b[m\x1b[K\xe2\x80\x99 is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\\nIf you want to declare a parameter that won't change type without a default value use:\\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\\n\\nIf you want to declare a parameter that can dynamically change type use:\\n```\\nrcl_interfaces::msg::ParameterDescriptor descriptor;\\ndescriptor.dynamic_typing = true;\\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\\n``` [\x1b[01;35m\x1b[K-Wdeprecated-declarations\x1b[m\x1b[K]\n"}
+[5.369755] (lego_loam_sr) StderrLine: {'line': b'  100 |   this->declare_parameter(PARAM_SURF_THRESHOLD\x1b[01;35m\x1b[K)\x1b[m\x1b[K;\n'}
+[5.369787] (lego_loam_sr) StderrLine: {'line': b'      |                                               \x1b[01;35m\x1b[K^\x1b[m\x1b[K\n'}
+[5.369819] (lego_loam_sr) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28\x1b[m\x1b[K,\n'}
+[5.369853] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors.hpp:22\x1b[m\x1b[K,\n'}
+[5.369888] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156\x1b[m\x1b[K,\n'}
+[5.369920] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5\x1b[m\x1b[K,\n'}
+[5.369954] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4\x1b[m\x1b[K,\n'}
+[5.369987] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37\x1b[m\x1b[K:\n'}
+[5.370019] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kdeclared here\n'}
+[5.370052] (lego_loam_sr) StderrLine: {'line': b'  422 |   \x1b[01;36m\x1b[Kdeclare_parameter\x1b[m\x1b[K(const std::string & name);\n'}
+[5.370084] (lego_loam_sr) StderrLine: {'line': b'      |   \x1b[01;36m\x1b[K^~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[5.370116] (lego_loam_sr) StderrLine: {'line': b"\x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:101:41:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)\x1b[m\x1b[K\xe2\x80\x99 is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\\nIf you want to declare a parameter that won't change type without a default value use:\\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\\n\\nIf you want to declare a parameter that can dynamically change type use:\\n```\\nrcl_interfaces::msg::ParameterDescriptor descriptor;\\ndescriptor.dynamic_typing = true;\\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\\n``` [\x1b[01;35m\x1b[K-Wdeprecated-declarations\x1b[m\x1b[K]\n"}
+[5.370154] (lego_loam_sr) StderrLine: {'line': b'  101 |   this->declare_parameter(PARAM_DISTANCE\x1b[01;35m\x1b[K)\x1b[m\x1b[K;\n'}
+[5.370187] (lego_loam_sr) StderrLine: {'line': b'      |                                         \x1b[01;35m\x1b[K^\x1b[m\x1b[K\n'}
+[5.370219] (lego_loam_sr) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28\x1b[m\x1b[K,\n'}
+[5.370252] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors.hpp:22\x1b[m\x1b[K,\n'}
+[5.370285] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156\x1b[m\x1b[K,\n'}
+[5.370317] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5\x1b[m\x1b[K,\n'}
+[5.370349] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4\x1b[m\x1b[K,\n'}
+[5.370382] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37\x1b[m\x1b[K:\n'}
+[5.370414] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kdeclared here\n'}
+[5.370446] (lego_loam_sr) StderrLine: {'line': b'  422 |   \x1b[01;36m\x1b[Kdeclare_parameter\x1b[m\x1b[K(const std::string & name);\n'}
+[5.370477] (lego_loam_sr) StderrLine: {'line': b'      |   \x1b[01;36m\x1b[K^~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[5.370509] (lego_loam_sr) StderrLine: {'line': b"\x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:102:45:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)\x1b[m\x1b[K\xe2\x80\x99 is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\\nIf you want to declare a parameter that won't change type without a default value use:\\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\\n\\nIf you want to declare a parameter that can dynamically change type use:\\n```\\nrcl_interfaces::msg::ParameterDescriptor descriptor;\\ndescriptor.dynamic_typing = true;\\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\\n``` [\x1b[01;35m\x1b[K-Wdeprecated-declarations\x1b[m\x1b[K]\n"}
+[5.370545] (lego_loam_sr) StderrLine: {'line': b'  102 |   this->declare_parameter(PARAM_ANGLE_BOTTOM\x1b[01;35m\x1b[K)\x1b[m\x1b[K;\n'}
+[5.370578] (lego_loam_sr) StderrLine: {'line': b'      |                                             \x1b[01;35m\x1b[K^\x1b[m\x1b[K\n'}
+[5.370610] (lego_loam_sr) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28\x1b[m\x1b[K,\n'}
+[5.370643] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors.hpp:22\x1b[m\x1b[K,\n'}
+[5.370676] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156\x1b[m\x1b[K,\n'}
+[5.370709] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5\x1b[m\x1b[K,\n'}
+[5.370741] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4\x1b[m\x1b[K,\n'}
+[5.370773] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37\x1b[m\x1b[K:\n'}
+[5.370808] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kdeclared here\n'}
+[5.370840] (lego_loam_sr) StderrLine: {'line': b'  422 |   \x1b[01;36m\x1b[Kdeclare_parameter\x1b[m\x1b[K(const std::string & name);\n'}
+[5.370874] (lego_loam_sr) StderrLine: {'line': b'      |   \x1b[01;36m\x1b[K^~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[5.370906] (lego_loam_sr) StderrLine: {'line': b"\x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:103:42:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)\x1b[m\x1b[K\xe2\x80\x99 is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\\nIf you want to declare a parameter that won't change type without a default value use:\\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\\n\\nIf you want to declare a parameter that can dynamically change type use:\\n```\\nrcl_interfaces::msg::ParameterDescriptor descriptor;\\ndescriptor.dynamic_typing = true;\\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\\n``` [\x1b[01;35m\x1b[K-Wdeprecated-declarations\x1b[m\x1b[K]\n"}
+[5.370942] (lego_loam_sr) StderrLine: {'line': b'  103 |   this->declare_parameter(PARAM_ANGLE_TOP\x1b[01;35m\x1b[K)\x1b[m\x1b[K;\n'}
+[5.370974] (lego_loam_sr) StderrLine: {'line': b'      |                                          \x1b[01;35m\x1b[K^\x1b[m\x1b[K\n'}
+[5.371006] (lego_loam_sr) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28\x1b[m\x1b[K,\n'}
+[5.371039] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors.hpp:22\x1b[m\x1b[K,\n'}
+[5.371071] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156\x1b[m\x1b[K,\n'}
+[5.371103] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5\x1b[m\x1b[K,\n'}
+[5.371135] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4\x1b[m\x1b[K,\n'}
+[5.371168] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37\x1b[m\x1b[K:\n'}
+[5.371200] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kdeclared here\n'}
+[5.371232] (lego_loam_sr) StderrLine: {'line': b'  422 |   \x1b[01;36m\x1b[Kdeclare_parameter\x1b[m\x1b[K(const std::string & name);\n'}
+[5.371264] (lego_loam_sr) StderrLine: {'line': b'      |   \x1b[01;36m\x1b[K^~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[5.371296] (lego_loam_sr) StderrLine: {'line': b"\x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:104:37:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)\x1b[m\x1b[K\xe2\x80\x99 is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\\nIf you want to declare a parameter that won't change type without a default value use:\\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\\n\\nIf you want to declare a parameter that can dynamically change type use:\\n```\\nrcl_interfaces::msg::ParameterDescriptor descriptor;\\ndescriptor.dynamic_typing = true;\\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\\n``` [\x1b[01;35m\x1b[K-Wdeprecated-declarations\x1b[m\x1b[K]\n"}
+[5.371335] (lego_loam_sr) StderrLine: {'line': b'  104 |   this->declare_parameter(PARAM_DBFr\x1b[01;35m\x1b[K)\x1b[m\x1b[K;\n'}
+[5.371368] (lego_loam_sr) StderrLine: {'line': b'      |                                     \x1b[01;35m\x1b[K^\x1b[m\x1b[K\n'}
+[5.371401] (lego_loam_sr) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28\x1b[m\x1b[K,\n'}
+[5.371432] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors.hpp:22\x1b[m\x1b[K,\n'}
+[5.371464] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156\x1b[m\x1b[K,\n'}
+[5.371497] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5\x1b[m\x1b[K,\n'}
+[5.371530] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4\x1b[m\x1b[K,\n'}
+[5.371560] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37\x1b[m\x1b[K:\n'}
+[5.371593] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kdeclared here\n'}
+[5.371626] (lego_loam_sr) StderrLine: {'line': b'  422 |   \x1b[01;36m\x1b[Kdeclare_parameter\x1b[m\x1b[K(const std::string & name);\n'}
+[5.371658] (lego_loam_sr) StderrLine: {'line': b'      |   \x1b[01;36m\x1b[K^~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[5.371689] (lego_loam_sr) StderrLine: {'line': b"\x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:105:40:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)\x1b[m\x1b[K\xe2\x80\x99 is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\\nIf you want to declare a parameter that won't change type without a default value use:\\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\\n\\nIf you want to declare a parameter that can dynamically change type use:\\n```\\nrcl_interfaces::msg::ParameterDescriptor descriptor;\\ndescriptor.dynamic_typing = true;\\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\\n``` [\x1b[01;35m\x1b[K-Wdeprecated-declarations\x1b[m\x1b[K]\n"}
+[5.371727] (lego_loam_sr) StderrLine: {'line': b'  105 |   this->declare_parameter(PARAM_RatioXY\x1b[01;35m\x1b[K)\x1b[m\x1b[K;\n'}
+[5.371760] (lego_loam_sr) StderrLine: {'line': b'      |                                        \x1b[01;35m\x1b[K^\x1b[m\x1b[K\n'}
+[5.371792] (lego_loam_sr) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28\x1b[m\x1b[K,\n'}
+[5.371825] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors.hpp:22\x1b[m\x1b[K,\n'}
+[5.371857] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156\x1b[m\x1b[K,\n'}
+[5.371890] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5\x1b[m\x1b[K,\n'}
+[5.371922] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4\x1b[m\x1b[K,\n'}
+[5.371954] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37\x1b[m\x1b[K:\n'}
+[5.371986] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kdeclared here\n'}
+[5.372018] (lego_loam_sr) StderrLine: {'line': b'  422 |   \x1b[01;36m\x1b[Kdeclare_parameter\x1b[m\x1b[K(const std::string & name);\n'}
+[5.372053] (lego_loam_sr) StderrLine: {'line': b'      |   \x1b[01;36m\x1b[K^~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[5.372085] (lego_loam_sr) StderrLine: {'line': b"\x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:106:39:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)\x1b[m\x1b[K\xe2\x80\x99 is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\\nIf you want to declare a parameter that won't change type without a default value use:\\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\\n\\nIf you want to declare a parameter that can dynamically change type use:\\n```\\nrcl_interfaces::msg::ParameterDescriptor descriptor;\\ndescriptor.dynamic_typing = true;\\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\\n``` [\x1b[01;35m\x1b[K-Wdeprecated-declarations\x1b[m\x1b[K]\n"}
+[5.372119] (lego_loam_sr) StderrLine: {'line': b'  106 |   this->declare_parameter(PARAM_RatioZ\x1b[01;35m\x1b[K)\x1b[m\x1b[K;\n'}
+[5.372154] (lego_loam_sr) StderrLine: {'line': b'      |                                       \x1b[01;35m\x1b[K^\x1b[m\x1b[K\n'}
+[5.372187] (lego_loam_sr) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28\x1b[m\x1b[K,\n'}
+[5.372221] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/executors.hpp:22\x1b[m\x1b[K,\n'}
+[5.372255] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156\x1b[m\x1b[K,\n'}
+[5.372289] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5\x1b[m\x1b[K,\n'}
+[5.372321] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4\x1b[m\x1b[K,\n'}
+[5.372353] (lego_loam_sr) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37\x1b[m\x1b[K:\n'}
+[5.372385] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kdeclared here\n'}
+[5.372418] (lego_loam_sr) StderrLine: {'line': b'  422 |   \x1b[01;36m\x1b[Kdeclare_parameter\x1b[m\x1b[K(const std::string & name);\n'}
+[5.372469] (lego_loam_sr) StderrLine: {'line': b'      |   \x1b[01;36m\x1b[K^~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[5.372913] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:\x1b[m\x1b[K In destructor \xe2\x80\x98\x1b[01m\x1b[Kvirtual FeatureAssociation::~FeatureAssociation()\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[5.372988] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:162:25:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kconverting to \xe2\x80\x98\x1b[01m\x1b[Kcloud_msgs::msg::CloudInfo\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Kcloud_msgs::msg::CloudInfo_<std::allocator<void> >\x1b[m\x1b[K\xe2\x80\x99} from initializer list would use explicit constructor \xe2\x80\x98\x1b[01m\x1b[Kcloud_msgs::msg::CloudInfo_<ContainerAllocator>::CloudInfo_(rosidl_runtime_cpp::MessageInitialization) [with ContainerAllocator = std::allocator<void>]\x1b[m\x1b[K\xe2\x80\x99\n'}
+[5.373030] (lego_loam_sr) StderrLine: {'line': b'  162 |   _input_channel.send({}\x1b[01;35m\x1b[K)\x1b[m\x1b[K;\n'}
+[5.373065] (lego_loam_sr) StderrLine: {'line': b'      |                         \x1b[01;35m\x1b[K^\x1b[m\x1b[K\n'}
+[5.373098] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:162:25:\x1b[m\x1b[K \x1b[01;36m\x1b[Knote: \x1b[m\x1b[Kin C++11 and above a default constructor can be explicit\n'}
+[5.383073] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:\x1b[m\x1b[K In member function \xe2\x80\x98\x1b[01m\x1b[Kvoid FeatureAssociation::jointStateCallback(sensor_msgs::msg::JointState_<std::allocator<void> >::SharedPtr)\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[5.383305] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:379:20:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kunused variable \xe2\x80\x98\x1b[01m\x1b[Kvalue\x1b[m\x1b[K\xe2\x80\x99 [\x1b[01;35m\x1b[K-Wunused-variable\x1b[m\x1b[K]\n'}
+[5.383356] (lego_loam_sr) StderrLine: {'line': b'  379 |             double \x1b[01;35m\x1b[Kvalue\x1b[m\x1b[K = msg->position[i];\n'}
+[5.383392] (lego_loam_sr) StderrLine: {'line': b'      |                    \x1b[01;35m\x1b[K^~~~~\x1b[m\x1b[K\n'}
+[5.416462] (-) TimerEvent: {}
+[5.516784] (-) TimerEvent: {}
+[5.617037] (-) TimerEvent: {}
+[5.656584] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:\x1b[m\x1b[K In member function \xe2\x80\x98\x1b[01m\x1b[Kvoid FeatureAssociation::runFeatureAssociation()\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[5.656767] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:2460:11:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kunused variable \xe2\x80\x98\x1b[01m\x1b[Kgseg_Hz2\x1b[m\x1b[K\xe2\x80\x99 [\x1b[01;35m\x1b[K-Wunused-variable\x1b[m\x1b[K]\n'}
+[5.656808] (lego_loam_sr) StderrLine: {'line': b' 2460 |     float \x1b[01;35m\x1b[Kgseg_Hz2\x1b[m\x1b[K = (gseg_runtime_all2/gseg_runtime_list2.size())*1000;\n'}
+[5.656843] (lego_loam_sr) StderrLine: {'line': b'      |           \x1b[01;35m\x1b[K^~~~~~~~\x1b[m\x1b[K\n'}
+[5.656876] (lego_loam_sr) StderrLine: {'line': b'\x1b[01m\x1b[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:2468:11:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kunused variable \xe2\x80\x98\x1b[01m\x1b[Kodometry_itertimes\x1b[m\x1b[K\xe2\x80\x99 [\x1b[01;35m\x1b[K-Wunused-variable\x1b[m\x1b[K]\n'}
+[5.656910] (lego_loam_sr) StderrLine: {'line': b' 2468 |     float \x1b[01;35m\x1b[Kodometry_itertimes\x1b[m\x1b[K = (odometry_itertimes_all/odometry_itertimes_list.size());\n'}
+[5.656943] (lego_loam_sr) StderrLine: {'line': b'      |           \x1b[01;35m\x1b[K^~~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[5.717208] (-) TimerEvent: {}
+[5.817524] (-) TimerEvent: {}
+[5.917835] (-) TimerEvent: {}
+[6.018151] (-) TimerEvent: {}
+[6.118460] (-) TimerEvent: {}
+[6.218773] (-) TimerEvent: {}
+[6.319086] (-) TimerEvent: {}
+[6.419420] (-) TimerEvent: {}
+[6.519677] (-) TimerEvent: {}
+[6.619988] (-) TimerEvent: {}
+[6.720295] (-) TimerEvent: {}
+[6.820662] (-) TimerEvent: {}
+[6.920934] (-) TimerEvent: {}
+[7.021252] (-) TimerEvent: {}
+[7.121690] (-) TimerEvent: {}
+[7.222064] (-) TimerEvent: {}
+[7.322383] (-) TimerEvent: {}
+[7.422790] (-) TimerEvent: {}
+[7.523347] (-) TimerEvent: {}
+[7.623649] (-) TimerEvent: {}
+[7.724021] (-) TimerEvent: {}
+[7.824410] (-) TimerEvent: {}
+[7.924828] (-) TimerEvent: {}
+[8.025197] (-) TimerEvent: {}
+[8.125507] (-) TimerEvent: {}
+[8.225975] (-) TimerEvent: {}
+[8.326299] (-) TimerEvent: {}
+[8.426634] (-) TimerEvent: {}
+[8.526950] (-) TimerEvent: {}
+[8.627250] (-) TimerEvent: {}
+[8.727493] (-) TimerEvent: {}
+[8.827780] (-) TimerEvent: {}
+[8.928077] (-) TimerEvent: {}
+[9.028385] (-) TimerEvent: {}
+[9.128702] (-) TimerEvent: {}
+[9.229012] (-) TimerEvent: {}
+[9.329331] (-) TimerEvent: {}
+[9.429649] (-) TimerEvent: {}
+[9.529948] (-) TimerEvent: {}
+[9.630240] (-) TimerEvent: {}
+[9.730546] (-) TimerEvent: {}
+[9.830894] (-) TimerEvent: {}
+[9.931210] (-) TimerEvent: {}
+[10.031516] (-) TimerEvent: {}
+[10.131830] (-) TimerEvent: {}
+[10.232135] (-) TimerEvent: {}
+[10.332446] (-) TimerEvent: {}
+[10.432757] (-) TimerEvent: {}
+[10.533061] (-) TimerEvent: {}
+[10.633318] (-) TimerEvent: {}
+[10.733629] (-) TimerEvent: {}
+[10.833930] (-) TimerEvent: {}
+[10.934256] (-) TimerEvent: {}
+[11.034580] (-) TimerEvent: {}
+[11.134890] (-) TimerEvent: {}
+[11.235192] (-) TimerEvent: {}
+[11.335499] (-) TimerEvent: {}
+[11.435807] (-) TimerEvent: {}
+[11.536115] (-) TimerEvent: {}
+[11.636417] (-) TimerEvent: {}
+[11.736744] (-) TimerEvent: {}
+[11.837046] (-) TimerEvent: {}
+[11.937350] (-) TimerEvent: {}
+[12.037662] (-) TimerEvent: {}
+[12.137961] (-) TimerEvent: {}
+[12.238273] (-) TimerEvent: {}
+[12.338577] (-) TimerEvent: {}
+[12.438903] (-) TimerEvent: {}
+[12.539218] (-) TimerEvent: {}
+[12.639525] (-) TimerEvent: {}
+[12.739834] (-) TimerEvent: {}
+[12.840151] (-) TimerEvent: {}
+[12.940468] (-) TimerEvent: {}
+[13.040798] (-) TimerEvent: {}
+[13.141125] (-) TimerEvent: {}
+[13.241437] (-) TimerEvent: {}
+[13.341696] (-) TimerEvent: {}
+[13.442016] (-) TimerEvent: {}
+[13.542266] (-) TimerEvent: {}
+[13.642606] (-) TimerEvent: {}
+[13.742913] (-) TimerEvent: {}
+[13.843231] (-) TimerEvent: {}
+[13.943554] (-) TimerEvent: {}
+[14.043869] (-) TimerEvent: {}
+[14.144176] (-) TimerEvent: {}
+[14.244507] (-) TimerEvent: {}
+[14.344873] (-) TimerEvent: {}
+[14.445216] (-) TimerEvent: {}
+[14.545536] (-) TimerEvent: {}
+[14.645870] (-) TimerEvent: {}
+[14.746186] (-) TimerEvent: {}
+[14.846518] (-) TimerEvent: {}
+[14.946845] (-) TimerEvent: {}
+[15.047185] (-) TimerEvent: {}
+[15.147520] (-) TimerEvent: {}
+[15.247857] (-) TimerEvent: {}
+[15.348146] (-) TimerEvent: {}
+[15.448462] (-) TimerEvent: {}
+[15.548835] (-) TimerEvent: {}
+[15.649239] (-) TimerEvent: {}
+[15.749565] (-) TimerEvent: {}
+[15.849857] (-) TimerEvent: {}
+[15.950173] (-) TimerEvent: {}
+[16.050493] (-) TimerEvent: {}
+[16.150817] (-) TimerEvent: {}
+[16.251132] (-) TimerEvent: {}
+[16.351400] (-) TimerEvent: {}
+[16.451775] (-) TimerEvent: {}
+[16.552112] (-) TimerEvent: {}
+[16.652430] (-) TimerEvent: {}
+[16.752774] (-) TimerEvent: {}
+[16.853103] (-) TimerEvent: {}
+[16.953412] (-) TimerEvent: {}
+[17.053716] (-) TimerEvent: {}
+[17.154026] (-) TimerEvent: {}
+[17.254326] (-) TimerEvent: {}
+[17.354631] (-) TimerEvent: {}
+[17.454937] (-) TimerEvent: {}
+[17.555280] (-) TimerEvent: {}
+[17.655602] (-) TimerEvent: {}
+[17.755927] (-) TimerEvent: {}
+[17.856244] (-) TimerEvent: {}
+[17.956569] (-) TimerEvent: {}
+[18.056825] (-) TimerEvent: {}
+[18.157140] (-) TimerEvent: {}
+[18.257486] (-) TimerEvent: {}
+[18.357818] (-) TimerEvent: {}
+[18.458138] (-) TimerEvent: {}
+[18.558479] (-) TimerEvent: {}
+[18.658806] (-) TimerEvent: {}
+[18.759115] (-) TimerEvent: {}
+[18.859416] (-) TimerEvent: {}
+[18.959735] (-) TimerEvent: {}
+[19.060070] (-) TimerEvent: {}
+[19.160396] (-) TimerEvent: {}
+[19.260731] (-) TimerEvent: {}
+[19.361031] (-) TimerEvent: {}
+[19.461284] (-) TimerEvent: {}
+[19.561581] (-) TimerEvent: {}
+[19.661896] (-) TimerEvent: {}
+[19.762184] (-) TimerEvent: {}
+[19.862498] (-) TimerEvent: {}
+[19.962813] (-) TimerEvent: {}
+[20.063136] (-) TimerEvent: {}
+[20.163438] (-) TimerEvent: {}
+[20.263739] (-) TimerEvent: {}
+[20.364094] (-) TimerEvent: {}
+[20.464425] (-) TimerEvent: {}
+[20.564735] (-) TimerEvent: {}
+[20.665047] (-) TimerEvent: {}
+[20.765366] (-) TimerEvent: {}
+[20.865703] (-) TimerEvent: {}
+[20.966003] (-) TimerEvent: {}
+[21.066291] (-) TimerEvent: {}
+[21.166605] (-) TimerEvent: {}
+[21.266915] (-) TimerEvent: {}
+[21.367221] (-) TimerEvent: {}
+[21.467518] (-) TimerEvent: {}
+[21.567825] (-) TimerEvent: {}
+[21.668129] (-) TimerEvent: {}
+[21.768436] (-) TimerEvent: {}
+[21.868756] (-) TimerEvent: {}
+[21.969062] (-) TimerEvent: {}
+[22.069371] (-) TimerEvent: {}
+[22.169681] (-) TimerEvent: {}
+[22.269997] (-) TimerEvent: {}
+[22.370322] (-) TimerEvent: {}
+[22.470659] (-) TimerEvent: {}
+[22.570984] (-) TimerEvent: {}
+[22.671300] (-) TimerEvent: {}
+[22.771603] (-) TimerEvent: {}
+[22.871888] (-) TimerEvent: {}
+[22.972158] (-) TimerEvent: {}
+[23.072430] (-) TimerEvent: {}
+[23.172718] (-) TimerEvent: {}
+[23.273004] (-) TimerEvent: {}
+[23.373331] (-) TimerEvent: {}
+[23.473733] (-) TimerEvent: {}
+[23.574046] (-) TimerEvent: {}
+[23.674347] (-) TimerEvent: {}
+[23.774645] (-) TimerEvent: {}
+[23.874949] (-) TimerEvent: {}
+[23.975243] (-) TimerEvent: {}
+[24.075570] (-) TimerEvent: {}
+[24.175866] (-) TimerEvent: {}
+[24.276154] (-) TimerEvent: {}
+[24.376448] (-) TimerEvent: {}
+[24.476738] (-) TimerEvent: {}
+[24.576996] (-) TimerEvent: {}
+[24.677299] (-) TimerEvent: {}
+[24.777558] (-) TimerEvent: {}
+[24.877852] (-) TimerEvent: {}
+[24.978139] (-) TimerEvent: {}
+[25.078442] (-) TimerEvent: {}
+[25.178742] (-) TimerEvent: {}
+[25.279030] (-) TimerEvent: {}
+[25.379320] (-) TimerEvent: {}
+[25.479621] (-) TimerEvent: {}
+[25.579917] (-) TimerEvent: {}
+[25.680231] (-) TimerEvent: {}
+[25.780530] (-) TimerEvent: {}
+[25.880838] (-) TimerEvent: {}
+[25.981142] (-) TimerEvent: {}
+[26.081435] (-) TimerEvent: {}
+[26.181725] (-) TimerEvent: {}
+[26.282015] (-) TimerEvent: {}
+[26.382310] (-) TimerEvent: {}
+[26.482631] (-) TimerEvent: {}
+[26.582941] (-) TimerEvent: {}
+[26.683242] (-) TimerEvent: {}
+[26.783537] (-) TimerEvent: {}
+[26.883844] (-) TimerEvent: {}
+[26.984145] (-) TimerEvent: {}
+[27.084440] (-) TimerEvent: {}
+[27.184748] (-) TimerEvent: {}
+[27.285045] (-) TimerEvent: {}
+[27.385307] (-) TimerEvent: {}
+[27.485615] (-) TimerEvent: {}
+[27.585923] (-) TimerEvent: {}
+[27.686243] (-) TimerEvent: {}
+[27.786560] (-) TimerEvent: {}
+[27.886875] (-) TimerEvent: {}
+[27.987189] (-) TimerEvent: {}
+[28.087495] (-) TimerEvent: {}
+[28.187803] (-) TimerEvent: {}
+[28.288106] (-) TimerEvent: {}
+[28.388413] (-) TimerEvent: {}
+[28.488730] (-) TimerEvent: {}
+[28.589040] (-) TimerEvent: {}
+[28.689290] (-) TimerEvent: {}
+[28.789545] (-) TimerEvent: {}
+[28.889856] (-) TimerEvent: {}
+[28.990166] (-) TimerEvent: {}
+[29.090472] (-) TimerEvent: {}
+[29.190790] (-) TimerEvent: {}
+[29.291120] (-) TimerEvent: {}
+[29.391436] (-) TimerEvent: {}
+[29.491740] (-) TimerEvent: {}
+[29.592005] (-) TimerEvent: {}
+[29.692300] (-) TimerEvent: {}
+[29.792599] (-) TimerEvent: {}
+[29.892906] (-) TimerEvent: {}
+[29.993210] (-) TimerEvent: {}
+[30.093508] (-) TimerEvent: {}
+[30.193844] (-) TimerEvent: {}
+[30.294174] (-) TimerEvent: {}
+[30.394484] (-) TimerEvent: {}
+[30.494807] (-) TimerEvent: {}
+[30.595105] (-) TimerEvent: {}
+[30.695427] (-) TimerEvent: {}
+[30.795730] (-) TimerEvent: {}
+[30.896053] (-) TimerEvent: {}
+[30.996372] (-) TimerEvent: {}
+[31.096713] (-) TimerEvent: {}
+[31.197001] (-) TimerEvent: {}
+[31.297274] (-) TimerEvent: {}
+[31.305184] (lego_loam_sr) StdoutLine: {'line': b'[ 33%] \x1b[32m\x1b[1mLinking CXX executable lego_loam_sr\x1b[0m\n'}
+[31.397431] (-) TimerEvent: {}
+[31.497753] (-) TimerEvent: {}
+[31.598132] (-) TimerEvent: {}
+[31.698611] (-) TimerEvent: {}
+[31.799000] (-) TimerEvent: {}
+[31.899409] (-) TimerEvent: {}
+[31.999833] (-) TimerEvent: {}
+[32.100294] (-) TimerEvent: {}
+[32.201058] (-) TimerEvent: {}
+[32.302028] (-) TimerEvent: {}
+[32.402840] (-) TimerEvent: {}
+[32.503640] (-) TimerEvent: {}
+[32.604278] (-) TimerEvent: {}
+[32.704983] (-) TimerEvent: {}
+[32.805347] (-) TimerEvent: {}
+[32.905247] (lego_loam_sr) StdoutLine: {'line': b'[100%] Built target lego_loam_sr\n'}
+[32.905391] (-) TimerEvent: {}
+[32.933239] (lego_loam_sr) CommandEnded: {'returncode': 0}
+[32.973550] (lego_loam_sr) JobProgress: {'identifier': 'lego_loam_sr', 'progress': 'install'}
+[32.974389] (lego_loam_sr) Command: {'cmd': ['/usr/bin/cmake', '--install', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr'], 'cwd': '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'iec'), ('SSH_AGENT_PID', '2402'), ('XDG_SESSION_TYPE', 'x11'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib:/opt/ros/galactic/opt/yaml_cpp_vendor/lib:/opt/ros/galactic/opt/rviz_ogre_vendor/lib:/opt/ros/galactic/lib/x86_64-linux-gnu:/opt/ros/galactic/lib'), ('HOME', '/home/iec'), ('DESKTOP_SESSION', 'ubuntu'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('MANAGERPID', '2219'), ('DBUS_STARTER_BUS_TYPE', 'session'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus,guid=f861fcc10768c8676a27535765a168bc'), ('COLORTERM', 'truecolor'), ('IM_CONFIG_PHASE', '1'), ('COLCON_PREFIX_PATH', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install'), ('ROS_DISTRO', 'galactic'), ('LOGNAME', 'iec'), ('JOURNAL_STREAM', '8:46889'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'iec'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('WINDOWPATH', '2'), ('PATH', '/opt/ros/galactic/bin:/home/iec/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'), ('SESSION_MANAGER', 'local/iec-slave:@/tmp/.ICE-unix/2440,unix/iec-slave:/tmp/.ICE-unix/2440'), ('INVOCATION_ID', '64e6587337e849b78b04388b83c490e9'), ('XDG_MENU_PREFIX', 'gnome-'), ('GNOME_TERMINAL_SCREEN', '/org/gnome/Terminal/screen/17716af1_2ffe_43aa_a609_5cdd2999a132'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('DISPLAY', ':0'), ('LANG', 'en_US.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/gdm/Xauthority'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('GNOME_TERMINAL_SERVICE', ':1.103'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('AMENT_PREFIX_PATH', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr:/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs:/opt/ros/galactic'), ('SHELL', '/bin/bash'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('GPG_AGENT_INFO', '/run/user/1000/gnupg/S.gpg-agent:0:1'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr'), ('LC_ALL', 'en_US.UTF-8'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('DBUS_STARTER_ADDRESS', 'unix:path=/run/user/1000/bus,guid=f861fcc10768c8676a27535765a168bc'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/python3.8/site-packages:/opt/ros/galactic/lib/python3.8/site-packages'), ('COLCON', '1'), ('VTE_VERSION', '6003'), ('CMAKE_PREFIX_PATH', '/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs:/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr:/opt/ros/galactic')]), 'shell': False}
+[32.988807] (lego_loam_sr) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[32.989401] (lego_loam_sr) StdoutLine: {'line': b'-- Installing: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/lib/lego_loam_sr/lego_loam_sr\n'}
+[32.993310] (lego_loam_sr) StdoutLine: {'line': b'-- Set runtime path of "/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/lib/lego_loam_sr/lego_loam_sr" to ""\n'}
+[32.993501] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/config\n'}
+[32.993612] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/config/loam_config.yaml\n'}
+[32.993827] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch\n'}
+[32.993992] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/record.launch.py\n'}
+[32.994148] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/__pycache__\n'}
+[32.994244] (lego_loam_sr) StdoutLine: {'line': b'-- Installing: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/__pycache__/run.launch.cpython-38.pyc\n'}
+[32.994406] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/seg-total.jpg\n'}
+[32.994502] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/run.launch.py\n'}
+[32.994593] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/odometry.jpg\n'}
+[32.994685] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/dataset-demo.gif\n'}
+[32.994775] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/record.launch.xml\n'}
+[32.994866] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/google-earth.png\n'}
+[32.994956] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/block.png\n'}
+[32.995048] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/demo.gif\n'}
+[32.995143] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/rviz\n'}
+[32.995233] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/rviz/test.rviz\n'}
+[32.995406] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/ament_index/resource_index/package_run_dependencies/lego_loam_sr\n'}
+[32.995675] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/ament_index/resource_index/parent_prefix_path/lego_loam_sr\n'}
+[32.995995] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/environment/ament_prefix_path.sh\n'}
+[32.996157] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/environment/ament_prefix_path.dsv\n'}
+[32.996486] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/environment/path.sh\n'}
+[32.996543] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/environment/path.dsv\n'}
+[32.996603] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/local_setup.bash\n'}
+[32.996663] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/local_setup.sh\n'}
+[32.996741] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/local_setup.zsh\n'}
+[32.996819] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/local_setup.dsv\n'}
+[32.996883] (lego_loam_sr) StdoutLine: {'line': b'-- Installing: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/package.dsv\n'}
+[32.996948] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/ament_index/resource_index/packages/lego_loam_sr\n'}
+[32.997025] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/cmake/ament_cmake_export_include_directories-extras.cmake\n'}
+[32.997096] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/cmake/lego_loam_srConfig.cmake\n'}
+[32.997161] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/cmake/lego_loam_srConfig-version.cmake\n'}
+[32.997236] (lego_loam_sr) StdoutLine: {'line': b'-- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/package.xml\n'}
+[32.997308] (lego_loam_sr) CommandEnded: {'returncode': 0}
+[33.005804] (-) TimerEvent: {}
+[33.106166] (-) TimerEvent: {}
+[33.197819] (lego_loam_sr) JobEnded: {'identifier': 'lego_loam_sr', 'rc': 0}
+[33.198588] (-) EventReactorShutdown: {}

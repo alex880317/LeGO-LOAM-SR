@@ -53,7 +53,7 @@ feature_association:
       DBFr: 5.0 #5.0
       RatioXY: 0.5 #0.5 
       RatioZ: 2.5 #2.5
-      use_imu_undistortion: true # Alex
+      use_imu_undistortion: false # Alex
 
     mapping:
       mapping_frequency_divider: 1

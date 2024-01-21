@@ -42,7 +42,7 @@ using std::string;
 using std::to_string;
 
 // Save pcd
-const std::string fileDirectory = "/home/iec_lab/LeGOMapping_ws/Result/";
+const std::string fileDirectory = "/home/iec/colcon_ws/src/LeGO-LOAM-SR/Result/";
 const std::string PARAM_ENABLE_LOOP = "mapping.enable_loop_closure";
 const std::string SAVE_KEY_FEATURE_PCD = "mapping.save_key_feature_pcd";
 const std::string INFO_SAVE_PATH = "mapping.info_save_path";
@@ -390,7 +390,7 @@ void MapOptimization::saveMapService(const geometry_msgs::msg::Twist::SharedPtr 
   // Save Pose
   pcl::io::savePCDFileASCII(fileDirectory+"trajectory.pcd", *cloudKeyPoses3D);
   std::ofstream ofs;
-  ofs.open("/home/iec_lab/LeGOMapping_ws/Result/pose.txt");
+  ofs.open("/home/iec/colcon_ws/src/LeGO-LOAM-SR/Result/pose.txt");
   ofs.setf(std::ios::fixed, std::ios::floatfield);
   for (size_t i = 0; i < cloudKeyPoses6D->points.size(); ++i) {
     Pose6DOF << cloudKeyPoses6D->points[i].yaw, cloudKeyPoses6D->points[i].roll, cloudKeyPoses6D->points[i].pitch,
@@ -403,7 +403,7 @@ void MapOptimization::saveMapService(const geometry_msgs::msg::Twist::SharedPtr 
 
   // Save maptime
   std::ofstream timefile;
-  timefile.open("/home/iec_lab/LeGOMapping_ws/Result/mapt.txt");
+  timefile.open("/home/iec/colcon_ws/src/LeGO-LOAM-SR/Result/mapt.txt");
   timefile.setf(std::ios::fixed, std::ios::floatfield);
   for (size_t i = 0; i < gseg_runtime_list3.size(); ++i) {
     timefile << float(gseg_runtime_list3[i]*1000) << std::endl;
@@ -412,7 +412,7 @@ void MapOptimization::saveMapService(const geometry_msgs::msg::Twist::SharedPtr 
   timefile.close();
   // Save MapIterTimes
   std::ofstream MapIterTimesfile;
-  MapIterTimesfile.open("/home/iec_lab/LeGOMapping_ws/Result/MapIterTimes.txt");
+  MapIterTimesfile.open("/home/iec/colcon_ws/src/LeGO-LOAM-SR/Result/MapIterTimes.txt");
   MapIterTimesfile.setf(std::ios::fixed, std::ios::floatfield);
   for (size_t i = 0; i < MapIterTimes.size(); ++i) {
     MapIterTimesfile << float(MapIterTimes[i]) << std::endl;

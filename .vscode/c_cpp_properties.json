@@ -1,0 +1,25 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/iec/colcon_ws/install/ros1_bridge/include/**",
+        "/home/iec/LeGOMapping_ws/install/cloud_msgs/include/**",
+        "/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/include/**",
+        "/opt/ros/galactic/include/**",
+        "/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/**",
+        "/home/iec/colcon_ws/src/ros1_bridge/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

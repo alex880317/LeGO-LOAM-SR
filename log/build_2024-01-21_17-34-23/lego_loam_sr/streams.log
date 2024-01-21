@@ -1,0 +1,39 @@
+[0.148s] Invoking command in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr': AMENT_PREFIX_PATH=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs:/opt/ros/galactic LD_LIBRARY_PATH=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/python3.8/site-packages:${PYTHONPATH} /usr/bin/cmake --build /home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr -- -j16 -l16
+[0.999s] [100%] Built target lego_loam_sr
+[1.007s] Invoked command in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr' returned '0': AMENT_PREFIX_PATH=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs:/opt/ros/galactic LD_LIBRARY_PATH=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/python3.8/site-packages:${PYTHONPATH} /usr/bin/cmake --build /home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr -- -j16 -l16
+[1.025s] Invoking command in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr': AMENT_PREFIX_PATH=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs:/opt/ros/galactic LD_LIBRARY_PATH=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/python3.8/site-packages:${PYTHONPATH} /usr/bin/cmake --install /home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr
+[1.031s] -- Install configuration: ""
+[1.130s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/lib/lego_loam_sr/lego_loam_sr
+[1.168s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/config
+[1.192s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/config/loam_config.yaml
+[1.192s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch
+[1.192s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/record.launch.py
+[1.192s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/__pycache__
+[1.202s] -- Installing: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/__pycache__/run.launch.cpython-38.pyc
+[1.235s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/seg-total.jpg
+[1.235s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/run.launch.py
+[1.235s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/odometry.jpg
+[1.235s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/dataset-demo.gif
+[1.235s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/record.launch.xml
+[1.235s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/google-earth.png
+[1.235s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/block.png
+[1.235s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/demo.gif
+[1.235s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/rviz
+[1.247s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/rviz/test.rviz
+[1.248s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/ament_index/resource_index/package_run_dependencies/lego_loam_sr
+[1.248s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/ament_index/resource_index/parent_prefix_path/lego_loam_sr
+[1.248s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/environment/ament_prefix_path.sh
+[1.248s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/environment/ament_prefix_path.dsv
+[1.248s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/environment/path.sh
+[1.248s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/environment/path.dsv
+[1.248s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/local_setup.bash
+[1.248s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/local_setup.sh
+[1.248s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/local_setup.zsh
+[1.248s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/local_setup.dsv
+[1.248s] -- Installing: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/package.dsv
+[1.259s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/ament_index/resource_index/packages/lego_loam_sr
+[1.260s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/cmake/ament_cmake_export_include_directories-extras.cmake
+[1.260s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/cmake/lego_loam_srConfig.cmake
+[1.260s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/cmake/lego_loam_srConfig-version.cmake
+[1.260s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/package.xml
+[1.261s] Invoked command in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr' returned '0': AMENT_PREFIX_PATH=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs:/opt/ros/galactic LD_LIBRARY_PATH=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs/lib/python3.8/site-packages:${PYTHONPATH} /usr/bin/cmake --install /home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr

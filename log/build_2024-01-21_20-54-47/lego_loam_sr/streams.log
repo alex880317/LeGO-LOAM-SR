@@ -1,0 +1,268 @@
+[0.122s] Invoking command in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr': CMAKE_PREFIX_PATH=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs:/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr:/opt/ros/galactic /usr/bin/cmake --build /home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr -- -j16 -l16
+[0.184s] [35m[1mScanning dependencies of target lego_loam_sr[0m
+[0.248s] [ 16%] [32mBuilding CXX object CMakeFiles/lego_loam_sr.dir/src/featureAssociation.cpp.o[0m
+[7.016s] In file included from [01m[K/usr/include/boost/preprocessor/tuple/elem.hpp:23[m[K,
+[7.017s]                  from [01m[K/usr/include/boost/preprocessor/arithmetic/add.hpp:21[m[K,
+[7.017s]                  from [01m[K/usr/include/boost/mpl/aux_/preprocessor/def_params_tail.hpp:66[m[K,
+[7.017s]                  from [01m[K/usr/include/boost/mpl/aux_/na_spec.hpp:28[m[K,
+[7.017s]                  from [01m[K/usr/include/boost/mpl/not.hpp:20[m[K,
+[7.017s]                  from [01m[K/usr/include/boost/mpl/assert.hpp:17[m[K,
+[7.017s]                  from [01m[K/usr/include/pcl-1.10/pcl/point_traits.h:48[m[K,
+[7.017s]                  from [01m[K/usr/include/pcl-1.10/pcl/point_cloud.h:50[m[K,
+[7.017s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:12[m[K,
+[7.017s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4[m[K,
+[7.017s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37[m[K:
+[7.017s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:151:36:[m[K [01;35m[Kwarning: [m[K‘[01m[Kusing uint16_t = uint16_t[m[K’ is deprecated: use std::uint16_t instead of pcl::uint16_t [[01;35m[K-Wdeprecated-declarations[m[K]
+[7.017s]   151 |                                   ([01;35m[Kuint16_t[m[K, label, label)
+[7.017s]       |                                    [01;35m[K^~~~~~~~[m[K
+[7.017s] In file included from [01m[K/usr/include/pcl-1.10/pcl/PCLHeader.h:10[m[K,
+[7.017s]                  from [01m[K/usr/include/pcl-1.10/pcl/point_cloud.h:47[m[K,
+[7.017s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:12[m[K,
+[7.017s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4[m[K,
+[7.017s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37[m[K:
+[7.018s] [01m[K/usr/include/pcl-1.10/pcl/pcl_macros.h:94:9:[m[K [01;36m[Knote: [m[Kdeclared here
+[7.018s]    94 |   using [01;36m[Kuint16_t[m[K [[deprecated("use std::uint16_t instead of pcl::uint16_t")]] = std::uint16_t;
+[7.018s]       |         [01;36m[K^~~~~~~~[m[K
+[7.018s] In file included from [01m[K/usr/include/boost/preprocessor/tuple/elem.hpp:23[m[K,
+[7.018s]                  from [01m[K/usr/include/boost/preprocessor/arithmetic/add.hpp:21[m[K,
+[7.018s]                  from [01m[K/usr/include/boost/mpl/aux_/preprocessor/def_params_tail.hpp:66[m[K,
+[7.018s]                  from [01m[K/usr/include/boost/mpl/aux_/na_spec.hpp:28[m[K,
+[7.018s]                  from [01m[K/usr/include/boost/mpl/not.hpp:20[m[K,
+[7.018s]                  from [01m[K/usr/include/boost/mpl/assert.hpp:17[m[K,
+[7.018s]                  from [01m[K/usr/include/pcl-1.10/pcl/point_traits.h:48[m[K,
+[7.018s]                  from [01m[K/usr/include/pcl-1.10/pcl/point_cloud.h:50[m[K,
+[7.018s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:12[m[K,
+[7.018s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4[m[K,
+[7.018s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37[m[K:
+[7.018s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:152:36:[m[K [01;35m[Kwarning: [m[K‘[01m[Kusing uint16_t = uint16_t[m[K’ is deprecated: use std::uint16_t instead of pcl::uint16_t [[01;35m[K-Wdeprecated-declarations[m[K]
+[7.018s]   152 |                                   ([01;35m[Kuint16_t[m[K, id, id))
+[7.018s]       |                                    [01;35m[K^~~~~~~~[m[K
+[7.018s] In file included from [01m[K/usr/include/pcl-1.10/pcl/PCLHeader.h:10[m[K,
+[7.018s]                  from [01m[K/usr/include/pcl-1.10/pcl/point_cloud.h:47[m[K,
+[7.018s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:12[m[K,
+[7.018s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4[m[K,
+[7.018s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37[m[K:
+[7.018s] [01m[K/usr/include/pcl-1.10/pcl/pcl_macros.h:94:9:[m[K [01;36m[Knote: [m[Kdeclared here
+[7.018s]    94 |   using [01;36m[Kuint16_t[m[K [[deprecated("use std::uint16_t instead of pcl::uint16_t")]] = std::uint16_t;
+[7.018s]       |         [01;36m[K^~~~~~~~[m[K
+[7.234s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:[m[K In constructor ‘[01m[KFeatureAssociation::FeatureAssociation(const string&, Channel<ProjectionOut>&, Channel<AssociationOut>&)[m[K’:
+[7.235s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:94:47:[m[K [01;35m[Kwarning: [m[K‘[01m[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)[m[K’ is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\nIf you want to declare a parameter that won't change type without a default value use:\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\n\nIf you want to declare a parameter that can dynamically change type use:\n```\nrcl_interfaces::msg::ParameterDescriptor descriptor;\ndescriptor.dynamic_typing = true;\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\n``` [[01;35m[K-Wdeprecated-declarations[m[K]
+[7.235s]    94 |   this->declare_parameter(PARAM_VERTICAL_SCANS[01;35m[K)[m[K;
+[7.235s]       |                                               [01;35m[K^[m[K
+[7.235s] In file included from [01m[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28[m[K,
+[7.235s]                  from [01m[K/opt/ros/galactic/include/rclcpp/executors.hpp:22[m[K,
+[7.235s]                  from [01m[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156[m[K,
+[7.235s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5[m[K,
+[7.235s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4[m[K,
+[7.235s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37[m[K:
+[7.235s] [01m[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:[m[K [01;36m[Knote: [m[Kdeclared here
+[7.235s]   422 |   [01;36m[Kdeclare_parameter[m[K(const std::string & name);
+[7.235s]       |   [01;36m[K^~~~~~~~~~~~~~~~~[m[K
+[7.235s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:95:49:[m[K [01;35m[Kwarning: [m[K‘[01m[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)[m[K’ is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\nIf you want to declare a parameter that won't change type without a default value use:\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\n\nIf you want to declare a parameter that can dynamically change type use:\n```\nrcl_interfaces::msg::ParameterDescriptor descriptor;\ndescriptor.dynamic_typing = true;\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\n``` [[01;35m[K-Wdeprecated-declarations[m[K]
+[7.235s]    95 |   this->declare_parameter(PARAM_HORIZONTAL_SCANS[01;35m[K)[m[K;
+[7.235s]       |                                                 [01;35m[K^[m[K
+[7.236s] In file included from [01m[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28[m[K,
+[7.236s]                  from [01m[K/opt/ros/galactic/include/rclcpp/executors.hpp:22[m[K,
+[7.236s]                  from [01m[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156[m[K,
+[7.236s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5[m[K,
+[7.236s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4[m[K,
+[7.236s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37[m[K:
+[7.236s] [01m[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:[m[K [01;36m[Knote: [m[Kdeclared here
+[7.236s]   422 |   [01;36m[Kdeclare_parameter[m[K(const std::string & name);
+[7.236s]       |   [01;36m[K^~~~~~~~~~~~~~~~~[m[K
+[7.236s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:96:44:[m[K [01;35m[Kwarning: [m[K‘[01m[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)[m[K’ is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\nIf you want to declare a parameter that won't change type without a default value use:\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\n\nIf you want to declare a parameter that can dynamically change type use:\n```\nrcl_interfaces::msg::ParameterDescriptor descriptor;\ndescriptor.dynamic_typing = true;\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\n``` [[01;35m[K-Wdeprecated-declarations[m[K]
+[7.236s]    96 |   this->declare_parameter(PARAM_SCAN_PERIOD[01;35m[K)[m[K;
+[7.236s]       |                                            [01;35m[K^[m[K
+[7.236s] In file included from [01m[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28[m[K,
+[7.236s]                  from [01m[K/opt/ros/galactic/include/rclcpp/executors.hpp:22[m[K,
+[7.236s]                  from [01m[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156[m[K,
+[7.236s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5[m[K,
+[7.236s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4[m[K,
+[7.236s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37[m[K:
+[7.236s] [01m[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:[m[K [01;36m[Knote: [m[Kdeclared here
+[7.236s]   422 |   [01;36m[Kdeclare_parameter[m[K(const std::string & name);
+[7.236s]       |   [01;36m[K^~~~~~~~~~~~~~~~~[m[K
+[7.236s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:97:53:[m[K [01;35m[Kwarning: [m[K‘[01m[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)[m[K’ is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\nIf you want to declare a parameter that won't change type without a default value use:\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\n\nIf you want to declare a parameter that can dynamically change type use:\n```\nrcl_interfaces::msg::ParameterDescriptor descriptor;\ndescriptor.dynamic_typing = true;\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\n``` [[01;35m[K-Wdeprecated-declarations[m[K]
+[7.236s]    97 |   this->declare_parameter(PARAM_USE_IMU_UNDISTORTION[01;35m[K)[m[K;
+[7.236s]       |                                                     [01;35m[K^[m[K
+[7.236s] In file included from [01m[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28[m[K,
+[7.236s]                  from [01m[K/opt/ros/galactic/include/rclcpp/executors.hpp:22[m[K,
+[7.236s]                  from [01m[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156[m[K,
+[7.236s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5[m[K,
+[7.237s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4[m[K,
+[7.237s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37[m[K:
+[7.237s] [01m[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:[m[K [01;36m[Knote: [m[Kdeclared here
+[7.237s]   422 |   [01;36m[Kdeclare_parameter[m[K(const std::string & name);
+[7.237s]       |   [01;36m[K^~~~~~~~~~~~~~~~~[m[K
+[7.237s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:98:45:[m[K [01;35m[Kwarning: [m[K‘[01m[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)[m[K’ is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\nIf you want to declare a parameter that won't change type without a default value use:\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\n\nIf you want to declare a parameter that can dynamically change type use:\n```\nrcl_interfaces::msg::ParameterDescriptor descriptor;\ndescriptor.dynamic_typing = true;\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\n``` [[01;35m[K-Wdeprecated-declarations[m[K]
+[7.237s]    98 |   this->declare_parameter(PARAM_FREQ_DIVIDER[01;35m[K)[m[K;
+[7.237s]       |                                             [01;35m[K^[m[K
+[7.237s] In file included from [01m[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28[m[K,
+[7.237s]                  from [01m[K/opt/ros/galactic/include/rclcpp/executors.hpp:22[m[K,
+[7.237s]                  from [01m[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156[m[K,
+[7.237s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5[m[K,
+[7.237s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4[m[K,
+[7.237s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37[m[K:
+[7.237s] [01m[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:[m[K [01;36m[Knote: [m[Kdeclared here
+[7.237s]   422 |   [01;36m[Kdeclare_parameter[m[K(const std::string & name);
+[7.237s]       |   [01;36m[K^~~~~~~~~~~~~~~~~[m[K
+[7.237s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:99:47:[m[K [01;35m[Kwarning: [m[K‘[01m[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)[m[K’ is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\nIf you want to declare a parameter that won't change type without a default value use:\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\n\nIf you want to declare a parameter that can dynamically change type use:\n```\nrcl_interfaces::msg::ParameterDescriptor descriptor;\ndescriptor.dynamic_typing = true;\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\n``` [[01;35m[K-Wdeprecated-declarations[m[K]
+[7.237s]    99 |   this->declare_parameter(PARAM_EDGE_THRESHOLD[01;35m[K)[m[K;
+[7.237s]       |                                               [01;35m[K^[m[K
+[7.237s] In file included from [01m[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28[m[K,
+[7.237s]                  from [01m[K/opt/ros/galactic/include/rclcpp/executors.hpp:22[m[K,
+[7.237s]                  from [01m[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156[m[K,
+[7.237s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5[m[K,
+[7.237s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4[m[K,
+[7.237s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37[m[K:
+[7.237s] [01m[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:[m[K [01;36m[Knote: [m[Kdeclared here
+[7.238s]   422 |   [01;36m[Kdeclare_parameter[m[K(const std::string & name);
+[7.238s]       |   [01;36m[K^~~~~~~~~~~~~~~~~[m[K
+[7.238s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:100:47:[m[K [01;35m[Kwarning: [m[K‘[01m[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)[m[K’ is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\nIf you want to declare a parameter that won't change type without a default value use:\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\n\nIf you want to declare a parameter that can dynamically change type use:\n```\nrcl_interfaces::msg::ParameterDescriptor descriptor;\ndescriptor.dynamic_typing = true;\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\n``` [[01;35m[K-Wdeprecated-declarations[m[K]
+[7.238s]   100 |   this->declare_parameter(PARAM_SURF_THRESHOLD[01;35m[K)[m[K;
+[7.238s]       |                                               [01;35m[K^[m[K
+[7.238s] In file included from [01m[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28[m[K,
+[7.238s]                  from [01m[K/opt/ros/galactic/include/rclcpp/executors.hpp:22[m[K,
+[7.238s]                  from [01m[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156[m[K,
+[7.238s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5[m[K,
+[7.238s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4[m[K,
+[7.238s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37[m[K:
+[7.238s] [01m[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:[m[K [01;36m[Knote: [m[Kdeclared here
+[7.238s]   422 |   [01;36m[Kdeclare_parameter[m[K(const std::string & name);
+[7.238s]       |   [01;36m[K^~~~~~~~~~~~~~~~~[m[K
+[7.238s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:101:41:[m[K [01;35m[Kwarning: [m[K‘[01m[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)[m[K’ is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\nIf you want to declare a parameter that won't change type without a default value use:\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\n\nIf you want to declare a parameter that can dynamically change type use:\n```\nrcl_interfaces::msg::ParameterDescriptor descriptor;\ndescriptor.dynamic_typing = true;\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\n``` [[01;35m[K-Wdeprecated-declarations[m[K]
+[7.238s]   101 |   this->declare_parameter(PARAM_DISTANCE[01;35m[K)[m[K;
+[7.238s]       |                                         [01;35m[K^[m[K
+[7.238s] In file included from [01m[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28[m[K,
+[7.238s]                  from [01m[K/opt/ros/galactic/include/rclcpp/executors.hpp:22[m[K,
+[7.238s]                  from [01m[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156[m[K,
+[7.238s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5[m[K,
+[7.238s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4[m[K,
+[7.238s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37[m[K:
+[7.238s] [01m[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:[m[K [01;36m[Knote: [m[Kdeclared here
+[7.238s]   422 |   [01;36m[Kdeclare_parameter[m[K(const std::string & name);
+[7.238s]       |   [01;36m[K^~~~~~~~~~~~~~~~~[m[K
+[7.238s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:102:45:[m[K [01;35m[Kwarning: [m[K‘[01m[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)[m[K’ is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\nIf you want to declare a parameter that won't change type without a default value use:\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\n\nIf you want to declare a parameter that can dynamically change type use:\n```\nrcl_interfaces::msg::ParameterDescriptor descriptor;\ndescriptor.dynamic_typing = true;\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\n``` [[01;35m[K-Wdeprecated-declarations[m[K]
+[7.239s]   102 |   this->declare_parameter(PARAM_ANGLE_BOTTOM[01;35m[K)[m[K;
+[7.239s]       |                                             [01;35m[K^[m[K
+[7.239s] In file included from [01m[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28[m[K,
+[7.239s]                  from [01m[K/opt/ros/galactic/include/rclcpp/executors.hpp:22[m[K,
+[7.239s]                  from [01m[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156[m[K,
+[7.239s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5[m[K,
+[7.239s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4[m[K,
+[7.239s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37[m[K:
+[7.239s] [01m[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:[m[K [01;36m[Knote: [m[Kdeclared here
+[7.239s]   422 |   [01;36m[Kdeclare_parameter[m[K(const std::string & name);
+[7.239s]       |   [01;36m[K^~~~~~~~~~~~~~~~~[m[K
+[7.239s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:103:42:[m[K [01;35m[Kwarning: [m[K‘[01m[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)[m[K’ is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\nIf you want to declare a parameter that won't change type without a default value use:\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\n\nIf you want to declare a parameter that can dynamically change type use:\n```\nrcl_interfaces::msg::ParameterDescriptor descriptor;\ndescriptor.dynamic_typing = true;\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\n``` [[01;35m[K-Wdeprecated-declarations[m[K]
+[7.239s]   103 |   this->declare_parameter(PARAM_ANGLE_TOP[01;35m[K)[m[K;
+[7.239s]       |                                          [01;35m[K^[m[K
+[7.239s] In file included from [01m[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28[m[K,
+[7.239s]                  from [01m[K/opt/ros/galactic/include/rclcpp/executors.hpp:22[m[K,
+[7.239s]                  from [01m[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156[m[K,
+[7.239s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5[m[K,
+[7.239s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4[m[K,
+[7.239s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37[m[K:
+[7.239s] [01m[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:[m[K [01;36m[Knote: [m[Kdeclared here
+[7.240s]   422 |   [01;36m[Kdeclare_parameter[m[K(const std::string & name);
+[7.240s]       |   [01;36m[K^~~~~~~~~~~~~~~~~[m[K
+[7.240s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:104:37:[m[K [01;35m[Kwarning: [m[K‘[01m[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)[m[K’ is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\nIf you want to declare a parameter that won't change type without a default value use:\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\n\nIf you want to declare a parameter that can dynamically change type use:\n```\nrcl_interfaces::msg::ParameterDescriptor descriptor;\ndescriptor.dynamic_typing = true;\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\n``` [[01;35m[K-Wdeprecated-declarations[m[K]
+[7.240s]   104 |   this->declare_parameter(PARAM_DBFr[01;35m[K)[m[K;
+[7.240s]       |                                     [01;35m[K^[m[K
+[7.240s] In file included from [01m[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28[m[K,
+[7.240s]                  from [01m[K/opt/ros/galactic/include/rclcpp/executors.hpp:22[m[K,
+[7.240s]                  from [01m[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156[m[K,
+[7.240s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5[m[K,
+[7.240s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4[m[K,
+[7.240s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37[m[K:
+[7.240s] [01m[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:[m[K [01;36m[Knote: [m[Kdeclared here
+[7.240s]   422 |   [01;36m[Kdeclare_parameter[m[K(const std::string & name);
+[7.240s]       |   [01;36m[K^~~~~~~~~~~~~~~~~[m[K
+[7.240s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:105:40:[m[K [01;35m[Kwarning: [m[K‘[01m[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)[m[K’ is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\nIf you want to declare a parameter that won't change type without a default value use:\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\n\nIf you want to declare a parameter that can dynamically change type use:\n```\nrcl_interfaces::msg::ParameterDescriptor descriptor;\ndescriptor.dynamic_typing = true;\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\n``` [[01;35m[K-Wdeprecated-declarations[m[K]
+[7.240s]   105 |   this->declare_parameter(PARAM_RatioXY[01;35m[K)[m[K;
+[7.240s]       |                                        [01;35m[K^[m[K
+[7.240s] In file included from [01m[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28[m[K,
+[7.240s]                  from [01m[K/opt/ros/galactic/include/rclcpp/executors.hpp:22[m[K,
+[7.240s]                  from [01m[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156[m[K,
+[7.240s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5[m[K,
+[7.240s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4[m[K,
+[7.240s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37[m[K:
+[7.240s] [01m[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:[m[K [01;36m[Knote: [m[Kdeclared here
+[7.240s]   422 |   [01;36m[Kdeclare_parameter[m[K(const std::string & name);
+[7.241s]       |   [01;36m[K^~~~~~~~~~~~~~~~~[m[K
+[7.241s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:106:39:[m[K [01;35m[Kwarning: [m[K‘[01m[Kconst rclcpp::ParameterValue& rclcpp::Node::declare_parameter(const string&)[m[K’ is deprecated: declare_parameter() with only a name is deprecated and will be deleted in the future.\nIf you want to declare a parameter that won't change type without a default value use:\n`node->declare_parameter<ParameterT>(name)`, where e.g. ParameterT=int64_t.\n\nIf you want to declare a parameter that can dynamically change type use:\n```\nrcl_interfaces::msg::ParameterDescriptor descriptor;\ndescriptor.dynamic_typing = true;\nnode->declare_parameter(name, rclcpp::ParameterValue{}, descriptor);\n``` [[01;35m[K-Wdeprecated-declarations[m[K]
+[7.241s]   106 |   this->declare_parameter(PARAM_RatioZ[01;35m[K)[m[K;
+[7.241s]       |                                       [01;35m[K^[m[K
+[7.241s] In file included from [01m[K/opt/ros/galactic/include/rclcpp/executors/single_threaded_executor.hpp:28[m[K,
+[7.241s]                  from [01m[K/opt/ros/galactic/include/rclcpp/executors.hpp:22[m[K,
+[7.241s]                  from [01m[K/opt/ros/galactic/include/rclcpp/rclcpp.hpp:156[m[K,
+[7.241s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/include/lego_loam/utility.h:5[m[K,
+[7.241s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.h:4[m[K,
+[7.241s]                  from [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:37[m[K:
+[7.241s] [01m[K/opt/ros/galactic/include/rclcpp/node.hpp:422:3:[m[K [01;36m[Knote: [m[Kdeclared here
+[7.241s]   422 |   [01;36m[Kdeclare_parameter[m[K(const std::string & name);
+[7.241s]       |   [01;36m[K^~~~~~~~~~~~~~~~~[m[K
+[7.241s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:[m[K In destructor ‘[01m[Kvirtual FeatureAssociation::~FeatureAssociation()[m[K’:
+[7.241s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:162:25:[m[K [01;35m[Kwarning: [m[Kconverting to ‘[01m[Kcloud_msgs::msg::CloudInfo[m[K’ {aka ‘[01m[Kcloud_msgs::msg::CloudInfo_<std::allocator<void> >[m[K’} from initializer list would use explicit constructor ‘[01m[Kcloud_msgs::msg::CloudInfo_<ContainerAllocator>::CloudInfo_(rosidl_runtime_cpp::MessageInitialization) [with ContainerAllocator = std::allocator<void>][m[K’
+[7.241s]   162 |   _input_channel.send({}[01;35m[K)[m[K;
+[7.242s]       |                         [01;35m[K^[m[K
+[7.242s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:162:25:[m[K [01;36m[Knote: [m[Kin C++11 and above a default constructor can be explicit
+[7.253s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:[m[K In member function ‘[01m[Kvoid FeatureAssociation::jointStateCallback(sensor_msgs::msg::JointState_<std::allocator<void> >::SharedPtr)[m[K’:
+[7.253s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:379:20:[m[K [01;35m[Kwarning: [m[Kunused variable ‘[01m[Kvalue[m[K’ [[01;35m[K-Wunused-variable[m[K]
+[7.253s]   379 |             double [01;35m[Kvalue[m[K = msg->position[i];
+[7.253s]       |                    [01;35m[K^~~~~[m[K
+[7.436s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:[m[K In member function ‘[01m[Kbool FeatureAssociation::calculateTransformationSurf(int)[m[K’:
+[7.436s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:1620:19:[m[K [01;35m[Kwarning: [m[Kvariable ‘[01m[KdeltaImuEuler[m[K’ set but not used [[01;35m[K-Wunused-but-set-variable[m[K]
+[7.436s]  1620 |   Eigen::Vector3d [01;35m[KdeltaImuEuler[m[K = deltaImuMat.eulerAngles(2,1,0);
+[7.436s]       |                   [01;35m[K^~~~~~~~~~~~~[m[K
+[7.439s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:[m[K In member function ‘[01m[Kbool FeatureAssociation::calculateTransformationCorner(int)[m[K’:
+[7.439s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:1770:19:[m[K [01;35m[Kwarning: [m[Kvariable ‘[01m[KdeltaImuEuler[m[K’ set but not used [[01;35m[K-Wunused-but-set-variable[m[K]
+[7.439s]  1770 |   Eigen::Vector3d [01;35m[KdeltaImuEuler[m[K = deltaImuMat.eulerAngles(2,1,0);
+[7.439s]       |                   [01;35m[K^~~~~~~~~~~~~[m[K
+[7.618s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:[m[K In member function ‘[01m[Kvoid FeatureAssociation::runFeatureAssociation()[m[K’:
+[7.618s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:2460:11:[m[K [01;35m[Kwarning: [m[Kunused variable ‘[01m[Kgseg_Hz2[m[K’ [[01;35m[K-Wunused-variable[m[K]
+[7.618s]  2460 |     float [01;35m[Kgseg_Hz2[m[K = (gseg_runtime_all2/gseg_runtime_list2.size())*1000;
+[7.618s]       |           [01;35m[K^~~~~~~~[m[K
+[7.618s] [01m[K/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/featureAssociation.cpp:2468:11:[m[K [01;35m[Kwarning: [m[Kunused variable ‘[01m[Kodometry_itertimes[m[K’ [[01;35m[K-Wunused-variable[m[K]
+[7.618s]  2468 |     float [01;35m[Kodometry_itertimes[m[K = (odometry_itertimes_all/odometry_itertimes_list.size());
+[7.618s]       |           [01;35m[K^~~~~~~~~~~~~~~~~~[m[K
+[47.745s] [ 33%] [32m[1mLinking CXX executable lego_loam_sr[0m
+[51.615s] [100%] Built target lego_loam_sr
+[51.635s] Invoked command in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr' returned '0': CMAKE_PREFIX_PATH=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs:/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr:/opt/ros/galactic /usr/bin/cmake --build /home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr -- -j16 -l16
+[51.660s] Invoking command in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr': CMAKE_PREFIX_PATH=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs:/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr:/opt/ros/galactic /usr/bin/cmake --install /home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr
+[51.670s] -- Install configuration: ""
+[51.670s] -- Installing: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/lib/lego_loam_sr/lego_loam_sr
+[51.673s] -- Set runtime path of "/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/lib/lego_loam_sr/lego_loam_sr" to ""
+[51.673s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/config
+[51.673s] -- Installing: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/config/loam_config.yaml
+[51.673s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch
+[51.673s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/record.launch.py
+[51.673s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/__pycache__
+[51.673s] -- Installing: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/__pycache__/run.launch.cpython-38.pyc
+[51.673s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/seg-total.jpg
+[51.673s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/run.launch.py
+[51.673s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/odometry.jpg
+[51.673s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/dataset-demo.gif
+[51.673s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/record.launch.xml
+[51.673s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/google-earth.png
+[51.673s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/block.png
+[51.673s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/launch/demo.gif
+[51.674s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/rviz
+[51.674s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/rviz/test.rviz
+[51.674s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/ament_index/resource_index/package_run_dependencies/lego_loam_sr
+[51.674s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/ament_index/resource_index/parent_prefix_path/lego_loam_sr
+[51.674s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/environment/ament_prefix_path.sh
+[51.674s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/environment/ament_prefix_path.dsv
+[51.674s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/environment/path.sh
+[51.674s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/environment/path.dsv
+[51.674s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/local_setup.bash
+[51.674s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/local_setup.sh
+[51.674s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/local_setup.zsh
+[51.674s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/local_setup.dsv
+[51.674s] -- Installing: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/package.dsv
+[51.674s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/ament_index/resource_index/packages/lego_loam_sr
+[51.674s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/cmake/ament_cmake_export_include_directories-extras.cmake
+[51.674s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/cmake/lego_loam_srConfig.cmake
+[51.674s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/cmake/lego_loam_srConfig-version.cmake
+[51.674s] -- Up-to-date: /home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr/share/lego_loam_sr/package.xml
+[51.676s] Invoked command in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr' returned '0': CMAKE_PREFIX_PATH=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs:/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/lego_loam_sr:/opt/ros/galactic /usr/bin/cmake --install /home/iec/colcon_ws/src/LeGO-LOAM-SR/build/lego_loam_sr
