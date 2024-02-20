@@ -46,7 +46,7 @@ set(dependencies
 
 # rosidl_generate_interfaces(${PROJECT_NAME} "srv/SaveMap.srv" DEPENDENCIES std_msgs sensor_msgs)
 
-add_executable(${PROJECT_NAME} src/imageProjection.cpp src/featureAssociation.cpp src/mapOptmization.cpp src/transformFusion.cpp src/main.cpp)
+add_executable(${PROJECT_NAME} src/imageProjection.cpp src/featureAssociation.cpp src/mapOptmization.cpp src/transformFusion.cpp src/main.cpp src/myESKF.cpp)
 target_link_libraries(${PROJECT_NAME} ${PCL_LIBRARIES} gtsam)
 ament_target_dependencies(${PROJECT_NAME} ${dependencies} Eigen3)
 

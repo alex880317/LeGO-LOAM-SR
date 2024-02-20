@@ -1,6 +1,0 @@
-Invoking command in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/cloud_msgs': CMAKE_PREFIX_PATH=/opt/ros/galactic /usr/bin/cmake /home/iec/colcon_ws/src/LeGO-LOAM-SR/cloud_msgs -DCMAKE_INSTALL_PREFIX=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs
-Invoked command in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/cloud_msgs' returned '0': CMAKE_PREFIX_PATH=/opt/ros/galactic /usr/bin/cmake /home/iec/colcon_ws/src/LeGO-LOAM-SR/cloud_msgs -DCMAKE_INSTALL_PREFIX=/home/iec/colcon_ws/src/LeGO-LOAM-SR/install/cloud_msgs
-Invoking command in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/cloud_msgs': CMAKE_PREFIX_PATH=/opt/ros/galactic /usr/bin/cmake --build /home/iec/colcon_ws/src/LeGO-LOAM-SR/build/cloud_msgs -- -j16 -l16
-Invoked command in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/cloud_msgs' returned '0': CMAKE_PREFIX_PATH=/opt/ros/galactic /usr/bin/cmake --build /home/iec/colcon_ws/src/LeGO-LOAM-SR/build/cloud_msgs -- -j16 -l16
-Invoking command in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/cloud_msgs': CMAKE_PREFIX_PATH=/opt/ros/galactic /usr/bin/cmake --install /home/iec/colcon_ws/src/LeGO-LOAM-SR/build/cloud_msgs
-Invoked command in '/home/iec/colcon_ws/src/LeGO-LOAM-SR/build/cloud_msgs' returned '0': CMAKE_PREFIX_PATH=/opt/ros/galactic /usr/bin/cmake --install /home/iec/colcon_ws/src/LeGO-LOAM-SR/build/cloud_msgs

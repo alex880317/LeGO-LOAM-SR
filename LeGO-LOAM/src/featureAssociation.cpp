@@ -2073,17 +2073,17 @@ void FeatureAssociation::updateInitialGuess(){
     imuVeloFromStartY = imuVeloFromStartYCur;
     imuVeloFromStartZ = imuVeloFromStartZCur;
 
-    if (imuAngularFromStartX != 0 || imuAngularFromStartY != 0 || imuAngularFromStartZ != 0){
-        transformCur[0] = - imuAngularFromStartY;
-        transformCur[1] = - imuAngularFromStartZ;
-        transformCur[2] = - imuAngularFromStartX;
-    }
+    // if (imuAngularFromStartX != 0 || imuAngularFromStartY != 0 || imuAngularFromStartZ != 0){
+    //     transformCur[0] = - imuAngularFromStartY;
+    //     transformCur[1] = - imuAngularFromStartZ;
+    //     transformCur[2] = - imuAngularFromStartX;
+    // }
     
-    if (imuVeloFromStartX != 0 || imuVeloFromStartY != 0 || imuVeloFromStartZ != 0){
-        transformCur[3] -= imuVeloFromStartX * _scan_period;
-        transformCur[4] -= imuVeloFromStartY * _scan_period;
-        transformCur[5] -= imuVeloFromStartZ * _scan_period;
-    }
+    // if (imuVeloFromStartX != 0 || imuVeloFromStartY != 0 || imuVeloFromStartZ != 0){
+    //     transformCur[3] -= imuVeloFromStartX * _scan_period;
+    //     transformCur[4] -= imuVeloFromStartY * _scan_period;
+    //     transformCur[5] -= imuVeloFromStartZ * _scan_period;
+    // }
 
     //Alex
 
@@ -2196,11 +2196,11 @@ void FeatureAssociation::updateTransformation() {
     if (laserCloudOri->points.size() < 10) continue;
     if (calculateTransformationCorner(iterCount2) == false) break;
   }
-  auto message = geometry_msgs::msg::Vector3();
-  message.x = transformCur[0];
-  message.y = transformCur[1];
-  message.z = transformCur[2];
-  pubRotateMsgs->publish(message);
+  // auto message = geometry_msgs::msg::Vector3();
+  // message.x = transformCur[0];
+  // message.y = transformCur[1];
+  // message.z = transformCur[2];
+  // pubRotateMsgs->publish(message);
 }
 
 void FeatureAssociation::integrateTransformation() {
