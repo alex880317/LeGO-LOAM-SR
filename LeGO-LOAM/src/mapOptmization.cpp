@@ -1509,12 +1509,12 @@ bool MapOptimization::LMOptimization(int iterCount) {
     matX = matP * matX2;
   }
 
-  transformTobeMapped[0] += matX(0, 0);
-  transformTobeMapped[1] += matX(1, 0);
-  transformTobeMapped[2] += matX(2, 0);
-  transformTobeMapped[3] += matX(3, 0);
-  transformTobeMapped[4] += matX(4, 0);
-  transformTobeMapped[5] += matX(5, 0);
+  // transformTobeMapped[0] += matX(0, 0);
+  // transformTobeMapped[1] += matX(1, 0);
+  // transformTobeMapped[2] += matX(2, 0);
+  // transformTobeMapped[3] += matX(3, 0);
+  // transformTobeMapped[4] += matX(4, 0);
+  // transformTobeMapped[5] += matX(5, 0);
 
   float deltaR = sqrt(pow(pcl::rad2deg(matX(0, 0)), 2) +
                       pow(pcl::rad2deg(matX(1, 0)), 2) +

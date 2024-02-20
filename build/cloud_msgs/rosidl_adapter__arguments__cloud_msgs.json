@@ -1,6 +1,0 @@
-{
-  "package_name": "cloud_msgs",
-  "non_idl_tuples": [
-    "/home/iec/colcon_ws/src/LeGO-LOAM-SR/cloud_msgs:msg/CloudInfo.msg"
-  ]
-}
