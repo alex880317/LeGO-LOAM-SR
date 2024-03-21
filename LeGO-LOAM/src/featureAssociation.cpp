@@ -36,6 +36,7 @@
 
 #include "featureAssociation.h"
 #include "rclcpp/rclcpp.hpp"
+#include <limits> // Alex for std::numeric_limits<float>::quiet_NaN()
 
 
 const std::string PARAM_VERTICAL_SCANS = "laser.num_vertical_scans";
@@ -174,6 +175,7 @@ void FeatureAssociation::initializationValue() {
   distortedCloud.reset(new pcl::PointCloud<PointType>());
   outlierCloud.reset(new pcl::PointCloud<PointType>());
   // fullCloud.reset(new pcl::PointCloud<PointType>());
+  virtualshadowCloud.reset(new pcl::PointCloud<PointType>()); // Alex
 
   cornerPointsSharp.reset(new pcl::PointCloud<PointType>());
   cornerPointsLessSharp.reset(new pcl::PointCloud<PointType>());
@@ -210,6 +212,7 @@ void FeatureAssociation::initializationValue() {
   laserCloudSurfScan.reset(new pcl::PointCloud<PointType>());
   laserCloudOri.reset(new pcl::PointCloud<PointType>());
   coeffSel.reset(new pcl::PointCloud<PointType>());
+  virtualshadowCloud.reset(new pcl::PointCloud<PointType>);
 
   laserOdometry.header.frame_id = "camera_init";
   laserOdometry.child_frame_id = "laser_odom";
@@ -271,6 +274,9 @@ void FeatureAssociation::initializationValue() {
   imuVeloFromStartX = 0; imuVeloFromStartY = 0; imuVeloFromStartZ = 0;
   
   //Alex
+  odomcall_roll = 0;odomcall_pitch = 0;odomcall_yaw = 0;
+  odomInitialIter = 0;
+  x_initial = 0;y_initial = 0;z_initial = 0;
   odomStartPosX = 0;odomStartPosY = 0;odomStartPosZ = 0;
   odomStartRoll = 0;odomStartPitch = 0;odomStartYaw = 0;
   odomPointerLast = -1;
@@ -290,6 +296,12 @@ void FeatureAssociation::initializationValue() {
     WheelLR[i] = 0;
     Wheelk[i] = 0;
   }
+
+  lidar_to_body_centor << 0.008, 0.0, -0.035;
+  row_size = 16;col_size = 10;
+  row_angle = 0;col_angle = 0;
+  row_x = 0;col_y = 0;
+
 
 }
 
@@ -341,48 +353,100 @@ void FeatureAssociation::imuHandler(const sensor_msgs::msg::Imu::ConstSharedPtr 
 //Alex
 void FeatureAssociation::odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg) 
 {
-    // 在這裡處理接收到的 /odom 消息
-    // RCLCPP_INFO(this->get_logger(), "Received odom: '%s'", msg->header.frame_id.c_str());
-    // 你可以在這裡添加更多的邏輯來處理消息
-    double roll, pitch, yaw;
-    tf2::Quaternion orientation;
-    tf2::convert(msg->pose.pose.orientation, orientation);
-    tf2::Matrix3x3(orientation).getRPY(roll, pitch, yaw);
-    // RCLCPP_INFO(this->get_logger(), "Ground Truth Roll: '%f'", roll);
-    // auto orientation = msg->pose.pose.orientation;
-    // RCLCPP_INFO(this->get_logger(), "Orientation - x: %f, y: %f, z: %f, w: %f",
-    //             orientation.x, orientation.y, orientation.z, orientation.w);
-    odomPointerLast = (odomPointerLast + 1) % odomQueLength;
+  // 在這裡處理接收到的 /odom 消息
+  // RCLCPP_INFO(this->get_logger(), "Received odom: '%s'", msg->header.frame_id.c_str());
+  // 你可以在這裡添加更多的邏輯來處理消息
+  
+  tf2::Quaternion orientation;
+  tf2::convert(msg->pose.pose.orientation, orientation);
+  tf2::Matrix3x3(orientation).getRPY(odomcall_roll, odomcall_pitch, odomcall_yaw);
+  // RCLCPP_INFO(this->get_logger(), "Ground Truth Roll: '%f'", roll);
+  // auto orientation = msg->pose.pose.orientation;
+  // RCLCPP_INFO(this->get_logger(), "Orientation - x: %f, y: %f, z: %f, w: %f",
+  //             orientation.x, orientation.y, orientation.z, orientation.w);
+  
+  if(odomInitialIter == 0){
+    x_initial = msg->pose.pose.position.x;
+    y_initial = msg->pose.pose.position.y;
+    z_initial = msg->pose.pose.position.z;
+    odomInitialIter += 1;
+  }
 
-    odomTime[odomPointerLast] = msg->header.stamp.sec + msg->header.stamp.nanosec/1e9;
-    
-    odomRoll[odomPointerLast] = roll;
-    odomPitch[odomPointerLast] = pitch;
-    odomYaw[odomPointerLast] = yaw;
-
-    odomPosX[odomPointerLast] = msg->pose.pose.position.x;
-    odomPosY[odomPointerLast] = msg->pose.pose.position.y;
-    odomPosZ[odomPointerLast] = msg->pose.pose.position.z;
-    // RCLCPP_INFO(this->get_logger(), "odomPointerLast: '%d'", odomPointerLast);
+  odomPointerLast = (odomPointerLast + 1) % odomQueLength;
+  odomTime[odomPointerLast] = msg->header.stamp.sec + msg->header.stamp.nanosec/1e9;
+  
+  odomRoll[odomPointerLast] = odomcall_roll;
+  odomPitch[odomPointerLast] = odomcall_pitch;
+  odomYaw[odomPointerLast] = odomcall_yaw;
+  odomPosX[odomPointerLast] = msg->pose.pose.position.x - x_initial;
+  odomPosY[odomPointerLast] = msg->pose.pose.position.y - y_initial;
+  odomPosZ[odomPointerLast] = msg->pose.pose.position.z - z_initial;
+  
+  // std::cout << "odomPosX:" << odomPosX[odomPointerLast] << std::endl;
+  // std::cout << "odomPosY:" << odomPosY[odomPointerLast] << std::endl;
+  // std::cout << "odomPosZ:" << odomPosZ[odomPointerLast] << std::endl;
+  // RCLCPP_INFO(this->get_logger(), "odomPosX: '%d'", odomPosX[odomPointerLast]);
+  // 生成虛擬點雲
+  // GenerateShadowPoint();
 }
 
 //Alex
 void FeatureAssociation::jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg) {
-    // 处理接收到的消息，比如打印信息或其他逻辑
-    // RCLCPP_INFO(this->get_logger(), "Received joint state message");
-    // 你可能想访问并使用关节状态信息
-    // 例如: msg->position, msg->velocity 等
-    // 检查是否有位置数据
-    if(!msg->position.empty()) {
-        // 提取position中的每个值
-        for (size_t i = 0; i < msg->position.size(); ++i) {
-            double value = msg->position[i];
-            // 现在可以使用value进行计算或其他操作
-            // RCLCPP_INFO(this->get_logger(), "Position[%zu]: %f", i, value);
-        }
-    } else {
-        // RCLCPP_INFO(this->get_logger(), "No position data available.");
+  // 处理接收到的消息，比如打印信息或其他逻辑
+  // RCLCPP_INFO(this->get_logger(), "Received joint state message");
+  // 你可能想访问并使用关节状态信息
+  // 例如: msg->position, msg->velocity 等
+  // 检查是否有位置数据
+  if(!msg->position.empty()) {
+      // 提取position中的每个值
+      for (size_t i = 0; i < msg->position.size(); ++i) {
+          double value = msg->position[i];
+          // 现在可以使用value进行计算或其他操作
+          // RCLCPP_INFO(this->get_logger(), "Position[%zu]: %f", i, value);
+      }
+  } else {
+      // RCLCPP_INFO(this->get_logger(), "No position data available.");
+  }
+}
+
+void FeatureAssociation::GenerateShadowPoint(){
+  // Ground Truth
+  virtualshadowCloud->clear();
+  row_angle = (atan2(0.120, 0.05) * 2) / (row_size - 1);
+  col_angle = (atan2(0.077, 0.05) * 2) / (col_size - 1);
+  // pcl::PointCloud<pcl::PointXYZI>::Ptr virtualshadowCloud(new pcl::PointCloud<pcl::PointXYZI>);
+
+
+  for (int row = 0; row < row_size; row++) {
+    row_x = 0.05 * tan((((row_size - 1.0) / 2.0) * row_angle) - (row * row_angle));
+    // std::cout << "row_x : " << row_x << std::endl;
+    for(int col = 0; col < col_size; col++){
+      col_y = 0.05 * tan((((col_size - 1.0) / 2.0) * col_angle) - (col * col_angle));
+      virtualshadowpoint.x = col_y + lidar_to_body_centor[1];
+      virtualshadowpoint.y = -(0.035f + 0.05f) + lidar_to_body_centor[2];
+      virtualshadowpoint.z = row_x + lidar_to_body_centor[0];
+      // virtualshadowpoint.intensity = std::numeric_limits<float>::quiet_NaN();
+      virtualshadowpoint.intensity = (float)row + (float)17 + (float)col / 10000.0;
+      virtualshadowCloud->push_back(virtualshadowpoint);
     }
+  }
+
+  // 打印所有点
+  // for (const auto& point : *virtualshadowCloud) {
+  //     std::cout << "x: " << point.x
+  //               << ", y: " << point.y
+  //               << ", z: " << point.z
+  //               << ", intensity: " << point.intensity << std::endl;
+  // }
+  // int shadow_i;
+  // for (const auto& point : *virtualshadowCloud) {
+  //     surfPointsFlat->push_back(point);
+  //     std::cout << "virtualshadowCloud: x=" << point.x << ", y=" << point.y << ", z=" << point.z << ", intensity=" << point.intensity << std::endl;
+  //     std::cout << "shadow iter : " << shadow_i << std::endl;
+  //     shadow_i++;
+  // }
+  // ESKF
+
 }
 
 void FeatureAssociation::AccumulateIMUShiftAndRotation()
@@ -949,12 +1013,146 @@ void FeatureAssociation::extractFeatures() {
     surfPointsLessFlatScanDS->clear();
     downSizeFilter.setInputCloud(surfPointsLessFlatScan);
     downSizeFilter.filter(*surfPointsLessFlatScanDS);
-
     *surfPointsLessFlat += *surfPointsLessFlatScanDS;
   }
   // std::cout << "surfPointsFlat:" << surfPointsFlat->points.size() << std::endl;
   // std::cout << "cornerPointsLessSharp:" << cornerPointsLessSharp->points.size() << std::endl;
 }
+
+// void FeatureAssociation::extractFeaturesOurs() {
+//   cornerPointsSharp->clear();
+//   cornerPointsLessSharp->clear();
+//   surfPointsFlat->clear();
+//   surfPointsLessFlat->clear();
+
+//   for (int i = 0; i < _vertical_scans; i++) {
+//     surfPointsLessFlatScan->clear();
+//     int sp = segInfo.start_ring_index[i];
+//     int ep = segInfo.end_ring_index[i] - 1;
+//     if (sp >= ep) continue;
+//     std::sort(cloudSmoothness.begin() + sp, cloudSmoothness.begin() + ep, by_value());
+
+//     // Edge
+//     for (int k = ep; k >= sp; k--) {
+//       int ind = cloudSmoothness[k].ind;
+//       if (cloudNeighborPicked[ind] == 0 &&
+//           cloudCurvature[ind] > _edge_threshold &&
+//           segInfo.segmented_cloud_ground_flag[ind] == false) {
+//         cloudLabel[ind] = 1;
+//         cornerPointsLessSharp->push_back(segmentedCloud->points[ind]);
+
+
+//         cloudNeighborPicked[ind] = 1;
+//         for (int l = 1; l <= 5; l++) {
+//           if ( ind + l >= static_cast<int>(segInfo.segmented_cloud_col_ind.size()) ) {
+//             continue;
+//           }
+//           int columnDiff =
+//               std::abs(int(segInfo.segmented_cloud_col_ind[ind + l] -
+//                             segInfo.segmented_cloud_col_ind[ind + l - 1]));
+//           if (columnDiff > 10) break;
+//           cloudNeighborPicked[ind + l] = 1;
+//         }
+//         for (int l = -1; l >= -5; l--) {
+//           if( ind + l < 0 ) {
+//             continue;
+//           }
+//           int columnDiff =
+//               std::abs(int(segInfo.segmented_cloud_col_ind[ind + l] -
+//                             segInfo.segmented_cloud_col_ind[ind + l + 1]));
+//           if (columnDiff > 10) break;
+//           cloudNeighborPicked[ind + l] = 1;
+//         }
+//       }
+//     }
+
+//     // Planar
+//     int smallestPickedNum = 0;
+//     for (int k = sp; k <= ep; k++) {
+//       int ind = cloudSmoothness[k].ind;
+//       if (cloudNeighborPicked[ind] == 0 &&
+//           cloudCurvature[ind] < _surf_threshold &&
+//           segInfo.segmented_cloud_ground_flag[ind] == true) {
+//         cloudLabel[ind] = -1;
+//         surfPointsFlat->push_back(segmentedCloud->points[ind]);
+
+//         smallestPickedNum++;
+//         // if (smallestPickedNum >= 4) {
+//         //   break;
+//         // }
+
+//         cloudNeighborPicked[ind] = 1;
+//         for (int l = 1; l <= 5; l++) {
+//           if ( ind + l >= static_cast<int>(segInfo.segmented_cloud_col_ind.size()) ) {
+//             continue;
+//           }
+//           int columnDiff =
+//               std::abs(int(segInfo.segmented_cloud_col_ind.at(ind + l) -
+//                             segInfo.segmented_cloud_col_ind.at(ind + l - 1)));
+//           if (columnDiff > 10) break;
+
+//           cloudNeighborPicked[ind + l] = 1;
+//         }
+//         for (int l = -1; l >= -5; l--) {
+//           if (ind + l < 0) {
+//             continue;
+//           }
+//           int columnDiff =
+//               std::abs(int(segInfo.segmented_cloud_col_ind.at(ind + l) -
+//                             segInfo.segmented_cloud_col_ind.at(ind + l + 1)));
+//           if (columnDiff > 10) break;
+
+//           cloudNeighborPicked[ind + l] = 1;
+//         }
+//       }
+//     }
+
+//     for (int k = sp; k <= ep; k++) {
+//       if (cloudLabel[k] <= 0) {
+//         surfPointsLessFlatScan->push_back(segmentedCloud->points[k]);
+//       }
+//     }
+//     surfPointsLessFlatScanDS->clear();
+//     downSizeFilter.setInputCloud(surfPointsLessFlatScan);
+//     downSizeFilter.filter(*surfPointsLessFlatScanDS);
+//     *surfPointsLessFlat += *surfPointsLessFlatScanDS;
+//   }
+//   // *cornerPointsSharp = *cornerPointsLessSharp;
+//   // DBSCAN Refined Edge Feature
+//   DBSCAN_EdgeFeature();
+//   // DEBUG
+//   // for (int i = 0; i < (int)cluster.size(); ++i) {
+//   //       std::cout << cluster[i] << "; ";
+//   // }
+//   // std::cout << std::endl;
+//   cluster_length = cluster;
+//   std::sort(cluster_length.begin(), cluster_length.end());
+//   cluster_num_list.clear();
+//   int cluster_cnt = 1;
+//   for (int i = 0; i < (int)cluster_length.size()-1; i++) {
+//     if (cluster_length[i+1] - cluster_length[i] == 0){
+//       cluster_cnt++;
+//     }else{
+//       cluster_num_list.push_back(cluster_cnt);
+//       cluster_cnt = 1;
+//     }
+//   }
+//   cluster_inlier.clear();
+//   for (int i = 0; i < (int)cluster_num_list.size(); i++) {
+//     if (cluster_num_list[i]>=4){
+//       cluster_inlier.push_back(i+1);
+//     }
+//   }
+//   for (int i = 0; i < (int)cluster.size(); i++) {
+//     for (int j = 0; j < (int)cluster_inlier.size(); j++){
+//       if (cluster[i] == cluster_inlier[j]){
+//         cornerPointsSharp->push_back(cornerPointsLessSharp->points[i]);
+//       }
+//     }
+//   }
+//   // std::cout << "surfPointsFlat:" << surfPointsFlat->points.size() << std::endl;
+//   // std::cout << "cornerPointsSharp:" << cornerPointsSharp->points.size() << std::endl;
+// }
 
 void FeatureAssociation::extractFeaturesOurs() {
   cornerPointsSharp->clear();
@@ -962,10 +1160,12 @@ void FeatureAssociation::extractFeaturesOurs() {
   surfPointsFlat->clear();
   surfPointsLessFlat->clear();
 
-  for (int i = 0; i < _vertical_scans; i++) {
+  for (int i = 0; i < _vertical_scans; i++) { // _vertical_scans = 16,對每一條掃描線取特徵
     surfPointsLessFlatScan->clear();
     int sp = segInfo.start_ring_index[i];
     int ep = segInfo.end_ring_index[i] - 1;
+    // std::cout << "sp = " << sp << std::endl;
+    // std::cout << "ep = " << ep << std::endl;
     if (sp >= ep) continue;
     std::sort(cloudSmoothness.begin() + sp, cloudSmoothness.begin() + ep, by_value());
 
@@ -977,6 +1177,8 @@ void FeatureAssociation::extractFeaturesOurs() {
           segInfo.segmented_cloud_ground_flag[ind] == false) {
         cloudLabel[ind] = 1;
         cornerPointsLessSharp->push_back(segmentedCloud->points[ind]);
+        // std::cout << "cornerPointsLessSharp.size() = " << cornerPointsLessSharp -> points.size() << std::endl;
+
 
         cloudNeighborPicked[ind] = 1;
         for (int l = 1; l <= 5; l++) {
@@ -1003,21 +1205,31 @@ void FeatureAssociation::extractFeaturesOurs() {
     }
 
     // Planar
-    int smallestPickedNum = 0;
-    for (int k = sp; k <= ep; k++) {
-      int ind = cloudSmoothness[k].ind;
-      if (cloudNeighborPicked[ind] == 0 &&
+    int smallestPickedNum = 0; // 初始化一個變量 smallestPickedNum 用於記錄選取的平面點的數量。
+    for (int k = sp; k <= ep; k++) { // 通過一個循環，從 sp 開始到 ep 結束，遍歷某個範圍內的點雲數據。這個範圍可能是一個掃描線或是點雲數據的一個子集。
+      int ind = cloudSmoothness[k].ind; // 對於每個點 k，獲取它的索引 ind，這個索引是點在點雲數據中的位置。
+      // 檢查點 ind 是否已經被選取過（cloudNeighborPicked[ind] == 0），
+      // 其曲率是否小於一個閾值（cloudCurvature[ind] < _surf_threshold），
+      // 以及該點是否被標記為地面點（segInfo.segmented_cloud_ground_flag[ind] == true）。
+      // 這些條件用於篩選出可能屬於平面的點。
+      if (cloudNeighborPicked[ind] == 0 &&  
           cloudCurvature[ind] < _surf_threshold &&
           segInfo.segmented_cloud_ground_flag[ind] == true) {
-        cloudLabel[ind] = -1;
+        // 如果一個點滿足以上條件，它將被標記為 -1，表示它被認為是一個平面點，並將其添加到 surfPointsFlat 容器中，用於存儲平面點。 
+        // surfPointsFlat會在findCorrespondingSurfFeatures()中被調用 會在TransformToStart()先轉換到起始座標系 接著放到kdtree中找特徵匹配點
+        cloudLabel[ind] = -1; 
         surfPointsFlat->push_back(segmentedCloud->points[ind]);
+        // std::cout << "surfPointsFlat.size() = " << surfPointsFlat -> points.size() << std::endl;
 
-        smallestPickedNum++;
+        smallestPickedNum++;  // 更新 smallestPickedNum，記錄已選取的平面點數量。
         // if (smallestPickedNum >= 4) {
         //   break;
-        // }
+        // } // 原本平面點每個部份只取4個點
 
-        cloudNeighborPicked[ind] = 1;
+        cloudNeighborPicked[ind] = 1; // 將當前點標記為已被選取（cloudNeighborPicked[ind] = 1），以避免它被重覆選取。
+        // 對當前點的相鄰點進行遍歷，檢查它們是否在同一列（在一定範圍內），
+        // 並根據它們的列索引差異決定是否將它們也標記為已選取。
+        // 這樣做是為了在提取平面特征點時考慮點雲的連續性，避免將非平面區域的點錯誤地選為平面點。
         for (int l = 1; l <= 5; l++) {
           if ( ind + l >= static_cast<int>(segInfo.segmented_cloud_col_ind.size()) ) {
             continue;
@@ -1029,6 +1241,7 @@ void FeatureAssociation::extractFeaturesOurs() {
 
           cloudNeighborPicked[ind + l] = 1;
         }
+        // 類似地，對當前點之前的相鄰點進行檢查，應用同樣的邏輯。
         for (int l = -1; l >= -5; l--) {
           if (ind + l < 0) {
             continue;
@@ -1043,11 +1256,13 @@ void FeatureAssociation::extractFeaturesOurs() {
       }
     }
     
+    // 另一個循環用於遍歷相同的點雲範圍，將所有未被標記為平面點的點（cloudLabel[k] <= 0）添加到 surfPointsLessFlatScan 容器中。這可能包括一些不那麽平坦的點，但依然可能對後續處理有用。
     for (int k = sp; k <= ep; k++) {
       if (cloudLabel[k] <= 0) {
         surfPointsLessFlatScan->push_back(segmentedCloud->points[k]);
       }
     }
+    // 使用一個降采樣濾波器（downSizeFilter）對 surfPointsLessFlatScan 中的點進行降采樣，減少數據量以提高處理效率。處理後的點雲存儲在 surfPointsLessFlatScanDS 容器中。
     surfPointsLessFlatScanDS->clear();
     downSizeFilter.setInputCloud(surfPointsLessFlatScan);
     downSizeFilter.filter(*surfPointsLessFlatScanDS);
@@ -1088,6 +1303,14 @@ void FeatureAssociation::extractFeaturesOurs() {
   }
   // std::cout << "surfPointsFlat:" << surfPointsFlat->points.size() << std::endl;
   // std::cout << "cornerPointsSharp:" << cornerPointsSharp->points.size() << std::endl;
+
+  // Alex Shadow point push back
+  for (const auto& point : *virtualshadowCloud) {
+      surfPointsFlat->push_back(point);
+      // std::cout << "virtualshadowCloud: x=" << point.x << ", y=" << point.y << ", z=" << point.z << ", intensity=" << point.intensity << std::endl;
+      // std::cout << "shadow iter : " << shadow_i << std::endl;
+  }
+  // surfPointsFlat->push_back(virtualshadowCloud->virtualshadowpoint);
 }
 
 void FeatureAssociation::DBSCAN_EdgeFeature(){
@@ -1475,19 +1698,42 @@ void FeatureAssociation::findCorrespondingSurfFeatures(int iterCount) {
   int surfPointsFlatNum = surfPointsFlat->points.size();
 
   for (int i = 0; i < surfPointsFlatNum; i++) {
+    // std::cout << "knn times : " << i << std::endl;
     PointType pointSel;
     // pointSel = surfPointsFlat->points[i];
     TransformToStart(&surfPointsFlat->points[i], &pointSel);
-
+    std::cout << "pointSel's idx : " << pointSel.intensity << std::endl;
+    
+    // ----------------------------------------------------------------------------------------
+    // 每5次迭代找一次最近鄰點
+    //************************************
+    // Method:    nearestKSearch k-近邻搜索，搜索离point最近的k个点
+    // 注意此方法不对输入索引进行任何检查（即index >= cloud.points.size（） || index < 0），并假定是有效（即有限）数据。
+    // FullName:  pcl::KdTreeFLANN<PointT, Dist>::nearestKSearch
+    // Access:    public 
+    // Returns:   int 返回搜索到的点的个数
+    // Parameter: const PointT & point 搜索离point最近的k个点
+    // Parameter: int k 搜索离point最近的k个点
+    // Parameter: std::vector<int> & k_indices 搜索到的点在数据源中的下标
+    // Parameter: std::vector<float> & k_distances point到被搜索点的距离，与下标相对应
+    //************************************
     if (iterCount % 5 == 0) {
       kdtreeSurfLast.nearestKSearch(pointSel, 1, pointSearchInd,
                                      pointSearchSqDis);
+      laserCloudSurfLast;
+      std::cout << "correspondence's idx : " << laserCloudSurfLast->points[pointSearchInd[0]].intensity << std::endl;
       int closestPointInd = -1, minPointInd2 = -1, minPointInd3 = -1;
+      // std::cout << "Vector elements are (using range-based for loop): ";
+      // for (const auto& value : pointSearchInd) {
+      //     std::cout << value << " ";
+      // }
+      // std::cout << std::endl;
 
       if (pointSearchSqDis[0] < _nearest_feature_dist_sqr) {
         closestPointInd = pointSearchInd[0];
         int closestPointScan =
             int(laserCloudSurfLast->points[closestPointInd].intensity);
+            // std::cout << "closestPointScan = " << closestPointScan << std::endl;
 
         float pointSqDis, minPointSqDis2 = _nearest_feature_dist_sqr,
                           minPointSqDis3 = _nearest_feature_dist_sqr;
@@ -1545,16 +1791,17 @@ void FeatureAssociation::findCorrespondingSurfFeatures(int iterCount) {
         }
       }
 
-      pointSearchSurfInd1[i] = closestPointInd;
+      pointSearchSurfInd1[i] = closestPointInd; // 最近鄰點
       pointSearchSurfInd2[i] = minPointInd2;
       pointSearchSurfInd3[i] = minPointInd3;
     }
-
+    // ----------------------------------------------------------------------------------------
+    // 點到平面距離
     if (pointSearchSurfInd2[i] >= 0 && pointSearchSurfInd3[i] >= 0) {
       PointType tripod1 = laserCloudSurfLast->points[pointSearchSurfInd1[i]];
       PointType tripod2 = laserCloudSurfLast->points[pointSearchSurfInd2[i]];
       PointType tripod3 = laserCloudSurfLast->points[pointSearchSurfInd3[i]];
-
+      // 平面方程係數
       float pa = (tripod2.y - tripod1.y) * (tripod3.z - tripod1.z) -
                  (tripod3.y - tripod1.y) * (tripod2.z - tripod1.z);
       float pb = (tripod2.z - tripod1.z) * (tripod3.x - tripod1.x) -
@@ -1595,16 +1842,17 @@ void FeatureAssociation::findCorrespondingSurfFeatures(int iterCount) {
 }
 
 bool FeatureAssociation::calculateTransformationSurf(int iterCount) {
-  int pointSelNum = laserCloudOri->points.size();
+  int pointSelNum = laserCloudOri->points.size(); // 获取原始点云中点的数量
 
-  Eigen::Matrix<float,Eigen::Dynamic,3> matA(pointSelNum, 3);
-  Eigen::Matrix<float,3,Eigen::Dynamic> matAt(3,pointSelNum);
-  Eigen::Matrix<float,3,3> matAtA;
-  Eigen::VectorXf matB(pointSelNum);
-  Eigen::Matrix<float,3,1> matAtB;
-  Eigen::Matrix<float,3,1> matX;
-  Eigen::Matrix<float,3,3> matP;
-  std::cout << "Original"<< ": " << transformCur[0] << "," << transformCur[1] << "," << transformCur[2] << std::endl; // debug
+  // 初始化矩阵和向量用于后续的线性方程求解
+  Eigen::Matrix<float,Eigen::Dynamic,3> matA(pointSelNum, 3); // 系数矩阵A
+  Eigen::Matrix<float,3,Eigen::Dynamic> matAt(3,pointSelNum); // A的转置
+  Eigen::Matrix<float,3,3> matAtA; // A转置乘以A
+  Eigen::VectorXf matB(pointSelNum); // 常数向量B
+  Eigen::Matrix<float,3,1> matAtB; // A转置乘以B
+  Eigen::Matrix<float,3,1> matX; // 解向量X
+  Eigen::Matrix<float,3,3> matP; // 奇异性调整矩阵
+  // std::cout << "Original"<< ": " << transformCur[0] << "," << transformCur[1] << "," << transformCur[2] << std::endl; // debug
 
   //TODO
   // Eigen::Matrix3d imuMatPre;
@@ -1627,21 +1875,24 @@ bool FeatureAssociation::calculateTransformationSurf(int iterCount) {
   // transformCur[3] += imuVeloFromStartYCur * _scan_period;
   // transformCur[4] += imuVeloFromStartZCur * _scan_period;
   // transformCur[5] -= imuVeloFromStartXCur * _scan_period;
-  // std::cout << "After"<< ": " << transformCur[0] << "," << transformCur[1] << "," << transformCur[2] << std::endl;  // debug
-  imuRollPreSurf = imuRoll[imuPointerLast];
-  imuPitchPreSurf = imuPitch[imuPointerLast];
-  imuRollPreSurf = imuYaw[imuPointerLast];
+  // // std::cout << "After"<< ": " << transformCur[0] << "," << transformCur[1] << "," << transformCur[2] << std::endl;  // debug
+  // imuRollPreSurf = imuRoll[imuPointerLast];
+  // imuPitchPreSurf = imuPitch[imuPointerLast];
+  // imuRollPreSurf = imuYaw[imuPointerLast];
   //TODO
+  // 计算当前变换的sin和cos值，简化后续计算
   float srx = sin(transformCur[0]);
   float crx = cos(transformCur[0]);
   float sry = sin(transformCur[1]);
   float cry = cos(transformCur[1]);
   float srz = sin(transformCur[2]);
   float crz = cos(transformCur[2]);
+  // 获取当前的平移量
   float tx = transformCur[3];
   float ty = transformCur[4];
   float tz = transformCur[5];
 
+  // 下面的 a1 至 a11, b1, b2, b5, b6, c1 至 c9 是根据旋转和平移计算得出的中间变量
   float a1 = crx * sry * srz;
   float a2 = crx * crz * sry;
   float a3 = srx * sry;
@@ -1669,10 +1920,14 @@ bool FeatureAssociation::calculateTransformationSurf(int iterCount) {
   float c8 = -b1;
   float c9 = tx * -b2 - ty * -b1;
 
+  // 构建系数矩阵和常数向量
   for (int i = 0; i < pointSelNum; i++) {
-    PointType pointOri = laserCloudOri->points[i];
-    PointType coeff = coeffSel->points[i];
+    PointType pointOri = laserCloudOri->points[i]; // 原始点
+    PointType coeff = coeffSel->points[i]; // 对应的系数
 
+    // 使用变换和系数计算线性方程组的系数
+    // arx, arz, aty 是由点的原始位置、当前估计的变换和系数计算的线性方程的系数
+    // 下面是系数的具体计算公式
     float arx =
         (-a1 * pointOri.x + a2 * pointOri.y + a3 * pointOri.z + a4) * coeff.x +
         (a5 * pointOri.x - a6 * pointOri.y + crx * pointOri.z + a7) * coeff.y +
@@ -1684,24 +1939,28 @@ bool FeatureAssociation::calculateTransformationSurf(int iterCount) {
 
     float aty = -b6 * coeff.x + c4 * coeff.y + b2 * coeff.z;
 
-    float d2 = coeff.intensity;
+    float d2 = coeff.intensity;  // 权重因子或其他形式的系数
 
     matA(i, 0) = arx;
     matA(i, 1) = arz;
     matA(i, 2) = aty;
-    matB(i, 0) = -0.05 * d2;
+    matB(i, 0) = -0.05 * d2; // 根据权重调整常数项
   }
 
-  matAt = matA.transpose();
-  matAtA = matAt * matA;
-  matAtB = matAt * matB;
-  matX = matAtA.colPivHouseholderQr().solve(matAtB);
+  // 通过矩阵运算求解线性方程组
+  matAt = matA.transpose(); // 计算A的转置
+  matAtA = matAt * matA; // 计算AtA
+  matAtB = matAt * matB; // 计算AtB
+  matX = matAtA.colPivHouseholderQr().solve(matAtB); // 求解线性方程组得到X
 
+  // 如果是第一次迭代，检查是否存在奇异性，并准备相应的调整
   if (iterCount == 0) {
-    Eigen::Matrix<float,1,3> matE;
-    Eigen::Matrix<float,3,3> matV;
-    Eigen::Matrix<float,3,3> matV2;
+    // Eigen库中的自伴特征求解器用于计算特征值和特征向量
+    Eigen::Matrix<float,1,3> matE; // 特征值
+    Eigen::Matrix<float,3,3> matV; // 特征向量
+    Eigen::Matrix<float,3,3> matV2; // 用于奇异性调整的特征向量
 
+    // 求解特征值和特征向量
     Eigen::SelfAdjointEigenSolver< Eigen::Matrix<float,3,3> > esolver(matAtA);
     matE = esolver.eigenvalues().real();
     matV = esolver.eigenvectors().real();
@@ -1728,6 +1987,7 @@ bool FeatureAssociation::calculateTransformationSurf(int iterCount) {
     matX = matP * matX2;
   }
 
+  // 更新变换估计
   transformCur[0] += matX(0, 0);
   transformCur[2] += matX(1, 0);
   transformCur[4] += matX(2, 0);
@@ -1736,6 +1996,7 @@ bool FeatureAssociation::calculateTransformationSurf(int iterCount) {
     if (std::isnan(transformCur[i])) transformCur[i] = 0;
   }
 
+  // 收敛检查
   float deltaR = sqrt(pow(RAD2DEG * (matX(0, 0)), 2) +
                       pow(RAD2DEG * (matX(1, 0)), 2));
   float deltaT = sqrt(pow(matX(2, 0) * 100, 2));
@@ -1745,6 +2006,7 @@ bool FeatureAssociation::calculateTransformationSurf(int iterCount) {
   }
   return true;
 }
+
 
 bool FeatureAssociation::calculateTransformationCorner(int iterCount) {
   int pointSelNum = laserCloudOri->points.size();
@@ -1777,11 +2039,11 @@ bool FeatureAssociation::calculateTransformationCorner(int iterCount) {
   // transformCur[3] += imuVeloFromStartYCur * _scan_period;
   // transformCur[4] += imuVeloFromStartZCur * _scan_period;
   // transformCur[5] -= imuVeloFromStartXCur * _scan_period;
-  imuRollPreCorner = imuRoll[imuPointerLast];
-  imuPitchPreCorner = imuPitch[imuPointerLast];
-  imuRollPreCorner = imuYaw[imuPointerLast];
+  // imuRollPreCorner = imuRoll[imuPointerLast];
+  // imuPitchPreCorner = imuPitch[imuPointerLast];
+  // imuRollPreCorner = imuYaw[imuPointerLast];
   
-  std::cout << "Precompensation"   << imuRoll[imuPointerLast] << "," << imuPitch[imuPointerLast] << "," << imuYaw[imuPointerLast] << std::endl; //Alex debug
+  // std::cout << "Precompensation"   << imuRoll[imuPointerLast] << "," << imuPitch[imuPointerLast] << "," << imuYaw[imuPointerLast] << std::endl; //Alex debug
   //TODO
   float srx = sin(transformCur[0]);
   float crx = cos(transformCur[0]);
@@ -2032,6 +2294,17 @@ void FeatureAssociation::checkSystemInitialization() {
   laserCloudTemp = surfPointsLessFlat;
   surfPointsLessFlat = laserCloudSurfLast;
   laserCloudSurfLast = laserCloudTemp;
+  // 检查点云大小
+  // std::cout << "checkSystemInitialization " << std::endl;
+  // std::cout << "The point cloud without virtual points : " << laserCloudSurfLast->size() << std::endl;
+  // ------------------------------------------------------------------------------------
+  // Alex
+  for (const auto& point : *virtualshadowCloud) {
+      laserCloudSurfLast->push_back(point);
+  }
+  // std::cout << "The point cloud with virtual points : " << laserCloudSurfLast->size() << std::endl;
+  // std::cout << "checkSystemInitialization " << std::endl;
+  // ------------------------------------------------------------------------------------
 
   kdtreeCornerLast.setInputCloud(laserCloudCornerLast);
   kdtreeSurfLast.setInputCloud(laserCloudSurfLast);
@@ -2073,101 +2346,157 @@ void FeatureAssociation::updateInitialGuess(){
     imuVeloFromStartY = imuVeloFromStartYCur;
     imuVeloFromStartZ = imuVeloFromStartZCur;
 
-    // if (imuAngularFromStartX != 0 || imuAngularFromStartY != 0 || imuAngularFromStartZ != 0){
-    //     transformCur[0] = - imuAngularFromStartY;
-    //     transformCur[1] = - imuAngularFromStartZ;
-    //     transformCur[2] = - imuAngularFromStartX;
-    // }
+    if (imuAngularFromStartX != 0 || imuAngularFromStartY != 0 || imuAngularFromStartZ != 0){
+        transformCur[0] = - imuAngularFromStartY;
+        transformCur[1] = - imuAngularFromStartZ;
+        transformCur[2] = - imuAngularFromStartX;
+    }
     
-    // if (imuVeloFromStartX != 0 || imuVeloFromStartY != 0 || imuVeloFromStartZ != 0){
-    //     transformCur[3] -= imuVeloFromStartX * _scan_period;
-    //     transformCur[4] -= imuVeloFromStartY * _scan_period;
-    //     transformCur[5] -= imuVeloFromStartZ * _scan_period;
-    // }
+    if (imuVeloFromStartX != 0 || imuVeloFromStartY != 0 || imuVeloFromStartZ != 0){
+        transformCur[3] -= imuVeloFromStartX * _scan_period;
+        transformCur[4] -= imuVeloFromStartY * _scan_period;
+        transformCur[5] -= imuVeloFromStartZ * _scan_period;
+    }
 
-    //Alex
+    // //Alex
 
-    // RCLCPP_INFO(this->get_logger(), "pre compensation y: '%f'", transformCur[4]);
-    // RCLCPP_INFO(this->get_logger(), "pre compensation z: '%f'", transformCur[5]);
-    // RCLCPP_INFO(this->get_logger(), "pre compensation x: '%f'", transformCur[3]);
-    // RCLCPP_INFO(this->get_logger(), "IMU time: '%f'", imuTime[imuPointerLast]);
+    // // RCLCPP_INFO(this->get_logger(), "pre compensation y: '%f'", transformCur[4]);
+    // // RCLCPP_INFO(this->get_logger(), "pre compensation z: '%f'", transformCur[5]);
+    // // RCLCPP_INFO(this->get_logger(), "pre compensation x: '%f'", transformCur[3]);
+    // // RCLCPP_INFO(this->get_logger(), "IMU time: '%f'", imuTime[imuPointerLast]);
 
-    Eigen::Matrix3d rotation_matrix_now;
-    Eigen::Matrix3d rotation_matrix_last;
-    rotation_matrix_now = Eigen::AngleAxisd(odomYaw[odomPointerLast], Eigen::Vector3d::UnitZ()) *
-                          Eigen::AngleAxisd(odomPitch[odomPointerLast], Eigen::Vector3d::UnitY()) *
-                          Eigen::AngleAxisd(odomRoll[odomPointerLast], Eigen::Vector3d::UnitX());
-    // rotation_matrix_last = Eigen::AngleAxisd(-transformSum[1], Eigen::Vector3d::UnitY()) *
-    //                        Eigen::AngleAxisd(-transformSum[0], Eigen::Vector3d::UnitX()) *
-    //                        Eigen::AngleAxisd(transformSum[2], Eigen::Vector3d::UnitZ());
-    rotation_matrix_last = Eigen::AngleAxisd(transformSum[1], Eigen::Vector3d::UnitZ()) *
-                           Eigen::AngleAxisd(transformSum[0], Eigen::Vector3d::UnitY()) *
-                           Eigen::AngleAxisd(transformSum[2], Eigen::Vector3d::UnitX());
-    Eigen::Matrix3d rotationFromStartToEnd = rotation_matrix_last.transpose() * rotation_matrix_now;
-    rotationFromStartToEnd.transposeInPlace();
-    // // 打印矩陣
-    // std::cout << "Here is the matrix 3x3:\n" << a << std::endl;
-    // Eigen::Matrix3d rotationFromStartToEnd = rotation_matrix_now;
-    // singular                       
-    // Eigen::Vector3d eulerFromStartToEnd = rotation_matrix_now.eulerAngles(2, 1, 0);
-    // odomX = eulerFromStartToEnd[0];
-    // odomY = eulerFromStartToEnd[1];
-    // odomZ = eulerFromStartToEnd[2];
-    // odomZ = eulerFromStartToEnd[2];
+    // Eigen::Matrix3d rotation_matrix_now;
+    // Eigen::Matrix3d rotation_matrix_last;
+    // rotation_matrix_now = Eigen::AngleAxisd(odomYaw[odomPointerLast], Eigen::Vector3d::UnitZ()) *
+    //                       Eigen::AngleAxisd(odomPitch[odomPointerLast], Eigen::Vector3d::UnitY()) *
+    //                       Eigen::AngleAxisd(odomRoll[odomPointerLast], Eigen::Vector3d::UnitX());
+    // // rotation_matrix_last = Eigen::AngleAxisd(-transformSum[1], Eigen::Vector3d::UnitY()) *
+    // //                        Eigen::AngleAxisd(-transformSum[0], Eigen::Vector3d::UnitX()) *
+    // //                        Eigen::AngleAxisd(transformSum[2], Eigen::Vector3d::UnitZ());
+    // rotation_matrix_last = Eigen::AngleAxisd(transformSum[1], Eigen::Vector3d::UnitZ()) *
+    //                        Eigen::AngleAxisd(transformSum[0], Eigen::Vector3d::UnitY()) *
+    //                        Eigen::AngleAxisd(transformSum[2], Eigen::Vector3d::UnitX());
+    // Eigen::Matrix3d rotationFromStartToEnd = rotation_matrix_last.transpose() * rotation_matrix_now;
+    // rotationFromStartToEnd.transposeInPlace();
 
-    // without singular //https://blog.csdn.net/WillWinston/article/details/125746107
-    odomX = std::atan2(rotationFromStartToEnd(2, 1), rotationFromStartToEnd(2, 2)); //odomRoll
-    odomY = std::atan2(-rotationFromStartToEnd(2, 0), std::sqrt(rotationFromStartToEnd(2, 1) * rotationFromStartToEnd(2, 1) + rotationFromStartToEnd(2, 2) * rotationFromStartToEnd(2, 2)));  //odomPitch
-    odomZ = std::atan2(rotationFromStartToEnd(1, 0), rotationFromStartToEnd(0, 0)); //odomYaw
+
+    // // without singular //https://blog.csdn.net/WillWinston/article/details/125746107
+    // odomX = std::atan2(rotationFromStartToEnd(2, 1), rotationFromStartToEnd(2, 2)); //odomRoll
+    // odomY = std::atan2(-rotationFromStartToEnd(2, 0), std::sqrt(rotationFromStartToEnd(2, 1) * rotationFromStartToEnd(2, 1) + rotationFromStartToEnd(2, 2) * rotationFromStartToEnd(2, 2)));  //odomPitch
+    // odomZ = std::atan2(rotationFromStartToEnd(1, 0), rotationFromStartToEnd(0, 0)); //odomYaw
     
-    transformCur[0] = odomY; //odomRoll
-    transformCur[1] = odomZ; //odomPitch
-    transformCur[2] = odomX; //odomYaw
+    // transformCur[0] = odomY; //odomRoll
+    // transformCur[1] = odomZ; //odomPitch
+    // transformCur[2] = odomX; //odomYaw
 
-    Eigen::Vector3d transVector;
-    Eigen::Vector3d outer_param_body;
-    outer_param_body << 0.08, 0, 0.0377;
-    Eigen::Vector3d outer_param_global = rotation_matrix_now * outer_param_body;
-    transVector << (transformSum[5] - (odomPosX[odomPointerLast] + outer_param_global[0])), (transformSum[3] - (odomPosY[odomPointerLast] + outer_param_global[1])), (transformSum[4] - (odomPosZ[odomPointerLast] + outer_param_global[2]));
-    Eigen::Vector3d transVectorBody = rotation_matrix_now.transpose() * transVector;
-    transformCur[5] = transVectorBody[0];
-    transformCur[3] = transVectorBody[1];
-    transformCur[4] = transVectorBody[2];
+    // Eigen::Vector3d transVector;
+    // Eigen::Vector3d outer_param_body;
+    // outer_param_body << 0.08, 0, 0.0377;
+    // Eigen::Vector3d outer_param_global = rotation_matrix_now * outer_param_body;
+    // transVector << (transformSum[5] - (odomPosX[odomPointerLast] + outer_param_body[0] + outer_param_global[0])), (transformSum[3] - (odomPosY[odomPointerLast] + outer_param_body[1] + outer_param_global[1])), (transformSum[4] - (odomPosZ[odomPointerLast] + outer_param_body[2] + outer_param_global[2]));
+    // Eigen::Vector3d transVectorBody = rotation_matrix_last.transpose() * transVector;
+    // transformCur[5] = transVectorBody[0];
+    // transformCur[3] = transVectorBody[1];
+    // transformCur[4] = transVectorBody[2];
+
+
+    // // // 打印矩陣
+    // // std::cout << "Here is the matrix 3x3:\n" << a << std::endl;
+    // // Eigen::Matrix3d rotationFromStartToEnd = rotation_matrix_now;
+    // // singular                       
+    // // Eigen::Vector3d eulerFromStartToEnd = rotation_matrix_now.eulerAngles(2, 1, 0);
+    // // odomX = eulerFromStartToEnd[0];
+    // // odomY = eulerFromStartToEnd[1];
+    // // odomZ = eulerFromStartToEnd[2];
+    // // odomZ = eulerFromStartToEnd[2];
+
+    // // Eigen::Vector3d transVector;
+    // // Eigen::Vector3d outer_param_body;
+    // // outer_param_body << 0.08, 0, 0.0377;
+    // // Eigen::Vector3d outer_param_global = rotation_matrix_now * outer_param_body;
+    // // transVector << (transformSum[5] - (odomPosX[odomPointerLast] + outer_param_global[0])), (transformSum[3] - (odomPosY[odomPointerLast] + outer_param_global[1])), (transformSum[4] - (odomPosZ[odomPointerLast] + outer_param_global[2]));
+    // // Eigen::Vector3d transVectorBody = rotation_matrix_now.transpose() * transVector;
     
-    // odomX = std::atan2(-rotationFromStartToEnd(1, 2), std::sqrt(rotationFromStartToEnd(1, 1) * rotationFromStartToEnd(1, 1) + rotationFromStartToEnd(1, 0) * rotationFromStartToEnd(1, 0))) - transformSum[0]; //odomRoll
-    // odomY = std::atan2(rotationFromStartToEnd(0, 2), rotationFromStartToEnd(2, 2)) - transformSum[1];  //odomPitch
-    // odomZ = std::atan2(rotationFromStartToEnd(0, 1), rotationFromStartToEnd(0, 0)) - transformSum[2]; //odomYaw
-    // transformCur[1] = std::atan2(-rotationFromStartToEnd(1, 2), 1); //odomRoll
-    // transformCur[2] = std::atan2(rotationFromStartToEnd(0, 2), rotationFromStartToEnd(2, 2));  //odomPitch
-    // transformCur[0] = std::atan2(rotationFromStartToEnd(0, 1), rotationFromStartToEnd(0, 0)); //odomYaw
 
-    // transformCur[0] = -(odomPitch[odomPointerLast] - transformSum[0]);
-    // transformCur[1] = -(odomYaw[odomPointerLast] - transformSum[1]);
-    // transformCur[2] = -(odomRoll[odomPointerLast] - transformSum[2]);
-    // transformCur[3] = odomPosY[odomPointerLast] - transformSum[3];
-    // transformCur[4] = odomPosZ[odomPointerLast] - transformSum[4];
-    // transformCur[5] = odomPosX[odomPointerLast] - transformSum[5];
-    // odomStartPosX = 0;odomStartPosY = 0;odomStartPosZ = 0;
-    // odomStartRoll = 0;odomStartPitch = 0;odomStartYaw = 0;
+    // // odomX = std::atan2(rotationFromStartToEnd(2, 1), rotationFromStartToEnd(2, 2)); //odomRoll
+    // // odomY = std::atan2(-rotationFromStartToEnd(2, 0), std::sqrt(rotationFromStartToEnd(2, 1) * rotationFromStartToEnd(2, 1) + rotationFromStartToEnd(2, 2) * rotationFromStartToEnd(2, 2)));  //odomPitch
+    // // odomZ = std::atan2(rotationFromStartToEnd(1, 0), rotationFromStartToEnd(0, 0)); //odomYaw
+    // // transformCur[0] = odomY; //odomRoll
+    // // transformCur[1] = odomZ; //odomPitch
+    // // transformCur[2] = odomX; //odomYaw
+    
+    // // odomX = std::atan2(-rotationFromStartToEnd(1, 2), std::sqrt(rotationFromStartToEnd(1, 1) * rotationFromStartToEnd(1, 1) + rotationFromStartToEnd(1, 0) * rotationFromStartToEnd(1, 0))) - transformSum[0]; //odomRoll
+    // // odomY = std::atan2(rotationFromStartToEnd(0, 2), rotationFromStartToEnd(2, 2)) - transformSum[1];  //odomPitch
+    // // odomZ = std::atan2(rotationFromStartToEnd(0, 1), rotationFromStartToEnd(0, 0)) - transformSum[2]; //odomYaw
+    // // transformCur[1] = std::atan2(-rotationFromStartToEnd(1, 2), 1); //odomRoll
+    // // transformCur[2] = std::atan2(rotationFromStartToEnd(0, 2), rotationFromStartToEnd(2, 2));  //odomPitch
+    // // transformCur[0] = std::atan2(rotationFromStartToEnd(0, 1), rotationFromStartToEnd(0, 0)); //odomYaw
 
-    // RCLCPP_INFO(this->get_logger(), "odom x: '%f'", (odomY + imuAngularFromStartZ)*57.32);
-    // RCLCPP_INFO(this->get_logger(), "odom Y: '%f'", (odomZ + imuAngularFromStartX)*57.32);
-    // RCLCPP_INFO(this->get_logger(), "odom Z: '%f'", (odomX + imuAngularFromStartY)*57.32);
-    RCLCPP_INFO(this->get_logger(), "slam X: '%f'", outer_param_global[0]);
-    RCLCPP_INFO(this->get_logger(), "slam Y: '%f'", outer_param_global[1]);
-    RCLCPP_INFO(this->get_logger(), "slam Z: '%f'", outer_param_global[2]);
+    // // transformCur[0] = -(odomPitch[odomPointerLast] - transformSum[0]);
+    // // transformCur[1] = -(odomYaw[odomPointerLast] - transformSum[1]);
+    // // transformCur[2] = -(odomRoll[odomPointerLast] - transformSum[2]);
+    // // transformCur[3] = odomPosY[odomPointerLast] - transformSum[3];
+    // // transformCur[4] = odomPosZ[odomPointerLast] - transformSum[4];
+    // // transformCur[5] = odomPosX[odomPointerLast] - transformSum[5];
+    // // odomStartPosX = 0;odomStartPosY = 0;odomStartPosZ = 0;
+    // // odomStartRoll = 0;odomStartPitch = 0;odomStartYaw = 0;
+
+    // // RCLCPP_INFO(this->get_logger(), "odom x: '%f'", (odomY + imuAngularFromStartZ)*57.32);
+    // // RCLCPP_INFO(this->get_logger(), "odom Y: '%f'", (odomZ + imuAngularFromStartX)*57.32);
+    // // RCLCPP_INFO(this->get_logger(), "odom Z: '%f'", (odomX + imuAngularFromStartY)*57.32);
+    // // RCLCPP_INFO(this->get_logger(), "slam X: '%f'", transformCur[0]);
+    // // RCLCPP_INFO(this->get_logger(), "slam Y: '%f'", transformCur[1]);
+    // // RCLCPP_INFO(this->get_logger(), "slam Z: '%f'", transformCur[2]);
+
+    // // auto message2 = geometry_msgs::msg::Vector3();
+    // // message2.x = odomY;
+    // // message2.y = odomZ;
+    // // message2.z = odomX;
+    // // pubRotateMsgs->publish(message2);
+
+    // // auto message2 = geometry_msgs::msg::Vector3();
+    // // message2.x = transVector[0];
+    // // message2.y = transVector[1];
+    // // message2.z = transVector[2];
+    // // pubRotateMsgs->publish(message2);
+    // // transformCur[5] = transVectorBody[0];
+    // // transformCur[3] = transVectorBody[1];
+    // // transformCur[4] = transVectorBody[2];
+    
+    // // odomX = std::atan2(-rotationFromStartToEnd(1, 2), std::sqrt(rotationFromStartToEnd(1, 1) * rotationFromStartToEnd(1, 1) + rotationFromStartToEnd(1, 0) * rotationFromStartToEnd(1, 0))) - transformSum[0]; //odomRoll
+    // // odomY = std::atan2(rotationFromStartToEnd(0, 2), rotationFromStartToEnd(2, 2)) - transformSum[1];  //odomPitch
+    // // odomZ = std::atan2(rotationFromStartToEnd(0, 1), rotationFromStartToEnd(0, 0)) - transformSum[2]; //odomYaw
+    // // transformCur[1] = std::atan2(-rotationFromStartToEnd(1, 2), 1); //odomRoll
+    // // transformCur[2] = std::atan2(rotationFromStartToEnd(0, 2), rotationFromStartToEnd(2, 2));  //odomPitch
+    // // transformCur[0] = std::atan2(rotationFromStartToEnd(0, 1), rotationFromStartToEnd(0, 0)); //odomYaw
+
+    // // transformCur[0] = -(odomPitch[odomPointerLast] - transformSum[0]);
+    // // transformCur[1] = -(odomYaw[odomPointerLast] - transformSum[1]);
+    // // transformCur[2] = -(odomRoll[odomPointerLast] - transformSum[2]);
+    // // transformCur[3] = odomPosY[odomPointerLast] - transformSum[3];
+    // // transformCur[4] = odomPosZ[odomPointerLast] - transformSum[4];
+    // // transformCur[5] = odomPosX[odomPointerLast] - transformSum[5];
+    // // odomStartPosX = 0;odomStartPosY = 0;odomStartPosZ = 0;
+    // // odomStartRoll = 0;odomStartPitch = 0;odomStartYaw = 0;
+
+    // // RCLCPP_INFO(this->get_logger(), "odom x: '%f'", (odomY + imuAngularFromStartZ)*57.32);
+    // // RCLCPP_INFO(this->get_logger(), "odom Y: '%f'", (odomZ + imuAngularFromStartX)*57.32);
+    // // RCLCPP_INFO(this->get_logger(), "odom Z: '%f'", (odomX + imuAngularFromStartY)*57.32);
+    // // RCLCPP_INFO(this->get_logger(), "slam X: '%f'", outer_param_global[0]);
+    // // RCLCPP_INFO(this->get_logger(), "slam Y: '%f'", outer_param_global[1]);
+    // // RCLCPP_INFO(this->get_logger(), "slam Z: '%f'", outer_param_global[2]);
+
+    // // auto message2 = geometry_msgs::msg::Vector3();
+    // // message2.x = odomY;
+    // // message2.y = odomZ;
+    // // message2.z = odomX;
+    // // pubRotateMsgs->publish(message2);
 
     // auto message2 = geometry_msgs::msg::Vector3();
-    // message2.x = odomY;
-    // message2.y = odomZ;
-    // message2.z = odomX;
+    // message2.x = odomYaw[odomPointerLast];
+    // message2.y = odomPitch[odomPointerLast];
+    // message2.z = odomRoll[odomPointerLast];
     // pubRotateMsgs->publish(message2);
-
-    auto message2 = geometry_msgs::msg::Vector3();
-    message2.x = transVector[0];
-    message2.y = transVector[1];
-    message2.z = transVector[2];
-    pubRotateMsgs->publish(message2);
 
 }
 
@@ -2351,6 +2680,7 @@ void FeatureAssociation::publishCloudsLast() {
   }
 
   int surfPointsFlatNum = surfPointsFlat->points.size();
+  // std::cout << "surfPointsFlatNum : " << surfPointsFlatNum << std::endl;
   for (int i = 0; i < surfPointsFlatNum; i++) {
     TransformToEnd(&surfPointsFlat->points[i],
                    &surfPointsFlat->points[i]);
@@ -2366,6 +2696,15 @@ void FeatureAssociation::publishCloudsLast() {
 
   laserCloudCornerScan = cornerPointsSharp;
   laserCloudSurfScan = surfPointsFlat;
+  // 检查点云大小
+  // std::cout << "The point cloud without virtual points : " << laserCloudSurfLast->size() << std::endl;
+  // ------------------------------------------------------------------------------------
+  // Alex
+  for (const auto& point : *virtualshadowCloud) {
+      laserCloudSurfLast->push_back(point);
+  }
+  // std::cout << "The point cloud with virtual points : " << laserCloudSurfLast->size() << std::endl;
+  // ------------------------------------------------------------------------------------
 
   laserCloudCornerLastNum = laserCloudCornerLast->points.size();
   laserCloudSurfLastNum = laserCloudSurfLast->points.size();
@@ -2420,6 +2759,10 @@ void FeatureAssociation::runFeatureAssociation() {
     timeScanCur = cloudHeader.stamp.sec + cloudHeader.stamp.nanosec/1e9;
     // std::cout << cloudHeader.stamp.nanosec << std::endl ;
     std::chrono::steady_clock::time_point time_start2 = std::chrono::steady_clock::now();
+
+    // Alex for Shadow Virtual Feature Point
+    GenerateShadowPoint();
+
     /**  1. Feature Extraction  */
     adjustDistortion(); // to loam coordinate
 
@@ -2428,6 +2771,7 @@ void FeatureAssociation::runFeatureAssociation() {
     markOccludedPoints();
 
     extractFeaturesOurs();
+    // extractFeatures();
 
     publishCloud();  // cloud for visualization
 
