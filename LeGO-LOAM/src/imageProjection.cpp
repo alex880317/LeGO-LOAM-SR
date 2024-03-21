@@ -810,6 +810,7 @@ void ImageProjection::cloudSegmentation() {
             _range_mat(i, j);
         // save seg cloud
         _segmented_cloud->push_back(_full_cloud->points[j + i * _horizontal_scans]);
+        // std::cout << "_segmented_cloud Form : " << _full_cloud->points[j + i * _horizontal_scans] << std::endl; // Alex
         segmentedCloudIntensity.push_back(_visual_cloud->points[j + i * _horizontal_scans].intensity);
         // size of seg cloud
         ++sizeOfSegCloud;

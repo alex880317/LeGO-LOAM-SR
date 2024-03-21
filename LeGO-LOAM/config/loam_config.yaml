@@ -59,8 +59,8 @@ feature_association:
       mapping_frequency_divider: 1
 
     featureAssociation:
-      edge_threshold: 0.005 #0.01
-      surf_threshold: 0.005 #0.005
+      edge_threshold: 0.03 #0.01
+      surf_threshold: 0.03 #0.005
       nearest_feature_search_distance: 5.0
 
 # VLP-32c

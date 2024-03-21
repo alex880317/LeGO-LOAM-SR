@@ -15,6 +15,10 @@
 #include <nav_msgs/msg/odometry.hpp>  //Alex
 #include <sensor_msgs/msg/joint_state.hpp>  //Alex
 #include <geometry_msgs/msg/vector3.hpp>  //Alex
+
+#include <pcl/point_types.h>
+#include <pcl/point_cloud.h>
+
 // /home/iec/LeGOMapping_ws/src/neptune_loam_localizer/LeGO-LOAM/src/featureAssociation.h
 class FeatureAssociation : public rclcpp::Node {
 
@@ -136,6 +140,15 @@ class FeatureAssociation : public rclcpp::Node {
   float odomY;
   float odomZ;
   // float TurnRF[200];
+  int odomInitialIter;
+  double x_initial;
+  double y_initial;
+  double z_initial;
+  double odomcall_roll, odomcall_pitch, odomcall_yaw;
+  Eigen::Vector3d lidar_to_body_centor;
+  int row_size;int col_size;
+  double row_angle;double col_angle;
+  float row_x;float col_y;
   
 
 
@@ -174,6 +187,8 @@ class FeatureAssociation : public rclcpp::Node {
   pcl::PointCloud<PointType>::Ptr visualCloud;
   pcl::PointCloud<PointType>::Ptr outlierCloud;
   pcl::PointCloud<PointType>::Ptr fullCloud;
+  pcl::PointCloud<PointType>::Ptr virtualshadowCloud; // Alex
+  pcl::PointXYZI virtualshadowpoint;
 
   pcl::PointCloud<PointType>::Ptr cornerPointsSharp;
   pcl::PointCloud<PointType>::Ptr cornerPointsLessSharp;
@@ -236,6 +251,8 @@ class FeatureAssociation : public rclcpp::Node {
 
   nanoflann::KdTreeFLANN<PointType> kdtreeCornerLast;
   nanoflann::KdTreeFLANN<PointType> kdtreeSurfLast;
+  // pcl::KdTreeFLANN<PointType> kdtreeCornerLast;
+  // pcl::KdTreeFLANN<PointType> kdtreeSurfLast;
 
   std::vector<int> pointSearchInd;
   std::vector<float> pointSearchSqDis;
@@ -254,6 +271,7 @@ class FeatureAssociation : public rclcpp::Node {
   void imuHandler(const sensor_msgs::msg::Imu::ConstSharedPtr imuIn);
   void odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg);
   void jointStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg);
+  void GenerateShadowPoint();
   void initializationValue();
   void AccumulateIMUShiftAndRotation();
   void updateImuRollPitchYawStartSinCos();

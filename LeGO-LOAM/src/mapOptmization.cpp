@@ -1509,6 +1509,7 @@ bool MapOptimization::LMOptimization(int iterCount) {
     matX = matP * matX2;
   }
 
+  // 如何關掉LiDAR Mapping,將這幾行註解掉 // Alex
   // transformTobeMapped[0] += matX(0, 0);
   // transformTobeMapped[1] += matX(1, 0);
   // transformTobeMapped[2] += matX(2, 0);
