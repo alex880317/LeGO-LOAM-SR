@@ -924,6 +924,7 @@ void FeatureAssociation::extractFeatures() {
       int largestPickedNum = 0;
       for (int k = ep; k >= sp; k--) {
         int ind = cloudSmoothness[k].ind;
+        // without遮擋點(markOccludedPoints) && 曲率大於閾值 && 不是地面點
         if (cloudNeighborPicked[ind] == 0 &&
             cloudCurvature[ind] > _edge_threshold &&
             segInfo.segmented_cloud_ground_flag[ind] == false) {
@@ -966,6 +967,7 @@ void FeatureAssociation::extractFeatures() {
       int smallestPickedNum = 0;
       for (int k = sp; k <= ep; k++) {
         int ind = cloudSmoothness[k].ind;
+        // without遮擋點(markOccludedPoints) && 曲率小於閾值 && 是地面點
         if (cloudNeighborPicked[ind] == 0 &&
             cloudCurvature[ind] < _surf_threshold &&
             segInfo.segmented_cloud_ground_flag[ind] == true) {
@@ -1702,7 +1704,7 @@ void FeatureAssociation::findCorrespondingSurfFeatures(int iterCount) {
     PointType pointSel;
     // pointSel = surfPointsFlat->points[i];
     TransformToStart(&surfPointsFlat->points[i], &pointSel);
-    std::cout << "pointSel's idx : " << pointSel.intensity << std::endl;
+    // std::cout << "pointSel's idx : " << pointSel.intensity << std::endl;
     
     // ----------------------------------------------------------------------------------------
     // 每5次迭代找一次最近鄰點
@@ -1721,7 +1723,7 @@ void FeatureAssociation::findCorrespondingSurfFeatures(int iterCount) {
       kdtreeSurfLast.nearestKSearch(pointSel, 1, pointSearchInd,
                                      pointSearchSqDis);
       laserCloudSurfLast;
-      std::cout << "correspondence's idx : " << laserCloudSurfLast->points[pointSearchInd[0]].intensity << std::endl;
+      // std::cout << "correspondence's idx : " << laserCloudSurfLast->points[pointSearchInd[0]].intensity << std::endl;
       int closestPointInd = -1, minPointInd2 = -1, minPointInd3 = -1;
       // std::cout << "Vector elements are (using range-based for loop): ";
       // for (const auto& value : pointSearchInd) {
@@ -2346,157 +2348,157 @@ void FeatureAssociation::updateInitialGuess(){
     imuVeloFromStartY = imuVeloFromStartYCur;
     imuVeloFromStartZ = imuVeloFromStartZCur;
 
-    if (imuAngularFromStartX != 0 || imuAngularFromStartY != 0 || imuAngularFromStartZ != 0){
-        transformCur[0] = - imuAngularFromStartY;
-        transformCur[1] = - imuAngularFromStartZ;
-        transformCur[2] = - imuAngularFromStartX;
-    }
+    // if (imuAngularFromStartX != 0 || imuAngularFromStartY != 0 || imuAngularFromStartZ != 0){
+    //     transformCur[0] = - imuAngularFromStartY;
+    //     transformCur[1] = - imuAngularFromStartZ;
+    //     transformCur[2] = - imuAngularFromStartX;
+    // }
     
-    if (imuVeloFromStartX != 0 || imuVeloFromStartY != 0 || imuVeloFromStartZ != 0){
-        transformCur[3] -= imuVeloFromStartX * _scan_period;
-        transformCur[4] -= imuVeloFromStartY * _scan_period;
-        transformCur[5] -= imuVeloFromStartZ * _scan_period;
-    }
+    // if (imuVeloFromStartX != 0 || imuVeloFromStartY != 0 || imuVeloFromStartZ != 0){
+    //     transformCur[3] -= imuVeloFromStartX * _scan_period;
+    //     transformCur[4] -= imuVeloFromStartY * _scan_period;
+    //     transformCur[5] -= imuVeloFromStartZ * _scan_period;
+    // }
 
-    // //Alex
+    //Alex
 
-    // // RCLCPP_INFO(this->get_logger(), "pre compensation y: '%f'", transformCur[4]);
-    // // RCLCPP_INFO(this->get_logger(), "pre compensation z: '%f'", transformCur[5]);
-    // // RCLCPP_INFO(this->get_logger(), "pre compensation x: '%f'", transformCur[3]);
-    // // RCLCPP_INFO(this->get_logger(), "IMU time: '%f'", imuTime[imuPointerLast]);
+    // RCLCPP_INFO(this->get_logger(), "pre compensation y: '%f'", transformCur[4]);
+    // RCLCPP_INFO(this->get_logger(), "pre compensation z: '%f'", transformCur[5]);
+    // RCLCPP_INFO(this->get_logger(), "pre compensation x: '%f'", transformCur[3]);
+    // RCLCPP_INFO(this->get_logger(), "IMU time: '%f'", imuTime[imuPointerLast]);
 
-    // Eigen::Matrix3d rotation_matrix_now;
-    // Eigen::Matrix3d rotation_matrix_last;
-    // rotation_matrix_now = Eigen::AngleAxisd(odomYaw[odomPointerLast], Eigen::Vector3d::UnitZ()) *
-    //                       Eigen::AngleAxisd(odomPitch[odomPointerLast], Eigen::Vector3d::UnitY()) *
-    //                       Eigen::AngleAxisd(odomRoll[odomPointerLast], Eigen::Vector3d::UnitX());
-    // // rotation_matrix_last = Eigen::AngleAxisd(-transformSum[1], Eigen::Vector3d::UnitY()) *
-    // //                        Eigen::AngleAxisd(-transformSum[0], Eigen::Vector3d::UnitX()) *
-    // //                        Eigen::AngleAxisd(transformSum[2], Eigen::Vector3d::UnitZ());
-    // rotation_matrix_last = Eigen::AngleAxisd(transformSum[1], Eigen::Vector3d::UnitZ()) *
-    //                        Eigen::AngleAxisd(transformSum[0], Eigen::Vector3d::UnitY()) *
-    //                        Eigen::AngleAxisd(transformSum[2], Eigen::Vector3d::UnitX());
-    // Eigen::Matrix3d rotationFromStartToEnd = rotation_matrix_last.transpose() * rotation_matrix_now;
-    // rotationFromStartToEnd.transposeInPlace();
+    Eigen::Matrix3d rotation_matrix_now;
+    Eigen::Matrix3d rotation_matrix_last;
+    rotation_matrix_now = Eigen::AngleAxisd(odomYaw[odomPointerLast], Eigen::Vector3d::UnitZ()) *
+                          Eigen::AngleAxisd(odomPitch[odomPointerLast], Eigen::Vector3d::UnitY()) *
+                          Eigen::AngleAxisd(odomRoll[odomPointerLast], Eigen::Vector3d::UnitX());
+    // rotation_matrix_last = Eigen::AngleAxisd(-transformSum[1], Eigen::Vector3d::UnitY()) *
+    //                        Eigen::AngleAxisd(-transformSum[0], Eigen::Vector3d::UnitX()) *
+    //                        Eigen::AngleAxisd(transformSum[2], Eigen::Vector3d::UnitZ());
+    rotation_matrix_last = Eigen::AngleAxisd(transformSum[1], Eigen::Vector3d::UnitZ()) *
+                           Eigen::AngleAxisd(transformSum[0], Eigen::Vector3d::UnitY()) *
+                           Eigen::AngleAxisd(transformSum[2], Eigen::Vector3d::UnitX());
+    Eigen::Matrix3d rotationFromStartToEnd = rotation_matrix_last.transpose() * rotation_matrix_now;
+    rotationFromStartToEnd.transposeInPlace();
 
 
-    // // without singular //https://blog.csdn.net/WillWinston/article/details/125746107
-    // odomX = std::atan2(rotationFromStartToEnd(2, 1), rotationFromStartToEnd(2, 2)); //odomRoll
-    // odomY = std::atan2(-rotationFromStartToEnd(2, 0), std::sqrt(rotationFromStartToEnd(2, 1) * rotationFromStartToEnd(2, 1) + rotationFromStartToEnd(2, 2) * rotationFromStartToEnd(2, 2)));  //odomPitch
-    // odomZ = std::atan2(rotationFromStartToEnd(1, 0), rotationFromStartToEnd(0, 0)); //odomYaw
+    // without singular //https://blog.csdn.net/WillWinston/article/details/125746107
+    odomX = std::atan2(rotationFromStartToEnd(2, 1), rotationFromStartToEnd(2, 2)); //odomRoll
+    odomY = std::atan2(-rotationFromStartToEnd(2, 0), std::sqrt(rotationFromStartToEnd(2, 1) * rotationFromStartToEnd(2, 1) + rotationFromStartToEnd(2, 2) * rotationFromStartToEnd(2, 2)));  //odomPitch
+    odomZ = std::atan2(rotationFromStartToEnd(1, 0), rotationFromStartToEnd(0, 0)); //odomYaw
     
-    // transformCur[0] = odomY; //odomRoll
-    // transformCur[1] = odomZ; //odomPitch
-    // transformCur[2] = odomX; //odomYaw
+    transformCur[0] = odomY; //odomRoll
+    transformCur[1] = odomZ; //odomPitch
+    transformCur[2] = odomX; //odomYaw
+
+    Eigen::Vector3d transVector;
+    Eigen::Vector3d outer_param_body;
+    outer_param_body << 0.08, 0, 0.0377;
+    Eigen::Vector3d outer_param_global = rotation_matrix_now * outer_param_body;
+    transVector << (transformSum[5] - (odomPosX[odomPointerLast] + outer_param_body[0] + outer_param_global[0])), (transformSum[3] - (odomPosY[odomPointerLast] + outer_param_body[1] + outer_param_global[1])), (transformSum[4] - (odomPosZ[odomPointerLast] + outer_param_body[2] + outer_param_global[2]));
+    Eigen::Vector3d transVectorBody = rotation_matrix_last.transpose() * transVector;
+    transformCur[5] = transVectorBody[0];
+    transformCur[3] = transVectorBody[1];
+    transformCur[4] = transVectorBody[2];
+
+
+    // // 打印矩陣
+    // std::cout << "Here is the matrix 3x3:\n" << a << std::endl;
+    // Eigen::Matrix3d rotationFromStartToEnd = rotation_matrix_now;
+    // singular                       
+    // Eigen::Vector3d eulerFromStartToEnd = rotation_matrix_now.eulerAngles(2, 1, 0);
+    // odomX = eulerFromStartToEnd[0];
+    // odomY = eulerFromStartToEnd[1];
+    // odomZ = eulerFromStartToEnd[2];
+    // odomZ = eulerFromStartToEnd[2];
 
     // Eigen::Vector3d transVector;
     // Eigen::Vector3d outer_param_body;
     // outer_param_body << 0.08, 0, 0.0377;
     // Eigen::Vector3d outer_param_global = rotation_matrix_now * outer_param_body;
-    // transVector << (transformSum[5] - (odomPosX[odomPointerLast] + outer_param_body[0] + outer_param_global[0])), (transformSum[3] - (odomPosY[odomPointerLast] + outer_param_body[1] + outer_param_global[1])), (transformSum[4] - (odomPosZ[odomPointerLast] + outer_param_body[2] + outer_param_global[2]));
-    // Eigen::Vector3d transVectorBody = rotation_matrix_last.transpose() * transVector;
+    // transVector << (transformSum[5] - (odomPosX[odomPointerLast] + outer_param_global[0])), (transformSum[3] - (odomPosY[odomPointerLast] + outer_param_global[1])), (transformSum[4] - (odomPosZ[odomPointerLast] + outer_param_global[2]));
+    // Eigen::Vector3d transVectorBody = rotation_matrix_now.transpose() * transVector;
+    
+
+    // odomX = std::atan2(rotationFromStartToEnd(2, 1), rotationFromStartToEnd(2, 2)); //odomRoll
+    // odomY = std::atan2(-rotationFromStartToEnd(2, 0), std::sqrt(rotationFromStartToEnd(2, 1) * rotationFromStartToEnd(2, 1) + rotationFromStartToEnd(2, 2) * rotationFromStartToEnd(2, 2)));  //odomPitch
+    // odomZ = std::atan2(rotationFromStartToEnd(1, 0), rotationFromStartToEnd(0, 0)); //odomYaw
+    // transformCur[0] = odomY; //odomRoll
+    // transformCur[1] = odomZ; //odomPitch
+    // transformCur[2] = odomX; //odomYaw
+    
+    // odomX = std::atan2(-rotationFromStartToEnd(1, 2), std::sqrt(rotationFromStartToEnd(1, 1) * rotationFromStartToEnd(1, 1) + rotationFromStartToEnd(1, 0) * rotationFromStartToEnd(1, 0))) - transformSum[0]; //odomRoll
+    // odomY = std::atan2(rotationFromStartToEnd(0, 2), rotationFromStartToEnd(2, 2)) - transformSum[1];  //odomPitch
+    // odomZ = std::atan2(rotationFromStartToEnd(0, 1), rotationFromStartToEnd(0, 0)) - transformSum[2]; //odomYaw
+    // transformCur[1] = std::atan2(-rotationFromStartToEnd(1, 2), 1); //odomRoll
+    // transformCur[2] = std::atan2(rotationFromStartToEnd(0, 2), rotationFromStartToEnd(2, 2));  //odomPitch
+    // transformCur[0] = std::atan2(rotationFromStartToEnd(0, 1), rotationFromStartToEnd(0, 0)); //odomYaw
+
+    // transformCur[0] = -(odomPitch[odomPointerLast] - transformSum[0]);
+    // transformCur[1] = -(odomYaw[odomPointerLast] - transformSum[1]);
+    // transformCur[2] = -(odomRoll[odomPointerLast] - transformSum[2]);
+    // transformCur[3] = odomPosY[odomPointerLast] - transformSum[3];
+    // transformCur[4] = odomPosZ[odomPointerLast] - transformSum[4];
+    // transformCur[5] = odomPosX[odomPointerLast] - transformSum[5];
+    // odomStartPosX = 0;odomStartPosY = 0;odomStartPosZ = 0;
+    // odomStartRoll = 0;odomStartPitch = 0;odomStartYaw = 0;
+
+    // RCLCPP_INFO(this->get_logger(), "odom x: '%f'", (odomY + imuAngularFromStartZ)*57.32);
+    // RCLCPP_INFO(this->get_logger(), "odom Y: '%f'", (odomZ + imuAngularFromStartX)*57.32);
+    // RCLCPP_INFO(this->get_logger(), "odom Z: '%f'", (odomX + imuAngularFromStartY)*57.32);
+    // RCLCPP_INFO(this->get_logger(), "slam X: '%f'", transformCur[0]);
+    // RCLCPP_INFO(this->get_logger(), "slam Y: '%f'", transformCur[1]);
+    // RCLCPP_INFO(this->get_logger(), "slam Z: '%f'", transformCur[2]);
+
+    // auto message2 = geometry_msgs::msg::Vector3();
+    // message2.x = odomY;
+    // message2.y = odomZ;
+    // message2.z = odomX;
+    // pubRotateMsgs->publish(message2);
+
+    // auto message2 = geometry_msgs::msg::Vector3();
+    // message2.x = transVector[0];
+    // message2.y = transVector[1];
+    // message2.z = transVector[2];
+    // pubRotateMsgs->publish(message2);
     // transformCur[5] = transVectorBody[0];
     // transformCur[3] = transVectorBody[1];
     // transformCur[4] = transVectorBody[2];
-
-
-    // // // 打印矩陣
-    // // std::cout << "Here is the matrix 3x3:\n" << a << std::endl;
-    // // Eigen::Matrix3d rotationFromStartToEnd = rotation_matrix_now;
-    // // singular                       
-    // // Eigen::Vector3d eulerFromStartToEnd = rotation_matrix_now.eulerAngles(2, 1, 0);
-    // // odomX = eulerFromStartToEnd[0];
-    // // odomY = eulerFromStartToEnd[1];
-    // // odomZ = eulerFromStartToEnd[2];
-    // // odomZ = eulerFromStartToEnd[2];
-
-    // // Eigen::Vector3d transVector;
-    // // Eigen::Vector3d outer_param_body;
-    // // outer_param_body << 0.08, 0, 0.0377;
-    // // Eigen::Vector3d outer_param_global = rotation_matrix_now * outer_param_body;
-    // // transVector << (transformSum[5] - (odomPosX[odomPointerLast] + outer_param_global[0])), (transformSum[3] - (odomPosY[odomPointerLast] + outer_param_global[1])), (transformSum[4] - (odomPosZ[odomPointerLast] + outer_param_global[2]));
-    // // Eigen::Vector3d transVectorBody = rotation_matrix_now.transpose() * transVector;
     
+    // odomX = std::atan2(-rotationFromStartToEnd(1, 2), std::sqrt(rotationFromStartToEnd(1, 1) * rotationFromStartToEnd(1, 1) + rotationFromStartToEnd(1, 0) * rotationFromStartToEnd(1, 0))) - transformSum[0]; //odomRoll
+    // odomY = std::atan2(rotationFromStartToEnd(0, 2), rotationFromStartToEnd(2, 2)) - transformSum[1];  //odomPitch
+    // odomZ = std::atan2(rotationFromStartToEnd(0, 1), rotationFromStartToEnd(0, 0)) - transformSum[2]; //odomYaw
+    // transformCur[1] = std::atan2(-rotationFromStartToEnd(1, 2), 1); //odomRoll
+    // transformCur[2] = std::atan2(rotationFromStartToEnd(0, 2), rotationFromStartToEnd(2, 2));  //odomPitch
+    // transformCur[0] = std::atan2(rotationFromStartToEnd(0, 1), rotationFromStartToEnd(0, 0)); //odomYaw
 
-    // // odomX = std::atan2(rotationFromStartToEnd(2, 1), rotationFromStartToEnd(2, 2)); //odomRoll
-    // // odomY = std::atan2(-rotationFromStartToEnd(2, 0), std::sqrt(rotationFromStartToEnd(2, 1) * rotationFromStartToEnd(2, 1) + rotationFromStartToEnd(2, 2) * rotationFromStartToEnd(2, 2)));  //odomPitch
-    // // odomZ = std::atan2(rotationFromStartToEnd(1, 0), rotationFromStartToEnd(0, 0)); //odomYaw
-    // // transformCur[0] = odomY; //odomRoll
-    // // transformCur[1] = odomZ; //odomPitch
-    // // transformCur[2] = odomX; //odomYaw
-    
-    // // odomX = std::atan2(-rotationFromStartToEnd(1, 2), std::sqrt(rotationFromStartToEnd(1, 1) * rotationFromStartToEnd(1, 1) + rotationFromStartToEnd(1, 0) * rotationFromStartToEnd(1, 0))) - transformSum[0]; //odomRoll
-    // // odomY = std::atan2(rotationFromStartToEnd(0, 2), rotationFromStartToEnd(2, 2)) - transformSum[1];  //odomPitch
-    // // odomZ = std::atan2(rotationFromStartToEnd(0, 1), rotationFromStartToEnd(0, 0)) - transformSum[2]; //odomYaw
-    // // transformCur[1] = std::atan2(-rotationFromStartToEnd(1, 2), 1); //odomRoll
-    // // transformCur[2] = std::atan2(rotationFromStartToEnd(0, 2), rotationFromStartToEnd(2, 2));  //odomPitch
-    // // transformCur[0] = std::atan2(rotationFromStartToEnd(0, 1), rotationFromStartToEnd(0, 0)); //odomYaw
+    // transformCur[0] = -(odomPitch[odomPointerLast] - transformSum[0]);
+    // transformCur[1] = -(odomYaw[odomPointerLast] - transformSum[1]);
+    // transformCur[2] = -(odomRoll[odomPointerLast] - transformSum[2]);
+    // transformCur[3] = odomPosY[odomPointerLast] - transformSum[3];
+    // transformCur[4] = odomPosZ[odomPointerLast] - transformSum[4];
+    // transformCur[5] = odomPosX[odomPointerLast] - transformSum[5];
+    // odomStartPosX = 0;odomStartPosY = 0;odomStartPosZ = 0;
+    // odomStartRoll = 0;odomStartPitch = 0;odomStartYaw = 0;
 
-    // // transformCur[0] = -(odomPitch[odomPointerLast] - transformSum[0]);
-    // // transformCur[1] = -(odomYaw[odomPointerLast] - transformSum[1]);
-    // // transformCur[2] = -(odomRoll[odomPointerLast] - transformSum[2]);
-    // // transformCur[3] = odomPosY[odomPointerLast] - transformSum[3];
-    // // transformCur[4] = odomPosZ[odomPointerLast] - transformSum[4];
-    // // transformCur[5] = odomPosX[odomPointerLast] - transformSum[5];
-    // // odomStartPosX = 0;odomStartPosY = 0;odomStartPosZ = 0;
-    // // odomStartRoll = 0;odomStartPitch = 0;odomStartYaw = 0;
-
-    // // RCLCPP_INFO(this->get_logger(), "odom x: '%f'", (odomY + imuAngularFromStartZ)*57.32);
-    // // RCLCPP_INFO(this->get_logger(), "odom Y: '%f'", (odomZ + imuAngularFromStartX)*57.32);
-    // // RCLCPP_INFO(this->get_logger(), "odom Z: '%f'", (odomX + imuAngularFromStartY)*57.32);
-    // // RCLCPP_INFO(this->get_logger(), "slam X: '%f'", transformCur[0]);
-    // // RCLCPP_INFO(this->get_logger(), "slam Y: '%f'", transformCur[1]);
-    // // RCLCPP_INFO(this->get_logger(), "slam Z: '%f'", transformCur[2]);
-
-    // // auto message2 = geometry_msgs::msg::Vector3();
-    // // message2.x = odomY;
-    // // message2.y = odomZ;
-    // // message2.z = odomX;
-    // // pubRotateMsgs->publish(message2);
-
-    // // auto message2 = geometry_msgs::msg::Vector3();
-    // // message2.x = transVector[0];
-    // // message2.y = transVector[1];
-    // // message2.z = transVector[2];
-    // // pubRotateMsgs->publish(message2);
-    // // transformCur[5] = transVectorBody[0];
-    // // transformCur[3] = transVectorBody[1];
-    // // transformCur[4] = transVectorBody[2];
-    
-    // // odomX = std::atan2(-rotationFromStartToEnd(1, 2), std::sqrt(rotationFromStartToEnd(1, 1) * rotationFromStartToEnd(1, 1) + rotationFromStartToEnd(1, 0) * rotationFromStartToEnd(1, 0))) - transformSum[0]; //odomRoll
-    // // odomY = std::atan2(rotationFromStartToEnd(0, 2), rotationFromStartToEnd(2, 2)) - transformSum[1];  //odomPitch
-    // // odomZ = std::atan2(rotationFromStartToEnd(0, 1), rotationFromStartToEnd(0, 0)) - transformSum[2]; //odomYaw
-    // // transformCur[1] = std::atan2(-rotationFromStartToEnd(1, 2), 1); //odomRoll
-    // // transformCur[2] = std::atan2(rotationFromStartToEnd(0, 2), rotationFromStartToEnd(2, 2));  //odomPitch
-    // // transformCur[0] = std::atan2(rotationFromStartToEnd(0, 1), rotationFromStartToEnd(0, 0)); //odomYaw
-
-    // // transformCur[0] = -(odomPitch[odomPointerLast] - transformSum[0]);
-    // // transformCur[1] = -(odomYaw[odomPointerLast] - transformSum[1]);
-    // // transformCur[2] = -(odomRoll[odomPointerLast] - transformSum[2]);
-    // // transformCur[3] = odomPosY[odomPointerLast] - transformSum[3];
-    // // transformCur[4] = odomPosZ[odomPointerLast] - transformSum[4];
-    // // transformCur[5] = odomPosX[odomPointerLast] - transformSum[5];
-    // // odomStartPosX = 0;odomStartPosY = 0;odomStartPosZ = 0;
-    // // odomStartRoll = 0;odomStartPitch = 0;odomStartYaw = 0;
-
-    // // RCLCPP_INFO(this->get_logger(), "odom x: '%f'", (odomY + imuAngularFromStartZ)*57.32);
-    // // RCLCPP_INFO(this->get_logger(), "odom Y: '%f'", (odomZ + imuAngularFromStartX)*57.32);
-    // // RCLCPP_INFO(this->get_logger(), "odom Z: '%f'", (odomX + imuAngularFromStartY)*57.32);
-    // // RCLCPP_INFO(this->get_logger(), "slam X: '%f'", outer_param_global[0]);
-    // // RCLCPP_INFO(this->get_logger(), "slam Y: '%f'", outer_param_global[1]);
-    // // RCLCPP_INFO(this->get_logger(), "slam Z: '%f'", outer_param_global[2]);
-
-    // // auto message2 = geometry_msgs::msg::Vector3();
-    // // message2.x = odomY;
-    // // message2.y = odomZ;
-    // // message2.z = odomX;
-    // // pubRotateMsgs->publish(message2);
+    // RCLCPP_INFO(this->get_logger(), "odom x: '%f'", (odomY + imuAngularFromStartZ)*57.32);
+    // RCLCPP_INFO(this->get_logger(), "odom Y: '%f'", (odomZ + imuAngularFromStartX)*57.32);
+    // RCLCPP_INFO(this->get_logger(), "odom Z: '%f'", (odomX + imuAngularFromStartY)*57.32);
+    // RCLCPP_INFO(this->get_logger(), "slam X: '%f'", outer_param_global[0]);
+    // RCLCPP_INFO(this->get_logger(), "slam Y: '%f'", outer_param_global[1]);
+    // RCLCPP_INFO(this->get_logger(), "slam Z: '%f'", outer_param_global[2]);
 
     // auto message2 = geometry_msgs::msg::Vector3();
-    // message2.x = odomYaw[odomPointerLast];
-    // message2.y = odomPitch[odomPointerLast];
-    // message2.z = odomRoll[odomPointerLast];
+    // message2.x = odomY;
+    // message2.y = odomZ;
+    // message2.z = odomX;
     // pubRotateMsgs->publish(message2);
+
+    auto message2 = geometry_msgs::msg::Vector3();
+    message2.x = odomYaw[odomPointerLast];
+    message2.y = odomPitch[odomPointerLast];
+    message2.z = odomRoll[odomPointerLast];
+    pubRotateMsgs->publish(message2);
 
 }
 
@@ -2785,6 +2787,7 @@ void FeatureAssociation::runFeatureAssociation() {
       updateInitialGuess();
     }
     updateTransformation();
+    updateInitialGuess();
 
     integrateTransformation();
 

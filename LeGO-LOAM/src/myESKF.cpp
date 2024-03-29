@@ -17,8 +17,8 @@
 // #include "rclcpp/rclcpp.hpp"
 // using namespace boost::numeric::ublas;
 
-// #include "matplotlibcpp.h"
-// namespace plt = matplotlibcpp;
+#include "matplotlibcpp.h"
+namespace plt = matplotlibcpp;
 
 ESKF::ESKF(const Eigen::MatrixXd& Omega_m, const Eigen::MatrixXd& Acc_m, const Eigen::MatrixXd& GPS, int iter)
     : Omega_m(Omega_m), Acc_m(Acc_m), GPSData(GPS), Iter(iter) {}
@@ -61,6 +61,12 @@ void ESKF::ValueInitialize() {
     NominalState.AccBias = accb[0];
     NominalState.GyroBias = gyrob[0];
     NominalState.Grav = gravity;
+    NominalPropagation.Pos = pos[0];
+    NominalPropagation.Vel = vel[0];
+    NominalPropagation.Qua = qua;
+    NominalPropagation.AccBias = accb[0];
+    NominalPropagation.GyroBias = gyrob[0];
+    NominalPropagation.Grav = gravity;
 
     PosError = Eigen::Vector3d::Zero();
     VelError = Eigen::Vector3d::Zero();
@@ -946,21 +952,23 @@ void ESKF::runESKF() {
             XFusion = Eigen::VectorXd::Zero(18);
         }
 
+        Eigen::Vector3d CurAtt = MatrixUtils::quaternionToEulerAngles(NominalState.Qua);
+
         Fusion_Pose_Data.push_back(NominalState.Pos);
+        Fusion_Vel_Data.push_back(NominalState.Vel);
+        Fusion_Att_Data.push_back(CurAtt);
         i_imu_update = i+1;
         // std::cout << "P Cov:" << P <<std::endl;
         // std::cout << "Pos:" << AckermanPropagation.Pos << std::endl << "iter = " << i_imu_update << std::endl;
         
     }
 
-    
+    // Ackerman propagation
     AckermanState = AckermanPropagation;
     encoder_pri = 0.0;
-    // plt::figure();
     std::vector<double> x_starts;
     std::vector<double> y_starts;
     std::vector<double> z_starts;
-    // end_time / sampling_time - 1
     for (size_t i = 0; i < end_time / sampling_time - 1; i++){
         AckermanBaseMea.vel = (vel_count_mea[i] / rear_wheel_count) * 2 * M_PI / sampling_time_ack;
         AckermanBaseMea.steer = (steer_count_mea[i] / heading_angle_count) * 2 * M_PI;
@@ -979,15 +987,16 @@ void ESKF::runESKF() {
     // x_starts.pop_back();y_starts.pop_back();
     // plt::quiver(x_starts, y_starts, ack_vel_x, ack_vel_y);
     
-    // for (size_t i = 0; i < end_time / sampling_time_slam - 1; i++){
-    //     // Lidar State Update
-    //     AckermanState.Pos = Position_mea[i]; // 換回mea
-    //     AckermanState.Qua = Eigen::AngleAxisd(yaw_mea[i], Eigen::Vector3d::UnitZ())
-    //                              * Eigen::AngleAxisd(pitch_mea[i], Eigen::Vector3d::UnitY())
-    //                              * Eigen::AngleAxisd(roll_mea[i], Eigen::Vector3d::UnitX());
+    // SLAM propagation
+    for (size_t i = 0; i < end_time / sampling_time_slam - 1; i++){
+        // Lidar State Update
+        AckermanState.Pos = Position_mea[i]; // 換回mea
+        AckermanState.Qua = Eigen::AngleAxisd(yaw_mea[i], Eigen::Vector3d::UnitZ())
+                                 * Eigen::AngleAxisd(pitch_mea[i], Eigen::Vector3d::UnitY())
+                                 * Eigen::AngleAxisd(roll_mea[i], Eigen::Vector3d::UnitX());
         
-    //     Fusion_Pose_Data.push_back(AckermanState.Pos);
-    // }
+        // Fusion_Pose_Data.push_back(AckermanState.Pos);
+    }
 
 
 
@@ -999,70 +1008,108 @@ void ESKF::runESKF() {
     // for (int val : t_slam) {
     //     std::cout << val << " ";
     // }
-    
-    // for (size_t i = 0; i < end_time / sampling_time - 1; ++i) {
-    //     // 每次迭代的處理
-    //     // 例如：Nominal_state = NominalStatePropagation(state);
-    //     NominalStatePropagation(NominalState);
-    //     // 根據您的 ESKF 類的具體實現調用相應的方法
-    // }
+
+    // IMU propagation
+    NominalState = NominalPropagation;
+    i_imu_update = 0;
+    for (size_t i = 0; i < end_time / sampling_time - 1; ++i) {
+        NominalStatePropagation();
+        // Fusion_Pose_Data.push_back(NominalState.Pos);
+        i_imu_update++;
+    }
 
 
 
     std::vector<double> fusion_pos_x;
     std::vector<double> fusion_pos_y;
-    std::ofstream file("Fusion_Pose_Data.txt");
+    std::ofstream file1("Fusion_Pose_Data.txt");
     for(const auto& vec : Fusion_Pose_Data) {
-        file << vec[0] << " " << vec[1] << " " << vec[2] << "\n";
+        file1 << vec[0] << " " << vec[1] << " " << vec[2] << "\n";
         fusion_pos_x.push_back(vec[0]);
         fusion_pos_y.push_back(vec[1]);
     }
-    // std::vector<double> fusion_vel_x;
-    // std::vector<double> fusion_vel_y;
-    // double dt = 0;
-    // std::vector<double> x_axis;
-    // std::ofstream file("Fusion_Pose_Data.txt");
-    // for(const auto& vec : Fusion_Pose_Data) {
-    //     file << vec[0] << " " << vec[1] << " " << vec[2] << "\n";
-    //     fusion_vel_x.push_back(vec[0]);
-    //     fusion_vel_y.push_back(vec[1]);
-    //     x_axis.push_back(dt);
-    //     dt += 0.01;
-    // }
-    file.close();
-
-
-
-
-    // // matplotlib
-    // // 初始化兩個std::vector<double>來存儲所有x和y坐標
-    // std::vector<double> x_coords;
-    // std::vector<double> y_coords;
-    // std::vector<double> z_coords;
-    // for(const auto& pos : Fusion_Pose_Data) {
-    //     x_coords.push_back(pos(0)); // 添加x坐標
-    //     y_coords.push_back(pos(1)); // 添加y坐標
-    //     z_coords.push_back(pos(2));
-    // }
-    // std::vector<double> index_vector(x_coords.size());
-
-    // // 初始化index_vector的值
-    // for(size_t i = 0; i < index_vector.size(); ++i) {
-    //     index_vector[i] = static_cast<double>(i);
-    // }
-    // plt::figure();
-    // plt::grid(true);plt::axis("equal");
-    // plt::title("Fusion Result");
-    // plt::plot(x_coords, y_coords);
-
-    // // plt::figure();
-    // // plt::plot(x_axis, fusion_vel_x);
-    // // plt::title("vel x");
-    // // plt::figure();
-    // // plt::plot(x_axis, fusion_vel_y);
-    // // plt::title("vel y");
+    file1.close();
     
-    // plt::show();
+
+    // matplotlib
+    // 初始化兩個std::vector<double>來存儲所有x和y坐標
+    std::vector<double> x_coords;
+    std::vector<double> y_coords;
+    std::vector<double> z_coords;
+    for(const auto& pos : Fusion_Pose_Data) {
+        x_coords.push_back(pos(0)); // 添加x坐標
+        y_coords.push_back(pos(1)); // 添加y坐標
+        z_coords.push_back(pos(2));
+    }
+    std::vector<double> index_vector(x_coords.size());
+
+    // 初始化index_vector的值
+    for(size_t i = 0; i < index_vector.size(); ++i) {
+        index_vector[i] = static_cast<double>(i);
+    }
+    plt::figure();
+    plt::grid(true);plt::axis("equal");
+    plt::title("Fusion Result");
+    plt::plot(x_coords, y_coords);
+
+    // velocity
+    std::vector<double> vx_coords;
+    std::vector<double> vy_coords;
+    std::vector<double> vz_coords;
+    std::ofstream file2("Fusion_Vel_Data.txt");
+    for(const auto& vel : Fusion_Vel_Data) {
+        file2 << vel[0] << " " << vel[1] << " " << vel[2] << "\n";
+        vx_coords.push_back(vel(0));
+        vy_coords.push_back(vel(1));
+        vz_coords.push_back(vel(2));
+    }
+    file2.close();
+
+    plt::figure();
+    plt::subplot(2, 3, 1);
+    plt::grid(true);
+    plt::title("Vx");
+    plt::plot(index_vector, vx_coords);
+
+    plt::subplot(2, 3, 2);
+    plt::grid(true);
+    plt::title("Vy");
+    plt::plot(index_vector, vy_coords);
+
+    plt::subplot(2, 3, 3);
+    plt::grid(true);
+    plt::title("Vz");
+    plt::plot(index_vector, vz_coords);
+
+    // attitude
+    std::vector<double> attx_coords;
+    std::vector<double> atty_coords;
+    std::vector<double> attz_coords;
+    std::ofstream file3("Fusion_Att_Data.txt");
+    for(const auto& att : Fusion_Att_Data) {
+        file3 << att[0] << " " << att[1] << " " << att[2] << "\n";
+        attx_coords.push_back(att(0));
+        atty_coords.push_back(att(1));
+        attz_coords.push_back(att(2));
+    }
+    file3.close();
+
+    plt::subplot(2, 3, 4);
+    plt::grid(true);
+    plt::title("roll");
+    plt::plot(index_vector, attx_coords);
+
+    plt::subplot(2, 3, 5);
+    plt::grid(true);
+    plt::title("pitch");
+    plt::plot(index_vector, atty_coords);
+
+    plt::subplot(2, 3, 6);
+    plt::grid(true);
+    plt::title("yaw");
+    plt::plot(index_vector, attz_coords);
+    
+    plt::show();
 }
 
 int main(){

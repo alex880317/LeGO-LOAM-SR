@@ -68,6 +68,7 @@ private:
     };
 
     KalmanState NominalState;
+    KalmanState NominalPropagation;
     KalmanState State;
     KalmanState ErrorState;
     
@@ -130,7 +131,6 @@ private:
     Eigen::MatrixXd Fi;
     Eigen::MatrixXd Qi;
 
-    // float AccSTD = 0.01;float GyroSTD = 0.0015;float AccBiasSTD = 0.0005;float GyroBiasSTD = 0.0005;
     float AccSTD = 0.01;float GyroSTD = 0.0015;float AccBiasSTD = 0.0005;float GyroBiasSTD = 0.0005;
     Eigen::VectorXd IMU_noise_scale;
 
@@ -232,6 +232,8 @@ private:
     // void loadFromJson(const std::string& filename);
 
     std::vector<Eigen::Vector3d> Fusion_Pose_Data;
+    std::vector<Eigen::Vector3d> Fusion_Vel_Data;
+    std::vector<Eigen::Vector3d> Fusion_Att_Data;
 
     // debug
     int d;

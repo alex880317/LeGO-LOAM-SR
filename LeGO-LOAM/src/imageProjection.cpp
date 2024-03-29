@@ -354,6 +354,7 @@ void ImageProjection::projectPointCloud() {
       float range = sqrt(thisPoint.x * thisPoint.x + thisPoint.y * thisPoint.y + thisPoint.z * thisPoint.z);
       float verticalAngle = std::asin(thisPoint.z / range);
       int temp = (verticalAngle + _ang_bottom) / (0.335*DEG_TO_RAD);
+      // std::cout << temp << std::endl;
       vertical_ori.push_back(temp);
       if(temp<0){
         // vertical_out.push_back(temp);
@@ -396,6 +397,7 @@ void ImageProjection::projectPointCloud() {
       for (size_t j=0; j<vertical_raw2.size(); ++j){
         if (vertical_ori[i]==vertical_raw2[j]){
           rowIdn = int(j);
+          std::cout << "rowIdn" << rowIdn << std::endl;
           break;
         }
       }
@@ -773,9 +775,18 @@ void ImageProjection::groundRemovalOurs() {
 
 void ImageProjection::cloudSegmentation() {
   // segmentation process
-  for (int i = 0; i < _vertical_scans; ++i)
-    for (int j = 0; j < _horizontal_scans; ++j)
+  // for (int i = 0; i < _vertical_scans; ++i)
+  //   for (int j = 0; j < _horizontal_scans; ++j)
+  //     if (_label_mat(i, j) == 0) labelComponents(i, j);
+
+  // Alex
+  for (int i = 0; i < _vertical_scans; ++i){
+    for (int j = 0; j < _horizontal_scans; ++j){
       if (_label_mat(i, j) == 0) labelComponents(i, j);
+    }
+    std::cout << "_vertical_scans = " << i << std::endl;
+    std::cout << "scanline = " << _vertical_scans << std::endl;
+  }
 
   int sizeOfSegCloud = 0;
   // extract segmented cloud for lidar odometry
