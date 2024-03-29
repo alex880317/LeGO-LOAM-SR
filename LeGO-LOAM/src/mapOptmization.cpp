@@ -162,7 +162,7 @@ MapOptimization::MapOptimization(const std::string &name, Channel<AssociationOut
   allocateMemory();
 
   _publish_global_thread = std::thread(&MapOptimization::publishGlobalMapThread, this);
-  _loop_closure_thread = std::thread(&MapOptimization::loopClosureThread, this);
+  // _loop_closure_thread = std::thread(&MapOptimization::loopClosureThread, this);
   _run_thread = std::thread(&MapOptimization::run, this);
 
 }
@@ -783,10 +783,12 @@ void MapOptimization::publishGlobalMap() {
   for (size_t i = 0; i < pointSearchIndGlobalMap.size(); ++i)
     globalMapKeyPoses->points.push_back(
         cloudKeyPoses3D->points[pointSearchIndGlobalMap[i]]);
-  // downsample near selected key frames
-  downSizeFilterGlobalMapKeyPoses.setInputCloud(globalMapKeyPoses);
-  downSizeFilterGlobalMapKeyPoses.filter(*globalMapKeyPosesDS);
-  // extract visualized and downsampled key frames
+  // // downsample near selected key frames
+  // downSizeFilterGlobalMapKeyPoses.setInputCloud(globalMapKeyPoses);
+  // downSizeFilterGlobalMapKeyPoses.filter(*globalMapKeyPosesDS);
+  // // extract visualized and downsampled key frames
+
+  globalMapKeyPosesDS = globalMapKeyPoses;
 
   for (size_t i = 0; i < globalMapKeyPosesDS->points.size(); ++i) {
     int thisKeyInd = (int)globalMapKeyPosesDS->points[i].intensity;
@@ -803,10 +805,12 @@ void MapOptimization::publishGlobalMap() {
                              &cloudKeyPoses6D->points[thisKeyInd]);
     // *globalMapKeyFrames += *transformPointCloud(visualCloudList[thisKeyInd], &cloudKeyPoses6D->points[thisKeyInd]);
   }
-  // downsample visualized points
-  downSizeFilterGlobalMapKeyFrames.setInputCloud(globalMapKeyFrames);
-  downSizeFilterGlobalMapKeyFrames.filter(*globalMapKeyFramesDS);
-  // *globalMapKeyFramesDS = *globalMapKeyFrames;
+  // // downsample visualized points
+  // downSizeFilterGlobalMapKeyFrames.setInputCloud(globalMapKeyFrames);
+  // downSizeFilterGlobalMapKeyFrames.filter(*globalMapKeyFramesDS);
+  // // *globalMapKeyFramesDS = *globalMapKeyFrames;
+
+  globalMapKeyFramesDS = globalMapKeyFrames;
 
   sensor_msgs::msg::PointCloud2 cloudMsgTemp;
   pcl::toROSMsg(*globalMapKeyFrames, cloudMsgTemp);
@@ -1563,7 +1567,7 @@ void MapOptimization::scan2MapOptimization() {
       MapIterTimes_all += MapIterTimes[i];
     }
     float Mapping_itertimes = (MapIterTimes_all/MapIterTimes.size());
-    // std::cout << "Mapping Iteration Times:" << Mapping_itertimes << std::endl; // Bii  //Alex debug
+    // std::cout << "Mapping Iteration Times:" << Mapping_itertimes << std::endl; // Bii 
     if(iter_num>0){
       // std::cout << "Mapping Iteration Times:" << iter_num << std::endl;
     }

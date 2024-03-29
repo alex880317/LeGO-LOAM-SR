@@ -37,13 +37,26 @@ def generate_launch_description():
   )
 
   # LeGO-LOAM
+  DeclareLaunchArgument(
+      'velocity',
+      default_value='0.5',
+      description='Initial velocity'
+  ),
+  DeclareLaunchArgument(
+      'angle',
+      default_value='0.0',
+      description='Initial angle'
+  ),
   lego_loam_node = Node(
     package='lego_loam_sr',
     executable='lego_loam_sr',
     output='screen',
-    parameters=[config_file],
+    parameters=[{config_file,
+                {'velocity': LaunchConfiguration('velocity'),
+                'angle': LaunchConfiguration('angle'),
+                 }}],
     # remappings=[('/lidar_points', 'velodyne_points'),('/imu_type', '/kitti/oxts/imu')],
-     remappings=[('/lidar_points', '/velodyne_points'),('/imu_type', '/imu/data')],
+    remappings=[('/lidar_points', '/velodyne_points'),('/imu_type', '/imu/data')],
     # remappings=[('/lidar_points', '/velodyne_pcl_gen/cloud')],
     # remappings=[('/lidar_points', '/kitti/velo/pointcloud')],
     # remappings=[('/lidar_points', '/points_raw')],
