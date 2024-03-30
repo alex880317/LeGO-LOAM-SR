@@ -30,18 +30,18 @@
 #include "imageProjection.h"
 using namespace std;
 
-const std::string PARAM_VERTICAL_SCANS = "laser.num_vertical_scans";
-const std::string PARAM_HORIZONTAL_SCANS = "laser.num_horizontal_scans";
-const std::string PARAM_ANGLE_BOTTOM = "laser.vertical_angle_bottom";
-const std::string PARAM_ANGLE_TOP = "laser.vertical_angle_top";
-const std::string PARAM_GROUND_INDEX = "laser.ground_scan_index";
-const std::string PARAM_SENSOR_ANGLE = "laser.sensor_mount_angle";
-const std::string PARAM_USE_KITTI = "laser.use_kitti";
-const std::string PARAM_USE_VLP32C = "laser.use_vlp32c";
-const std::string PARAM_OFFLINE_PATH = "laser.offline_path";
-const std::string PARAM_SEGMENT_THETA = "image_projection.segment_theta";
-const std::string PARAM_SEGMENT_POINT = "image_projection.segment_valid_point_num";
-const std::string PARAM_SEGMENT_LINE = "image_projection.segment_valid_line_num";
+const std::string PARAM_VERTICAL_SCANS = "image_projection.ros__parameters.laser.num_vertical_scans";
+const std::string PARAM_HORIZONTAL_SCANS = "image_projection.ros__parameters.laser.num_horizontal_scans";
+const std::string PARAM_ANGLE_BOTTOM = "image_projection.ros__parameters.laser.vertical_angle_bottom";
+const std::string PARAM_ANGLE_TOP = "image_projection.ros__parameters.laser.vertical_angle_top";
+const std::string PARAM_GROUND_INDEX = "image_projection.ros__parameters.laser.ground_scan_index";
+const std::string PARAM_SENSOR_ANGLE = "image_projection.ros__parameters.laser.sensor_mount_angle";
+const std::string PARAM_USE_KITTI = "image_projection.ros__parameters.laser.use_kitti";
+const std::string PARAM_USE_VLP32C = "image_projection.ros__parameters.laser.use_vlp32c";
+const std::string PARAM_OFFLINE_PATH = "image_projection.ros__parameters.laser.offline_path";
+const std::string PARAM_SEGMENT_THETA = "image_projection.ros__parameters.image_projection.segment_theta";
+const std::string PARAM_SEGMENT_POINT = "image_projection.ros__parameters.image_projection.segment_valid_point_num";
+const std::string PARAM_SEGMENT_LINE = "image_projection.ros__parameters.image_projection.segment_valid_line_num";
 
 ImageProjection::ImageProjection(const std::string &name, Channel<ProjectionOut>& output_channel)
     : Node(name),  _output_channel(output_channel)
@@ -784,8 +784,8 @@ void ImageProjection::cloudSegmentation() {
     for (int j = 0; j < _horizontal_scans; ++j){
       if (_label_mat(i, j) == 0) labelComponents(i, j);
     }
-    std::cout << "_vertical_scans = " << i << std::endl;
-    std::cout << "scanline = " << _vertical_scans << std::endl;
+    // std::cout << "_vertical_scans = " << i << std::endl;
+    // std::cout << "scanline = " << _vertical_scans << std::endl;
   }
 
   int sizeOfSegCloud = 0;

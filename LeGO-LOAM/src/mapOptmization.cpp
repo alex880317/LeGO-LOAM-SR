@@ -43,18 +43,20 @@ using std::to_string;
 
 // Save pcd
 const std::string fileDirectory = "/home/iec/colcon_ws/src/LeGO-LOAM-SR/Result/";
-const std::string PARAM_ENABLE_LOOP = "mapping.enable_loop_closure";
-const std::string SAVE_KEY_FEATURE_PCD = "mapping.save_key_feature_pcd";
-const std::string INFO_SAVE_PATH = "mapping.info_save_path";
-const std::string ITER_COUNT_THRES = "mapping.iterCountThres";
-const std::string STEP_SIZE = "mapping.step_size";
-const std::string STOP_THRES = "mapping.stop_thres";
-const std::string PARAM_SEARCH_RADIUS = "mapping.surrounding_keyframe_search_radius";
-const std::string PARAM_SEARCH_NUM = "mapping.surrounding_keyframe_search_num";
-const std::string PARAM_HISTORY_SEARCH_RADIUS = "mapping.history_keyframe_search_radius";
-const std::string PARAM_HISTORY_SEARCH_NUM = "mapping.history_keyframe_search_num";
-const std::string PARAM_HISTORY_SCORE = "mapping.history_keyframe_fitness_score";
-const std::string PARAM_GLOBAL_SEARCH_RADIUS = "mapping.global_map_visualization_search_radius";
+const std::string PARAM_ENABLE_LOOP = "map_optimization.ros__parameters.mapping.enable_loop_closure";
+const std::string SAVE_KEY_FEATURE_PCD = "map_optimization.ros__parameters.mapping.save_key_feature_pcd";
+const std::string INFO_SAVE_PATH = "map_optimization.ros__parameters.mapping.info_save_path";
+const std::string ITER_COUNT_THRES = "map_optimization.ros__parameters.mapping.iterCountThres";
+const std::string STEP_SIZE = "map_optimization.ros__parameters.mapping.step_size";
+const std::string STOP_THRES = "map_optimization.ros__parameters.mapping.stop_thres";
+const std::string PARAM_SEARCH_RADIUS = "map_optimization.ros__parameters.mapping.surrounding_keyframe_search_radius";
+const std::string PARAM_SEARCH_NUM = "map_optimization.ros__parameters.mapping.surrounding_keyframe_search_num";
+const std::string PARAM_HISTORY_SEARCH_RADIUS = "map_optimization.ros__parameters.mapping.history_keyframe_search_radius";
+const std::string PARAM_HISTORY_SEARCH_NUM = "map_optimization.ros__parameters.mapping.history_keyframe_search_num";
+const std::string PARAM_HISTORY_SCORE = "map_optimization.ros__parameters.mapping.history_keyframe_fitness_score";
+const std::string PARAM_GLOBAL_SEARCH_RADIUS = "map_optimization.ros__parameters.mapping.global_map_visualization_search_radius";
+
+const std::string PARAM_Mapping_Mode = "map_optimization.ros__parameters.HighDenseMapping";
 
 MapOptimization::MapOptimization(const std::string &name, Channel<AssociationOut> &input_channel)
     : Node(name), _input_channel(input_channel), _publish_global_signal(false), _loop_closure_signal(false) {
@@ -158,6 +160,13 @@ MapOptimization::MapOptimization(const std::string &name, Channel<AssociationOut
   if (!this->get_parameter(INFO_SAVE_PATH, fileSaveDirectory)) {
   RCLCPP_WARN(this->get_logger(), "Parameter %s not found", fileSaveDirectory.c_str());
   } 
+  //----------------------------------------------------------------------------------------
+  // Alex
+  this->declare_parameter(PARAM_Mapping_Mode);
+  if (!this->get_parameter(PARAM_Mapping_Mode, _HighDense_Mapping_enabled)) {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PARAM_Mapping_Mode.c_str());
+  }
+  //----------------------------------------------------------------------------------------
 
   allocateMemory();
 
@@ -783,10 +792,17 @@ void MapOptimization::publishGlobalMap() {
   for (size_t i = 0; i < pointSearchIndGlobalMap.size(); ++i)
     globalMapKeyPoses->points.push_back(
         cloudKeyPoses3D->points[pointSearchIndGlobalMap[i]]);
+  //-----------------------------------------------------------------------------------
+  // Alex
   // // downsample near selected key frames
   // downSizeFilterGlobalMapKeyPoses.setInputCloud(globalMapKeyPoses);
   // downSizeFilterGlobalMapKeyPoses.filter(*globalMapKeyPosesDS);
   // // extract visualized and downsampled key frames
+  if (!_HighDense_Mapping_enabled){
+    downSizeFilterGlobalMapKeyPoses.setInputCloud(globalMapKeyPoses);
+    downSizeFilterGlobalMapKeyPoses.filter(*globalMapKeyPosesDS);
+  }
+  //-----------------------------------------------------------------------------------
 
   globalMapKeyPosesDS = globalMapKeyPoses;
 
@@ -805,10 +821,18 @@ void MapOptimization::publishGlobalMap() {
                              &cloudKeyPoses6D->points[thisKeyInd]);
     // *globalMapKeyFrames += *transformPointCloud(visualCloudList[thisKeyInd], &cloudKeyPoses6D->points[thisKeyInd]);
   }
+  //-----------------------------------------------------------------------------------
+  // Alex
   // // downsample visualized points
   // downSizeFilterGlobalMapKeyFrames.setInputCloud(globalMapKeyFrames);
   // downSizeFilterGlobalMapKeyFrames.filter(*globalMapKeyFramesDS);
   // // *globalMapKeyFramesDS = *globalMapKeyFrames;
+  if (!_HighDense_Mapping_enabled){
+    std::cout << _HighDense_Mapping_enabled << std::endl;
+    downSizeFilterGlobalMapKeyFrames.setInputCloud(globalMapKeyFrames);
+    downSizeFilterGlobalMapKeyFrames.filter(*globalMapKeyFramesDS);
+  }
+  //-----------------------------------------------------------------------------------
 
   globalMapKeyFramesDS = globalMapKeyFrames;
 

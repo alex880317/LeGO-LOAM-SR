@@ -31,7 +31,7 @@
 //     Robotics: Science and Systems Conference (RSS). Berkeley, CA, July 2014.
 
 #include "transformFusion.h"
-const std::string POSE_SAVE_PATH = "mapping.pose_save_path";
+const std::string POSE_SAVE_PATH = "transform_fusion.ros__parameters.mapping.pose_save_path";
 
 TransformFusion::TransformFusion(const std::string &name) : Node(name) {
   pubLaserOdometry2 = this->create_publisher<nav_msgs::msg::Odometry>("/integrated_to_init", 5);
