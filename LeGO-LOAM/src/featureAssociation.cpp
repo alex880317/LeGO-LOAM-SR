@@ -39,19 +39,19 @@
 #include <limits> // Alex for std::numeric_limits<float>::quiet_NaN()
 
 
-const std::string PARAM_VERTICAL_SCANS = "laser.num_vertical_scans";
-const std::string PARAM_HORIZONTAL_SCANS = "laser.num_horizontal_scans";
-const std::string PARAM_SCAN_PERIOD = "laser.scan_period";
-const std::string PARAM_USE_IMU_UNDISTORTION = "laser.use_imu_undistortion";
-const std::string PARAM_FREQ_DIVIDER = "mapping.mapping_frequency_divider";
-const std::string PARAM_EDGE_THRESHOLD = "featureAssociation.edge_threshold";
-const std::string PARAM_SURF_THRESHOLD = "featureAssociation.surf_threshold";
-const std::string PARAM_DISTANCE = "featureAssociation.nearest_feature_search_distance";
-const std::string PARAM_ANGLE_BOTTOM = "laser.vertical_angle_bottom";
-const std::string PARAM_ANGLE_TOP = "laser.vertical_angle_top";
-const std::string PARAM_DBFr = "laser.DBFr";
-const std::string PARAM_RatioXY = "laser.RatioXY";
-const std::string PARAM_RatioZ = "laser.RatioZ";
+const std::string PARAM_VERTICAL_SCANS = "feature_association.ros__parameters.laser.num_vertical_scans";
+const std::string PARAM_HORIZONTAL_SCANS = "feature_association.ros__parameters.laser.num_horizontal_scans";
+const std::string PARAM_SCAN_PERIOD = "feature_association.ros__parameters.laser.scan_period";
+const std::string PARAM_USE_IMU_UNDISTORTION = "feature_association.ros__parameters.laser.use_imu_undistortion";
+const std::string PARAM_FREQ_DIVIDER = "feature_association.ros__parameters.mapping.mapping_frequency_divider";
+const std::string PARAM_EDGE_THRESHOLD = "feature_association.ros__parameters.featureAssociation.edge_threshold";
+const std::string PARAM_SURF_THRESHOLD = "feature_association.ros__parameters.featureAssociation.surf_threshold";
+const std::string PARAM_DISTANCE = "feature_association.ros__parameters.featureAssociation.nearest_feature_search_distance";
+const std::string PARAM_ANGLE_BOTTOM = "feature_association.ros__parameters.laser.vertical_angle_bottom";
+const std::string PARAM_ANGLE_TOP = "feature_association.ros__parameters.laser.vertical_angle_top";
+const std::string PARAM_DBFr = "feature_association.ros__parameters.laser.DBFr";
+const std::string PARAM_RatioXY = "feature_association.ros__parameters.laser.RatioXY";
+const std::string PARAM_RatioZ = "feature_association.ros__parameters.laser.RatioZ";
 
 const float RAD2DEG = 180.0 / M_PI;
 

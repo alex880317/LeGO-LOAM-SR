@@ -85,6 +85,7 @@ class MapOptimization : public rclcpp::Node {
   float _global_map_visualization_search_radius;
   int mapping_count;
   std::vector <double> time;
+  bool _HighDense_Mapping_enabled;
 
   pcl::PointCloud<PointType>::Ptr _laser_cloud_input;
   pcl::PointCloud<PointType>::Ptr visualCloud;
