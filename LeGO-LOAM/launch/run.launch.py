@@ -13,6 +13,7 @@ import yaml
 def load_config(context, *args, **kwargs):
     lidar_type = LaunchConfiguration('lidar_type').perform(context)
     high_dense_mapping = LaunchConfiguration('HighDenseMapping').perform(context)
+    re_mapping = LaunchConfiguration('ReMapping').perform(context)
     config_path = os.path.join(get_package_share_directory('lego_loam_sr'), 'config', 'loam_config.yaml')
     
     with open(config_path, 'r') as file:
@@ -26,6 +27,12 @@ def load_config(context, *args, **kwargs):
         selected_config['map_optimization.ros__parameters.HighDenseMapping'] = True
     else:
         selected_config['map_optimization.ros__parameters.HighDenseMapping'] = False
+        
+    # 设置 ReMapping 参数
+    if re_mapping.lower() == 'true':
+        selected_config['map_optimization.ros__parameters.ReMapping'] = True
+    else:
+        selected_config['map_optimization.ros__parameters.ReMapping'] = False
     
     lego_loam_node = Node(
         package='lego_loam_sr',
@@ -91,6 +98,11 @@ def generate_launch_description():
       default_value='false',  # 设置默认值为false
       description='Enable or disable high dense mapping'
   )
+  declare_re_mapping_arg = DeclareLaunchArgument(
+      'ReMapping',
+      default_value='false',  # 设置默认值为false
+      description='Enable or disable re mapping'
+  )
   # lego_loam_node = Node(
   #   package='lego_loam_sr',
   #   executable='lego_loam_sr',
@@ -130,6 +142,7 @@ def generate_launch_description():
   # 添加到LaunchDescription实例
   ld.add_action(declare_lidar_type_arg)
   ld.add_action(declare_high_dense_mapping_arg)
+  ld.add_action(declare_re_mapping_arg)
   ld.add_action(OpaqueFunction(function=load_config))
 
   return ld
