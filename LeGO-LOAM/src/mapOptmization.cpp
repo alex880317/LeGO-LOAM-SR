@@ -828,7 +828,6 @@ void MapOptimization::publishGlobalMap() {
   // downSizeFilterGlobalMapKeyFrames.filter(*globalMapKeyFramesDS);
   // // *globalMapKeyFramesDS = *globalMapKeyFrames;
   if (!_HighDense_Mapping_enabled){
-    std::cout << _HighDense_Mapping_enabled << std::endl;
     downSizeFilterGlobalMapKeyFrames.setInputCloud(globalMapKeyFrames);
     downSizeFilterGlobalMapKeyFrames.filter(*globalMapKeyFramesDS);
   }

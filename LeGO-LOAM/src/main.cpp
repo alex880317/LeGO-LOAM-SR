@@ -3,6 +3,7 @@
 #include "imageProjection.h"
 #include "mapOptimization.h"
 #include "transformFusion.h"
+#include "publishHighDenseMap.h"
 
 int main(int argc, char** argv) {
   Channel<ProjectionOut> projection_out_channel(true);
@@ -12,18 +13,21 @@ int main(int argc, char** argv) {
 
   // Create nodes
   //test
+  auto HDM = std::make_shared<PCDPublisher>("publish_HighDenseMap");
   auto IP = std::make_shared<ImageProjection>("image_projection", projection_out_channel);
   auto FA = std::make_shared<FeatureAssociation>("feature_association", projection_out_channel, association_out_channel);
   auto MO = std::make_shared<MapOptimization>("map_optimization", association_out_channel);
   auto TF = std::make_shared<TransformFusion>("transform_fusion");
 
+  RCLCPP_INFO(HDM->get_logger(), "\033[1;32m---->\033[0m Started.");
   RCLCPP_INFO(IP->get_logger(), "\033[1;32m---->\033[0m Started.");
   RCLCPP_INFO(FA->get_logger(), "\033[1;32m---->\033[0m Started.");
   RCLCPP_INFO(MO->get_logger(), "\033[1;32m---->\033[0m Started.");
   RCLCPP_INFO(TF->get_logger(), "\033[1;32m---->\033[0m Started.");
 
   // Use 4 threads
-  rclcpp::executors::MultiThreadedExecutor executor(rclcpp::ExecutorOptions(), 4);
+  rclcpp::executors::MultiThreadedExecutor executor(rclcpp::ExecutorOptions(), 5);
+  executor.add_node(HDM);
   executor.add_node(IP);
   executor.add_node(FA);
   executor.add_node(MO);
