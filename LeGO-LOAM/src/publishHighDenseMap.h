@@ -20,6 +20,7 @@ private:
     pcl::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> rotatePointCloud(const pcl::shared_ptr<pcl::PointCloud<pcl::PointXYZ>>& input_cloud);
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr publisher_;
     pcl::PointCloud<pcl::PointXYZ>::Ptr transform_map;
+    bool remapping_enabled;
 };
 #endif // PUBLISHHIGHDENSEMAP_H
 

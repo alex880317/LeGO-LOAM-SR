@@ -8,7 +8,20 @@
 #include <Eigen/Core> 
 #include <Eigen/Geometry>
 
+const std::string PARAM_ReMapping = "map_optimization.ros__parameters.ReMapping";
+
 PCDPublisher::PCDPublisher(const std::string &name) : Node(name){
+        //---------------------------------------------------------------------------
+        // 在这里声明和获取参数
+        this->declare_parameter(PARAM_ReMapping);
+        if (!this->get_parameter(PARAM_ReMapping, remapping_enabled)) {
+            RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PARAM_ReMapping.c_str());
+            return;
+        }
+        if (!remapping_enabled){
+            return;
+        }
+        //---------------------------------------------------------------------------
         publisher_ = this->create_publisher<sensor_msgs::msg::PointCloud2>("high_dense_map", 10);
         std::string pcd_file_path = "/home/iec/colcon_ws/src/LeGO-LOAM-SR/Result/0329HighDenseWithOutDS/denseCloud.pcd"; // 修改为你的.pcd文件路径
         pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
@@ -29,6 +42,7 @@ PCDPublisher::PCDPublisher(const std::string &name) : Node(name){
         // Publishing the PointCloud2 message
         publisher_->publish(output);
 }
+
 pcl::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> PCDPublisher::rotatePointCloud(
     const pcl::shared_ptr<pcl::PointCloud<pcl::PointXYZ>>& input_cloud) {
     // 创建输出点云

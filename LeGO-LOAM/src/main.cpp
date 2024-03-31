@@ -5,11 +5,13 @@
 #include "transformFusion.h"
 #include "publishHighDenseMap.h"
 
+
 int main(int argc, char** argv) {
   Channel<ProjectionOut> projection_out_channel(true);
   Channel<AssociationOut> association_out_channel(false);
 
   rclcpp::init(argc, argv);
+  
 
   // Create nodes
   //test
