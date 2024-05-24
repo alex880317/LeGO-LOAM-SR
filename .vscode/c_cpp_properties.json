@@ -6,7 +6,11 @@
         "limitSymbolsToIncludedHeaders": false
       },
       "includePath": [
-        "${workspaceFolder}/**"
+        "${workspaceFolder}/**",
+        "/usr/include",
+        "/usr/include/eigen3",
+        "/usr/include/python3.8",
+        "/home/iec/Sophus"
       ],
       "name": "linux-gcc-x64",
       "intelliSenseMode": "linux-gcc-x64",
