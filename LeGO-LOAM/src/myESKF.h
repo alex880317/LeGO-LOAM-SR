@@ -234,6 +234,8 @@ private:
     std::vector<Eigen::Vector3d> Fusion_Pose_Data;
     std::vector<Eigen::Vector3d> Fusion_Vel_Data;
     std::vector<Eigen::Vector3d> Fusion_Att_Data;
+    std::vector<Eigen::Vector3d> Fusion_AccBias_Data;
+    std::vector<Eigen::Vector3d> Fusion_GyroBias_Data;
 
     // debug
     int d;

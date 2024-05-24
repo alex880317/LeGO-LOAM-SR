@@ -66,7 +66,7 @@ FeatureAssociation::FeatureAssociation(const std::string &name, Channel<Projecti
   //     "/visual_cloud", 1000, std::bind(&FeatureAssociation::visualcloudHandler, this, std::placeholders::_1));
 
   _sub_odom_gt = this->create_subscription<nav_msgs::msg::Odometry>(
-      "/odom", 100, std::bind(&FeatureAssociation::odomCallback, this, std::placeholders::_1)); //Alex
+      "/odom2", 100, std::bind(&FeatureAssociation::odomCallback, this, std::placeholders::_1)); //Alex
 
   _sub_Ack_encoder = this->create_subscription<sensor_msgs::msg::JointState>(
       "/racebot/joint_states", 100, std::bind(&FeatureAssociation::jointStateCallback, this, std::placeholders::_1)); //Alex

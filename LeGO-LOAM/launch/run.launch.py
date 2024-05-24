@@ -68,7 +68,7 @@ def generate_launch_description():
 
   # Nodes Configurations
   # config_file = os.path.join(get_package_share_directory('lego_loam_sr'), 'config', 'loam_config.yaml')
-  rviz_config = os.path.join(get_package_share_directory('lego_loam_sr'), 'rviz', 'test2.rviz')
+  rviz_config = os.path.join(get_package_share_directory('lego_loam_sr'), 'rviz', 'test.rviz')
 
   # Tf transformations
   transform_map = Node(

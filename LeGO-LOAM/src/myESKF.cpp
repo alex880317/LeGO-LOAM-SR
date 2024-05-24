@@ -47,20 +47,20 @@ void ESKF::ValueInitialize() {
 
     gravity << 0, 0, -9.8;
 
-    // State.Pos = pos[0];
-    // State.Vel = vel[0];
-    // State.Qua = qua;
-    // State.AccBias = accb[0];
-    // State.GyroBias = gyrob[0];
-    // State.Grav = gravity;
-    // NominalState = State;
+    State.Pos = pos[0];
+    State.Vel = vel[0];
+    State.Qua = qua;
+    State.AccBias = accb[0];
+    State.GyroBias = gyrob[0];
+    State.Grav = gravity;
+    NominalState = State;
     // NominalStatePropagation
-    NominalState.Pos = pos[0];
-    NominalState.Vel = vel[0];
-    NominalState.Qua = qua;
-    NominalState.AccBias = accb[0];
-    NominalState.GyroBias = gyrob[0];
-    NominalState.Grav = gravity;
+    // NominalState.Pos = pos[0];
+    // NominalState.Vel = vel[0];
+    // NominalState.Qua = qua;
+    // NominalState.AccBias = accb[0];
+    // NominalState.GyroBias = gyrob[0];
+    // NominalState.Grav = gravity;
     NominalPropagation.Pos = pos[0];
     NominalPropagation.Vel = vel[0];
     NominalPropagation.Qua = qua;
@@ -199,9 +199,20 @@ void ESKF::LidarMeasurementQuaNoiseScale() {
     qua_noise.push_back(std_w);
     qua_noise.push_back(std_x);
     qua_noise.push_back(std_y);
-    // qua_noise.push_back(std_z);
-    qua_noise.push_back(0.0894); // bug 1
+    qua_noise.push_back(std_z);
+    // qua_noise.push_back(0.0894); // bug 1
     std::cout << qua_noise[0] << "," << qua_noise[1] << "," << qua_noise[2] << "," << qua_noise[3] << std::endl;
+
+
+
+    // std::vector<double> vec;
+    // std::ifstream file("/home/iec/colcon_ws/src/LeGO-LOAM-SR/LeGO-LOAM/src/vector.csv");
+    // std::string line;
+    // while (std::getline(file, line)) {
+    //     vec.push_back(std::stod(line));
+    // }
+    // double test = MatrixUtils::calculateStandardDeviation(vec);
+
     // for (size_t index = 0; index < w.size(); ++index) {
     //     std::vector<double> temp = {w[index], x[index], y[index], z[index]};
     //     qua_noise.push_back(MatrixUtils::calculateStd(temp));
@@ -322,12 +333,12 @@ void ESKF::ErrorStateTransitionMatrix() {
     // int i = Iter;
     double delta_t = sampling_time;
 
-    Eigen::Vector3d p = NominalState.Pos;
-    Eigen::Vector3d v = NominalState.Vel;
-    Eigen::Quaterniond q = NominalState.Qua;
-    Eigen::Vector3d Acc_b = NominalState.AccBias;
-    Eigen::Vector3d Gyro_b = NominalState.GyroBias;
-    Eigen::Vector3d g = NominalState.Grav;
+    Eigen::Vector3d p = State.Pos;
+    Eigen::Vector3d v = State.Vel;
+    Eigen::Quaterniond q = State.Qua;
+    Eigen::Vector3d Acc_b = State.AccBias;
+    Eigen::Vector3d Gyro_b = State.GyroBias;
+    Eigen::Vector3d g = State.Grav;
 
     // 定义单位矩阵I
     Eigen::Matrix3d I = Eigen::Matrix3d::Identity();
@@ -957,10 +968,12 @@ void ESKF::runESKF() {
         Fusion_Pose_Data.push_back(NominalState.Pos);
         Fusion_Vel_Data.push_back(NominalState.Vel);
         Fusion_Att_Data.push_back(CurAtt);
+        Fusion_AccBias_Data.push_back(NominalState.AccBias);
+        Fusion_GyroBias_Data.push_back(NominalState.GyroBias);
         i_imu_update = i+1;
         // std::cout << "P Cov:" << P <<std::endl;
         // std::cout << "Pos:" << AckermanPropagation.Pos << std::endl << "iter = " << i_imu_update << std::endl;
-        
+        State = NominalState;
     }
 
     // Ackerman propagation
@@ -1093,6 +1106,32 @@ void ESKF::runESKF() {
         attz_coords.push_back(att(2));
     }
     file3.close();
+
+    // AccBias
+    std::vector<double> AccBiasx_coords;
+    std::vector<double> AccBiasy_coords;
+    std::vector<double> AccBiasz_coords;
+    std::ofstream file4("Fusion_AccBias_Data.txt");
+    for(const auto& vec : Fusion_AccBias_Data) {
+        file4 << vec[0] << " " << vec[1] << " " << vec[2] << "\n";
+        AccBiasx_coords.push_back(vec(0));
+        AccBiasy_coords.push_back(vec(1));
+        AccBiasz_coords.push_back(vec(2));
+    }
+    file4.close();
+
+    // GyroBias
+    std::vector<double> GyroBiasx_coords;
+    std::vector<double> GyroBiasy_coords;
+    std::vector<double> GyroBiasz_coords;
+    std::ofstream file5("Fusion_GyroBias_Data.txt");
+    for(const auto& vec : Fusion_GyroBias_Data) {
+        file5 << vec[0] << " " << vec[1] << " " << vec[2] << "\n";
+        GyroBiasx_coords.push_back(vec(0));
+        GyroBiasy_coords.push_back(vec(1));
+        GyroBiasz_coords.push_back(vec(2));
+    }
+    file5.close();
 
     plt::subplot(2, 3, 4);
     plt::grid(true);
@@ -1296,6 +1335,16 @@ int main(){
     // plt::xlim(0.05, 2 * M_PI - 0.05);
     // plt::ylim(-10, 10);
     // plt::show();
+
+    // Eigen::Quaterniond a(1, 2, 3, 4);
+    // Eigen::Quaterniond b(2, 3, 4, 5);
+    // Eigen::Quaterniond NominalState_q_nominal = a * b;
+    // // 打印四元數
+    // std::cout << "Quaternion q:" << std::endl;
+    // std::cout << "w: " << NominalState_q_nominal.w() << std::endl;
+    // std::cout << "x: " << NominalState_q_nominal.x() << std::endl;
+    // std::cout << "y: " << NominalState_q_nominal.y() << std::endl;
+    // std::cout << "z: " << NominalState_q_nominal.z() << std::endl;
 
     return 0;
 }

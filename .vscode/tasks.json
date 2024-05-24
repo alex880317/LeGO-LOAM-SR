@@ -1,0 +1,56 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build myESKF",
+            "type": "shell",
+            "command": "/usr/bin/g++",
+            "args": [
+                "-g",
+                "${workspaceFolder}/LeGO-LOAM/src/myESKF.cpp",
+                "${workspaceFolder}/LeGO-LOAM/src/MatrixUtils.cpp",
+                "${workspaceFolder}/LeGO-LOAM/src/MeaCovFromMatlab/MeaCov2C_pkg/MeaCov2C.cpp",
+                "${workspaceFolder}/LeGO-LOAM/src/MeaCovFromMatlab/MeaCov2C_pkg/MeaCov2C_data.cpp",
+                "${workspaceFolder}/LeGO-LOAM/src/MeaCovFromMatlab/MeaCov2C_pkg/MeaCov2C_initialize.cpp",
+                "${workspaceFolder}/LeGO-LOAM/src/MeaCovFromMatlab/MeaCov2C_pkg/MeaCov2C_terminate.cpp",
+                "${workspaceFolder}/LeGO-LOAM/src/MeaCovFromMatlab/MeaCov2C_pkg/rt_nonfinite.cpp",
+                "${workspaceFolder}/LeGO-LOAM/src/MeaCovFromMatlab/MeaCov2C_pkg/rtGetInf.cpp",
+                "${workspaceFolder}/LeGO-LOAM/src/MeaCovFromMatlab/MeaCov2C_pkg/rtGetNaN.cpp",
+                "-o",
+                "${workspaceFolder}/LeGO-LOAM/src/myESKF",
+                "-lfmt",
+                "-I/usr/include/python3.8",
+                "-lpython3.8",
+                "-I/usr/include/eigen3",
+                "-I/home/iec/Sophus"
+            ],
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "type": "cppbuild",
+            "label": "C/C++: g++ 建置使用中檔案",
+            "command": "/usr/bin/g++",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "${file}",
+                "-o",
+                "${fileDirname}/${fileBasenameNoExtension}"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "偵錯工具產生的工作。"
+        }
+    ]
+}
