@@ -17,11 +17,9 @@
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/common/common.h>
 #include <pcl/registration/icp.h>
-#include <pcl/registration/ndt.h>
 
 #include <tf2/utils.h>
 #include <tf2_ros/transform_broadcaster.h>
-#include <boost/format.hpp>
 
 #include <Eigen/Dense>
 #include <vector>
@@ -64,11 +62,7 @@ struct ProjectionOut
 {
   pcl::PointCloud<PointType>::Ptr segmented_cloud;
   pcl::PointCloud<PointType>::Ptr outlier_cloud;
-  // pcl::PointCloud<PointType>::Ptr visual_cloud;
-  // pcl::PointCloud<PointType>::Ptr full_cloud;
   cloud_msgs::msg::CloudInfo seg_msg;
-  std::vector<double> outlierCloud_Intensity;
-  std::vector<double> segmentedCloud_Intensity;
 };
 
 
@@ -77,8 +71,6 @@ struct AssociationOut
   pcl::PointCloud<PointType>::Ptr cloud_outlier_last;
   pcl::PointCloud<PointType>::Ptr cloud_corner_last;
   pcl::PointCloud<PointType>::Ptr cloud_surf_last;
-  pcl::PointCloud<PointType>::Ptr cloud_corner_scan;
-  pcl::PointCloud<PointType>::Ptr cloud_surf_scan;
   nav_msgs::msg::Odometry laser_odometry;
 };
 
@@ -132,24 +124,6 @@ POINT_CLOUD_REGISTER_POINT_STRUCT (PointXYZIRPYT,
                                    (float, roll, roll) (float, pitch, pitch) (float, yaw, yaw)
                                    (double, time, time)
 )
-
-struct PointXYZILID
-{
-  PCL_ADD_POINT4D;                    // quad-word XYZ
-  float    intensity;                 ///< laser intensity reading
-  uint16_t label;                     ///< point label
-  uint16_t id;
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW     // ensure proper alignment
-} EIGEN_ALIGN16;
-
-// Register custom point struct according to PCL
-POINT_CLOUD_REGISTER_POINT_STRUCT (PointXYZILID,
-                                  (float, x, x)
-                                  (float, y, y)
-                                  (float, z, z)
-                                  (float, intensity, intensity)
-                                  (uint16_t, label, label)
-                                  (uint16_t, id, id))
 
 typedef PointXYZIRPYT  PointTypePose;
 

@@ -31,7 +31,6 @@
 //     Robotics: Science and Systems Conference (RSS). Berkeley, CA, July 2014.
 
 #include "transformFusion.h"
-const std::string POSE_SAVE_PATH = "mapping.pose_save_path";
 
 TransformFusion::TransformFusion(const std::string &name) : Node(name) {
   pubLaserOdometry2 = this->create_publisher<nav_msgs::msg::Odometry>("/integrated_to_init", 5);
@@ -45,11 +44,6 @@ TransformFusion::TransformFusion(const std::string &name) : Node(name) {
 
   laserOdometryTrans.header.frame_id = "camera_init";
   laserOdometryTrans.child_frame_id = "camera";
-
-  this->declare_parameter(POSE_SAVE_PATH);
-  if (!this->get_parameter(POSE_SAVE_PATH, poseSaveDirectory)) {
-  RCLCPP_WARN(this->get_logger(), "Parameter %s not found", poseSaveDirectory.c_str());
-  } 
 
   tfBroadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(this);
 
@@ -205,68 +199,6 @@ void TransformFusion::laserOdometryHandler(
   laserOdometry2.pose.pose.position.y = transformMapped[4];
   laserOdometry2.pose.pose.position.z = transformMapped[5];
   pubLaserOdometry2->publish(laserOdometry2);
-
-  /////////////////////added, cout results///////////////////
-
-    // Eigen::Quaterniond q2;
-
-    // q2.w()=laserOdometry2.pose.pose.orientation.w;
-    // q2.x()=laserOdometry2.pose.pose.orientation.x;
-    // q2.y()=laserOdometry2.pose.pose.orientation.y;
-    // q2.z()=laserOdometry2.pose.pose.orientation.z;
-
-    // Eigen::Matrix3d R = q2.toRotationMatrix();
-
-    // if (init_flag==true)	
-    // {
-        
-    // H_init<< R.row(0)[0],R.row(0)[1],R.row(0)[2],transformMapped[3],
-    //             R.row(1)[0],R.row(1)[1],R.row(1)[2],transformMapped[4],
-    //             R.row(2)[0],R.row(2)[1],R.row(2)[2],transformMapped[5],
-    //             0,0,0,1;  
-
-    // init_flag=false;
-    // }
-
-    // H_rot<<	-1,0,0,0,
-    //             0,-1,0,0,
-    //             0,0,1,0,	
-    //                 0,0,0,1; 
-        
-    // H<<  R.row(0)[0],R.row(0)[1],R.row(0)[2],transformMapped[3],
-    //         R.row(1)[0],R.row(1)[1],R.row(1)[2],transformMapped[4],
-    //             R.row(2)[0],R.row(2)[1],R.row(2)[2],transformMapped[5],
-    //             0,0,0,1;  
-
-
-
-    // H = H_rot*H_init.inverse()*H; //to get H12 = H10*H02 , 180 rot according to z axis
-
-    // std::ofstream foutC(poseSaveDirectory, std::ios::app);
-
-    // foutC.setf(std::ios::scientific, std::ios::floatfield);
-    //     foutC.precision(6);
-
-    // //foutC << R[0] << " "<<transformMapped[3]<<" "<< R.row(1) <<" "<<transformMapped[4] <<" "<<  R.row(2) <<" "<< transformMapped[5] << endl;
-    //     for (int i = 0; i < 3; ++i)	
-    // {	 
-    //     for (int j = 0; j < 4; ++j)
-    //         {
-    //         if(i==2 && j==3)
-    //         {
-    //             foutC <<H.row(i)[j]<< std::endl ;	
-    //         }
-    //         else
-    //         {
-    //             foutC <<H.row(i)[j]<< " " ;
-    //         }
-            
-    //     }
-    // }
-
-    // foutC.close();
-
-
 
   laserOdometryTrans.header.stamp = laserOdometry->header.stamp;
   laserOdometryTrans.transform.translation.x = transformMapped[3];

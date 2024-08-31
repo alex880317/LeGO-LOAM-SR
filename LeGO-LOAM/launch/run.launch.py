@@ -42,16 +42,7 @@ def generate_launch_description():
     executable='lego_loam_sr',
     output='screen',
     parameters=[config_file],
-    # remappings=[('/lidar_points', 'velodyne_points'),('/imu_type', '/kitti/oxts/imu')],
-     remappings=[('/lidar_points', '/velodyne_points'),('/imu_type', '/imu/data')],
-    # remappings=[('/lidar_points', '/velodyne_pcl_gen/cloud')],
-    # remappings=[('/lidar_points', '/kitti/velo/pointcloud')],
-    # remappings=[('/lidar_points', '/points_raw')],
-    # remappings=[('/lidar_points', '/sensing/lidar/top/pointcloud_raw')],
-    # remappings=[('/imu_type', '/imu/data')],
-    # remappings=[('/imu_type', '/imu_correct')],
-    # remappings=[('/imu_type', '/lidar_xsens/imu/data')],
-    # remappings=[('/imu_type', '/kitti/oxts/imu')],
+    remappings=[('/lidar_points', '/velodyne_points')],
   )
 
   # Rviz
