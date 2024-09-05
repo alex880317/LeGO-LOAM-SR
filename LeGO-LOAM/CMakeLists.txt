@@ -11,6 +11,10 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 include_directories(${colcon_INCLUDE_DIRS})
+get_filename_component(PARENT_DIR ${CMAKE_CURRENT_LIST_DIR} DIRECTORY)
+include_directories(${PARENT_DIR}/plane_fitting/src)
+
+
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
@@ -31,8 +35,22 @@ find_package(PCL REQUIRED)
 find_package(GTSAM REQUIRED QUIET)
 find_package(Boost REQUIRED COMPONENTS thread serialization timer)
 
+find_package(OpenCV REQUIRED)
+message(STATUS "version: " ${OpenCV_VERSION})
+
+# OpenMP
+find_package(OpenMP)
+IF(OPENMP_FOUND)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+  message(STATUS "Found OpenMP")
+ENDIF()
+
 include_directories(include)
 ament_export_include_directories(include)
+
+include_directories(${CMAKE_SOURCE_DIR})
+include_directories(${OpenCV_INCLUDE_DIRS})
 
 set(dependencies
   rclcpp
@@ -50,8 +68,8 @@ set(dependencies
 
 add_executable(${PROJECT_NAME} src/imageProjection.cpp src/featureAssociation.cpp src/mapOptmization.cpp src/transformFusion.cpp src/main.cpp)
 add_executable(AGPC test/AGPC_Detection.cpp)
-target_link_libraries(${PROJECT_NAME} ${PCL_LIBRARIES} ${colcon_INCLUDE_DIRS} gtsam)
-target_link_libraries(AGPC ${PCL_LIBRARIES} ${colcon_INCLUDE_DIRS} gtsam )
+target_link_libraries(${PROJECT_NAME} ${PCL_LIBRARIES} ${colcon_INCLUDE_DIRS} ${OpenCV_LIBS} gtsam)
+target_link_libraries(AGPC ${PCL_LIBRARIES} ${colcon_INCLUDE_DIRS} ${OpenCV_LIBS} gtsam )
 ament_target_dependencies(${PROJECT_NAME} ${dependencies} Eigen3)
 ament_target_dependencies(AGPC ${dependencies} Eigen3)
 

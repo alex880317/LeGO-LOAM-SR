@@ -4,6 +4,10 @@
 #include "lego_loam/utility.h"
 #include "lego_loam/channel.h"
 #include <Eigen/QR>
+#include "GRANSAC.hpp"
+#include "PlaneModel.hpp"
+#include <omp.h>
+#include <opencv2/opencv.hpp>
 
 class ImageProjection : public rclcpp::Node {
  public:
@@ -14,6 +18,16 @@ class ImageProjection : public rclcpp::Node {
 
   void cloudHandler(const sensor_msgs::msg::PointCloud2::SharedPtr laserCloudMsg);
 
+  // 定義點結構
+  struct Point {
+    double x, y, z;
+    int index;
+
+    // 構造函數，用於初始化 x, y, z 和 index
+    Point(double x_val, double y_val, double z_val, int idx)
+        : x(x_val), y(y_val), z(z_val), index(idx) {}
+  };
+
  private:
   void findStartEndAngle();
   void resetParameters();
@@ -22,6 +36,9 @@ class ImageProjection : public rclcpp::Node {
   void cloudSegmentation();
   void labelComponents(int row, int col);
   void publishClouds();
+  std::vector<std::shared_ptr<GRANSAC::AbstractParameter>> ConvertPointCloudToGRANSAC(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud,
+                                                                                      const std::vector<int>& original_indices = std::vector<int>());
+  double calculateDistance(const std::vector<double>& p, const std::vector<double>& Gk);
 
   pcl::PointCloud<PointType>::Ptr _laser_cloud_in;
 

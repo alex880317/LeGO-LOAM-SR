@@ -15,6 +15,11 @@
 #include <cmath>
 #include <vector>
 
+#include "GRANSAC.hpp"
+#include "PlaneModel.hpp"
+#include <omp.h>
+#include <opencv2/opencv.hpp>
+
 // 定義點結構
 struct Point {
     double x, y, z;
@@ -26,11 +31,22 @@ double calculateDistance(const Point& p, const std::vector<double>& Gk) {
            std::sqrt(Gk[0]*Gk[0] + Gk[1]*Gk[1] + Gk[2]*Gk[2]);
 }
 
-// 函數用來擬合平面，這裡假設已經有一個函數來計算平面的參數
-std::vector<double> fitPlane(const std::vector<Point>& points) {
-    std::vector<double> Gk = {0, 0, 1, 2}; // 假設初始化一個平面參數
-    // 在這裡實現擬合算法
-    return Gk;
+
+std::vector<std::shared_ptr<GRANSAC::AbstractParameter>> ConvertPointCloudToGRANSAC(
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud)
+{
+    std::vector<std::shared_ptr<GRANSAC::AbstractParameter>> CandPoints;
+    CandPoints.resize(cloud->points.size());
+
+#pragma omp parallel for num_threads(6)
+    for (size_t i = 0; i < cloud->points.size(); ++i)
+    {
+        const pcl::PointXYZ& p = cloud->points[i];
+        std::shared_ptr<GRANSAC::AbstractParameter> CandPt = std::make_shared<Point3D>(p.x, p.y, p.z, i);
+        CandPoints[i] = CandPt;
+    }
+
+    return CandPoints;
 }
 
 // 主要程式碼入口
@@ -46,15 +62,14 @@ int main(int argc, char** argv) {
     reader->open(bag_file);
 
     int frame_number = 0;
-    int target_frame = 100; // 想要提取的幀號
+    int target_frame = 500; // 想要提取的幀號
 
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
 
     while (reader->has_next()) {
         auto bag_message = reader->read_next();
-        std::cout << bag_message->topic_name << std::endl;
+        // std::cout << bag_message->topic_name << std::endl;
         if (bag_message->topic_name == pointcloud_topic) {
-            std::cout << "1" << std::endl;
             auto library = rosbag2_cpp::get_typesupport_library("sensor_msgs/msg/PointCloud2", "rosidl_typesupport_cpp");
             auto ts = rosbag2_cpp::get_typesupport_handle("sensor_msgs/msg/PointCloud2", "rosidl_typesupport_cpp", library);
 
@@ -79,7 +94,7 @@ int main(int argc, char** argv) {
     // 從剛才提取的點雲中轉換成我們的自定義 Point 結構並進行濾波
     std::vector<Point> custom_cloud;
     for (const auto& pcl_point : cloud->points) {
-        std::cout << "z value : " << pcl_point.z << std::endl;
+        // std::cout << "z value : " << pcl_point.z << std::endl;
         if (pcl_point.z >= -0.05-0.035-0.05 && pcl_point.z <= 0.05-0.035-0.05) {
             Point pt = {pcl_point.x, pcl_point.y, pcl_point.z};
             custom_cloud.push_back(pt);
@@ -108,45 +123,38 @@ int main(int argc, char** argv) {
     std::cout << "Saved filtered point cloud to filtered_pointcloud.pcd" << std::endl;
     ////////////////////////////////////////////////////////////////////////////////////
 
-    // 地面檢測算法
-    int t = 0, t_iter = 10;
-    std::vector<double> Gk = {0, 0, 1, 2}; // 初始化平面參數
-    double Et = std::numeric_limits<double>::infinity();
-    std::vector<double> Gk_star = Gk;
 
-    while (t < t_iter) {
-        // Step 2.1 隨機選取 T_np 個點
-        std::vector<Point> Qk;
-        int T_np = 800; // 假設需要選取3個點
-        for (int i = 0; i < T_np; ++i) {
-            int index = std::rand() % custom_cloud.size();
-            Qk.push_back(custom_cloud[index]);
-        }
+    std::cout << "1" << std::endl;
+    // convert to <GRANSAC::AbstractParameter>
+    std::vector<std::shared_ptr<GRANSAC::AbstractParameter>> Qk = ConvertPointCloudToGRANSAC(filtered_cloud);
+    std::cout << "2" << std::endl;
+    // caculate RANSAC
+    GRANSAC::RANSAC<PlaneModel, 3> Estimator;
+    Estimator.Initialize(0.1, 100); // Threshold, iterations
+    std::cout << "3" << std::endl;
+    int64_t start = cv::getTickCount();
+	Estimator.Estimate(Qk);
+	int64_t end = cv::getTickCount();
+    std::cout << "4" << std::endl;
+    std::cout << "RANSAC took: " << GRANSAC::VPFloat(end - start) / GRANSAC::VPFloat(cv::getTickFrequency()) * 1000.0 << " ms." << std::endl;
 
-        // 使用選擇的點擬合平面
-        Gk = fitPlane(Qk);
-
-        std::vector<Point> Ak;
-
-        // Step 2.2 計算每個點到擬合平面的距離
-        double t_dis = 0.2; // 假設閾值
-        for (const auto& Rk_i : custom_cloud) {
-            double e_k_i = calculateDistance(Rk_i, Gk);
-            if (e_k_i < t_dis) {
-                Ak.push_back(Rk_i);
-            }
-        }
+    auto Ak = Estimator.GetBestInliers();
 
     ////////////////////////////////////////////////////////////////////////////////////
     // 將 custom_cloud 轉換為 PCL 格式
     pcl::PointCloud<pcl::PointXYZ>::Ptr Ground_Plane(new pcl::PointCloud<pcl::PointXYZ>);
     
     for (const auto& pt : Ak) {
-        pcl::PointXYZ pcl_point;
-        pcl_point.x = pt.x;
-        pcl_point.y = pt.y;
-        pcl_point.z = pt.z;
-        Ground_Plane->points.push_back(pcl_point);
+        auto point = std::dynamic_pointer_cast<Point3D>(pt);
+        if (point) {
+            pcl::PointXYZ pcl_point;
+            pcl_point.x = point->m_Point3D[0];
+            pcl_point.y = point->m_Point3D[1];
+            pcl_point.z = point->m_Point3D[2];
+            Ground_Plane->points.push_back(pcl_point);
+            int index = point->m_Index;  // 取出原始点云中的索引
+            std::cout << "index = " << index << std::endl;
+        }
     }
     
     // 設置點雲的 width 和 height 屬性
@@ -159,31 +167,19 @@ int main(int argc, char** argv) {
     std::cout << "Saved Ground_Plane point cloud to Ground_Plane.pcd" << std::endl;
     ////////////////////////////////////////////////////////////////////////////////////
 
-        // Step 2.3 判斷符合條件的點的數量
-        int t_a = 50; // 假設 t_a 是給定的閾值
-        if (Ak.size() > t_a) {
-            Gk = fitPlane(Ak);
-            double new_Et = 0.0;
-
-            for (const auto& Rk_i : Ak) {
-                new_Et += calculateDistance(Rk_i, Gk);
-            }
-
-            if (new_Et < Et) {
-                Gk_star = Gk;
-                Et = new_Et;
-            }
-        }
-
-        ++t;
-    }
-
-    // 輸出最終的地面參數
-    std::cout << "Ground plane parameters: ";
-    for (double param : Gk_star) {
-        std::cout << param << " ";
-    }
-    std::cout << std::endl;
+    // // 輸出最終的地面參數
+    // std::cout << "Ground plane parameters: ";
+    // for (double param : Gk_star) {
+    //     std::cout << param << " ";
+    // }
+    // std::cout << std::endl;
 
     return 0;
 }
+
+
+
+
+
+
+

@@ -29,6 +29,16 @@
 #include <boost/circular_buffer.hpp>
 #include "imageProjection.h"
 
+// Alex
+#include <cstdlib>  // std::div
+#include <memory>
+#include <iostream>
+#include <limits>
+#include <cmath>
+#include <vector>
+
+
+
 const std::string PARAM_VERTICAL_SCANS = "laser.num_vertical_scans";
 const std::string PARAM_HORIZONTAL_SCANS = "laser.num_horizontal_scans";
 const std::string PARAM_ANGLE_BOTTOM = "laser.vertical_angle_bottom";
@@ -245,10 +255,13 @@ void ImageProjection::groundRemoval() {
   // -1, no valid info to check if ground of not
   //  0, initial value, after validation, means not ground
   //  1, ground
+
+  /////////////////////////////////////////////////////////////////////////////////////
   for (int j = 0; j < _horizontal_scans; ++j) {
     for (int i = 0; i < _ground_scan_index; ++i) {
       int lowerInd = j + (i)*_horizontal_scans;
       int upperInd = j + (i + 1) * _horizontal_scans;
+      
 
       if (_full_cloud->points[lowerInd].intensity == -1 ||
           _full_cloud->points[upperInd].intensity == -1) {
@@ -257,23 +270,121 @@ void ImageProjection::groundRemoval() {
         continue;
       }
 
-      float dX =
-          _full_cloud->points[upperInd].x - _full_cloud->points[lowerInd].x;
-      float dY =
-          _full_cloud->points[upperInd].y - _full_cloud->points[lowerInd].y;
-      float dZ =
-          _full_cloud->points[upperInd].z - _full_cloud->points[lowerInd].z;
+      // float dX =
+      //     _full_cloud->points[upperInd].x - _full_cloud->points[lowerInd].x;
+      // float dY =
+      //     _full_cloud->points[upperInd].y - _full_cloud->points[lowerInd].y;
+      // float dZ =
+      //     _full_cloud->points[upperInd].z - _full_cloud->points[lowerInd].z;
 
-      float vertical_angle = std::atan2(dZ , sqrt(dX * dX + dY * dY + dZ * dZ));
+      // float vertical_angle = std::atan2(dZ , sqrt(dX * dX + dY * dY + dZ * dZ));
 
-      // TODO: review this change
+      // // TODO: review this change
 
-      if ( (vertical_angle - _sensor_mount_angle) <= 10 * DEG_TO_RAD) {
-        _ground_mat(i, j) = 1;
-        _ground_mat(i + 1, j) = 1;
-      }
+      // if ( (vertical_angle - _sensor_mount_angle) <= 10 * DEG_TO_RAD) {
+      //   _ground_mat(i, j) = 1;
+      //   _ground_mat(i + 1, j) = 1;
+      // }
     }
   }
+  /////////////////////////////////////////////////////////////////////////////////////
+
+
+  /////////////////////////////////////////////////////////////////////////////////////
+  // Alex ransac extract ground plane
+  // 從剛才提取的點雲中轉換成我們的自定義 Point 結構並進行濾波
+  std::vector<Point> custom_cloud;
+  int index = 0;  // 用來追蹤點的索引
+  for (const auto& pcl_point : _full_cloud->points) {
+      // std::cout << "z value : " << pcl_point.z << std::endl;
+      if (pcl_point.z >= -0.05-0.035-0.05 && pcl_point.z <= 0.05-0.035-0.05) {
+          Point pt = {pcl_point.x, pcl_point.y, pcl_point.z, index};
+          custom_cloud.push_back(pt);
+      }
+      index++;
+  }
+  
+  // 將 custom_cloud 轉換為 PCL 格式
+  pcl::PointCloud<pcl::PointXYZ>::Ptr filtered_cloud(new pcl::PointCloud<pcl::PointXYZ>);
+  std::vector<int> filteredclouds_idx;
+  for (const auto& pt : custom_cloud) {
+      pcl::PointXYZ pcl_point;
+      pcl_point.x = pt.x;
+      pcl_point.y = pt.y;
+      pcl_point.z = pt.z;
+      filtered_cloud->points.push_back(pcl_point);
+
+      filteredclouds_idx.push_back(pt.index);
+  }
+  // 設置點雲的 width 和 height 屬性
+  filtered_cloud->width = filtered_cloud->points.size();  // 點的數量
+  filtered_cloud->height = 1;  // 非結構化點雲
+  filtered_cloud->is_dense = false;  // 如果點雲可能包含無效點（例如 NaN）
+  // 儲存為 .pcd 檔案
+  pcl::io::savePCDFileASCII("filtered_pointcloud.pcd", *filtered_cloud);
+  std::cout << "Saved filtered point cloud to filtered_pointcloud.pcd" << std::endl;
+  
+
+  // convert to <GRANSAC::AbstractParameter>
+  std::vector<std::shared_ptr<GRANSAC::AbstractParameter>> Qk = ConvertPointCloudToGRANSAC(filtered_cloud, filteredclouds_idx);
+
+  // caculate RANSAC
+  GRANSAC::RANSAC<PlaneModel, 3> Estimator;
+  Estimator.Initialize(0.1, 100); // Threshold, iterations
+  int64_t start = cv::getTickCount();
+	Estimator.Estimate(Qk);
+	int64_t end = cv::getTickCount();
+  std::cout << "RANSAC took: " << GRANSAC::VPFloat(end - start) / GRANSAC::VPFloat(cv::getTickFrequency()) * 1000.0 << " ms." << std::endl;
+
+  auto Ak = Estimator.GetBestInliers();
+
+  // 將 custom_cloud 轉換為 PCL 格式
+  pcl::PointCloud<pcl::PointXYZ>::Ptr Ground_Plane(new pcl::PointCloud<pcl::PointXYZ>);
+  
+  for (const auto& pt : Ak) {
+      auto point = std::dynamic_pointer_cast<Point3D>(pt);
+      if (point) {
+          pcl::PointXYZ pcl_point;
+          pcl_point.x = point->m_Point3D[0];
+          pcl_point.y = point->m_Point3D[1];
+          pcl_point.z = point->m_Point3D[2];
+          Ground_Plane->points.push_back(pcl_point);
+          int index = point->m_Index;
+          
+          // 使用 std::div 函数计算商和余数
+          div_t result = std::div(index, _horizontal_scans);
+          int i = result.quot;int j = result.rem;
+
+          _ground_mat(i, j) = 1;
+      }
+  }
+
+  auto BestPlane = Estimator.GetBestModel();
+  std::vector<double> Gk(4);
+  for (int i = 0; i < 4; i++)
+  {
+    Gk[i] = BestPlane->m_PlaneCoefs[i];
+  }
+
+  std::vector<double> original = {0.0, 0.0, 0.0};
+  double dk_star = calculateDistance(original, Gk);
+
+  std::vector<double> Gk_star(4);
+  // 將 Gk 的前三個值複製到 Gk_star
+  for (int i = 0; i < 3; i++)
+  {
+      Gk_star[i] = Gk[i];
+  }
+  // 將 dk_star 填入 Gk_star 的最後一個位置
+  Gk_star[3] = dk_star;
+  std::cout << "Ground Plane Coefficient = ";
+  for (const auto& value : Gk_star) {
+      std::cout << value << " ";
+  }
+  std::cout << std::endl;
+  /////////////////////////////////////////////////////////////////////////////////////
+
+
   // extract ground cloud (_ground_mat == 1)
   // mark entry that doesn't need to label (ground and invalid point) for
   // segmentation note that ground remove is from 0~_N_scan-1, need _range_mat
@@ -476,4 +587,34 @@ void ImageProjection::publishClouds() {
 
   _output_channel.send( std::move(out) );
 
+}
+
+
+// Alex
+std::vector<std::shared_ptr<GRANSAC::AbstractParameter>> ImageProjection::ConvertPointCloudToGRANSAC(
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud,
+    const std::vector<int>& original_indices)
+{
+    std::vector<std::shared_ptr<GRANSAC::AbstractParameter>> CandPoints;
+    CandPoints.resize(cloud->points.size());
+
+    // 如果沒有提供 original_indices，則自行生成索引
+    bool use_provided_indices = !original_indices.empty();
+
+#pragma omp parallel for num_threads(6)
+    for (size_t i = 0; i < cloud->points.size(); ++i)
+    {
+        const pcl::PointXYZ& p = cloud->points[i];
+        int index = use_provided_indices ? original_indices[i] : i; // 如果提供了索引，則使用原始索引，否則使用當前的索引
+        std::shared_ptr<GRANSAC::AbstractParameter> CandPt = std::make_shared<Point3D>(p.x, p.y, p.z, index);
+        CandPoints[i] = CandPt;
+    }
+
+    return CandPoints;
+}
+
+// 函數用來計算點到平面的距離
+double ImageProjection::calculateDistance(const std::vector<double>& p, const std::vector<double>& Gk) {
+    return std::abs(Gk[0]*p[0] + Gk[1]*p[1] + Gk[2]*p[2] + Gk[3]) / 
+           std::sqrt(Gk[0]*Gk[0] + Gk[1]*Gk[1] + Gk[2]*Gk[2]);
 }
