@@ -1304,6 +1304,12 @@ void FeatureAssociation::runFeatureAssociation() {
     outlierCloud = projection.outlier_cloud;
     segmentedCloud = projection.segmented_cloud;
     segInfo = std::move(projection.seg_msg);
+    _Gk_star = projection.Gk_star;
+    // std::cout << "[FeatureAssociation]Ground Plane Coefficient = ";
+    // for (const auto& value : _Gk_star) {
+    //     std::cout << value << " ";
+    // }
+    // std::cout << std::endl;
 
     cloudHeader = segInfo.header;
 
@@ -1347,6 +1353,8 @@ void FeatureAssociation::runFeatureAssociation() {
       *out.cloud_outlier_last = *outlierCloud;
 
       out.laser_odometry = laserOdometry;
+      
+      std::swap(out.Gk_star, _Gk_star);
 
       _output_channel.send(std::move(out));
     }

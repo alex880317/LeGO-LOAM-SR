@@ -82,6 +82,7 @@ class ImageProjection : public rclcpp::Node {
   Eigen::MatrixXi _label_mat;   // label matrix for segmentaiton marking
   Eigen::Matrix<int8_t,Eigen::Dynamic,Eigen::Dynamic> _ground_mat;  // ground matrix for ground cloud marking
 
+  std::vector<double> _Gk_star;
 
 };
 

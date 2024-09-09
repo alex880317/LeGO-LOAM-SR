@@ -13,6 +13,8 @@ endif()
 include_directories(${colcon_INCLUDE_DIRS})
 get_filename_component(PARENT_DIR ${CMAKE_CURRENT_LIST_DIR} DIRECTORY)
 include_directories(${PARENT_DIR}/plane_fitting/src)
+include_directories(${PARENT_DIR}/customizeFactor/src)
+
 
 
 

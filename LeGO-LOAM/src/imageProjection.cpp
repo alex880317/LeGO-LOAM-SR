@@ -322,7 +322,7 @@ void ImageProjection::groundRemoval() {
   filtered_cloud->is_dense = false;  // 如果點雲可能包含無效點（例如 NaN）
   // 儲存為 .pcd 檔案
   pcl::io::savePCDFileASCII("filtered_pointcloud.pcd", *filtered_cloud);
-  std::cout << "Saved filtered point cloud to filtered_pointcloud.pcd" << std::endl;
+  // std::cout << "Saved filtered point cloud to filtered_pointcloud.pcd" << std::endl;
   
 
   // convert to <GRANSAC::AbstractParameter>
@@ -334,7 +334,7 @@ void ImageProjection::groundRemoval() {
   int64_t start = cv::getTickCount();
 	Estimator.Estimate(Qk);
 	int64_t end = cv::getTickCount();
-  std::cout << "RANSAC took: " << GRANSAC::VPFloat(end - start) / GRANSAC::VPFloat(cv::getTickFrequency()) * 1000.0 << " ms." << std::endl;
+  // std::cout << "RANSAC took: " << GRANSAC::VPFloat(end - start) / GRANSAC::VPFloat(cv::getTickFrequency()) * 1000.0 << " ms." << std::endl;
 
   auto Ak = Estimator.GetBestInliers();
 
@@ -369,19 +369,20 @@ void ImageProjection::groundRemoval() {
   std::vector<double> original = {0.0, 0.0, 0.0};
   double dk_star = calculateDistance(original, Gk);
 
-  std::vector<double> Gk_star(4);
-  // 將 Gk 的前三個值複製到 Gk_star
+
+  _Gk_star.resize(4);
+  // 將 Gk 的前三個值複製到 _Gk_star
   for (int i = 0; i < 3; i++)
   {
-      Gk_star[i] = Gk[i];
+      _Gk_star[i] = Gk[i];
   }
-  // 將 dk_star 填入 Gk_star 的最後一個位置
-  Gk_star[3] = dk_star;
-  std::cout << "Ground Plane Coefficient = ";
-  for (const auto& value : Gk_star) {
-      std::cout << value << " ";
-  }
-  std::cout << std::endl;
+  // 將 dk_star 填入 _Gk_star 的最後一個位置
+  _Gk_star[3] = dk_star;
+  // std::cout << "Ground Plane Coefficient = ";
+  // for (const auto& value : _Gk_star) {
+  //     std::cout << value << " ";
+  // }
+  // std::cout << std::endl;
   /////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -584,6 +585,7 @@ void ImageProjection::publishClouds() {
   std::swap( out.seg_msg, _seg_msg);
   std::swap(out.outlier_cloud, _outlier_cloud);
   std::swap(out.segmented_cloud, _segmented_cloud);
+  std::swap(out.Gk_star, _Gk_star);
 
   _output_channel.send( std::move(out) );
 

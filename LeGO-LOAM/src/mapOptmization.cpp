@@ -37,6 +37,12 @@
 #include "mapOptimization.h"
 #include <future>
 
+#include "GroundPlaneFactor.h"
+
+#include <gtsam/nonlinear/NonlinearFactorGraph.h>
+// #include <gtsam/nonlinear/GraphvizFormatting.h>
+#include <fstream>
+
 using namespace gtsam;
 
 const std::string PARAM_ENABLE_LOOP = "mapping.enable_loop_closure";
@@ -748,6 +754,10 @@ void MapOptimization::performLoopClosure() {
                            poseFrom.between(poseTo), constraintNoise));
   isam->update(gtSAMgraph);
   isam->update();
+
+  // 將新的因子添加到累積的因子圖中
+  // cumulativeGraph.add(gtSAMgraph);
+
   gtSAMgraph.resize(0);
 
   aLoopIsClosed = true;
@@ -1245,7 +1255,7 @@ void MapOptimization::saveKeyFramesAndFactor() {
 
   previousRobotPosPoint = currentRobotPosPoint;
   /**
-   * update grsam graph
+   * update gtsam graph
    */
   if (cloudKeyPoses3D->points.empty()) {
     gtSAMgraph.add(PriorFactor<Pose3>(
@@ -1261,6 +1271,7 @@ void MapOptimization::saveKeyFramesAndFactor() {
                  Point3(transformTobeMapped[5], transformTobeMapped[3],
                         transformTobeMapped[4])));
     for (int i = 0; i < 6; ++i) transformLast[i] = transformTobeMapped[i];
+    // std::cout << "cloudKeyPoses3D is empty" << std::endl;
   } else {
     gtsam::Pose3 poseFrom = Pose3(
         Rot3::RzRyRx(transformLast[2], transformLast[0], transformLast[1]),
@@ -1273,18 +1284,46 @@ void MapOptimization::saveKeyFramesAndFactor() {
     gtSAMgraph.add(BetweenFactor<Pose3>(
         cloudKeyPoses3D->points.size() - 1, cloudKeyPoses3D->points.size(),
         poseFrom.between(poseTo), odometryNoise));
+    //////////////////////////////////////////////////////////////////////////////////
+    // Alex
+    // // 創建噪聲模型，對應於 GroundPlaneFactor 的距離和法向量的噪聲
+    // auto distanceNoiseModel = gtsam::noiseModel::Diagonal::Sigmas(gtsam::Vector1(0.1));  // 1維距離噪聲
+    // auto normalVectorNoiseModel = gtsam::noiseModel::Diagonal::Sigmas(gtsam::Vector3(0.1, 0.1, 0.1));  // 3維法向量噪聲
+
+    // 假設法向量測量的兩個角度誤差（theta, phi）的標準差是 0.1，距離誤差的標準差是 0.05
+    gtsam::Vector sigmas(3);
+    sigmas << 0.1, 0.1, 0.05;  // 3 維向量：法向量兩個角度的標準差和距離的標準差
+    // 創建對角噪聲模型，使用 GTSAM 的 noiseModel::Diagonal::Sigmas
+    gtsam::SharedNoiseModel noiseModel = gtsam::noiseModel::Diagonal::Sigmas(sigmas);
+
+    gtsam::Key currentKey = cloudKeyPoses3D->points.size();
+    // 提取 measuredNormal 和 measuredDistance
+    gtsam::Vector3 measuredNormal(_Gk_star[0], _Gk_star[1], _Gk_star[2]);  // 前三個元素作為法向量
+    double measuredDistance = _Gk_star[3];  // 第四個元素作為距離
+    gtSAMgraph.add(boost::make_shared<GroundPlaneFactor>(
+    currentKey, measuredNormal, measuredDistance, noiseModel));
+
+    //////////////////////////////////////////////////////////////////////////////////
+
+
     initialEstimate.insert(
         cloudKeyPoses3D->points.size(),
         Pose3(Rot3::RzRyRx(transformAftMapped[2], transformAftMapped[0],
                            transformAftMapped[1]),
               Point3(transformAftMapped[5], transformAftMapped[3],
                      transformAftMapped[4])));
+    // std::cout << "Number of key poses: " << cloudKeyPoses3D->points.size() << std::endl; // state
+
   }
   /**
    * update iSAM
    */
   isam->update(gtSAMgraph, initialEstimate);
   isam->update();
+
+  
+  // 將新的因子添加到累積的因子圖中
+  // cumulativeGraph.add(gtSAMgraph);
 
   gtSAMgraph.resize(0);
   initialEstimate.clear();
@@ -1393,6 +1432,13 @@ void MapOptimization::run() {
   while (rclcpp::ok()) {
     AssociationOut association;
     _input_channel.receive(association);
+    _Gk_star = association.Gk_star;
+    // std::cout << "[MapOptimization]Ground Plane Coefficient = ";
+    // for (const auto& value : _Gk_star) {
+    //     std::cout << value << " ";
+    // }
+    // std::cout << std::endl;
+
     if( !rclcpp::ok() ) break;
 
     {
@@ -1426,6 +1472,9 @@ void MapOptimization::run() {
     }
     cycle_count++;
 
+    
+    
+
     if ((cycle_count % 3) == 0) {
       _loop_closure_signal.send(true);
     }
@@ -1434,4 +1483,11 @@ void MapOptimization::run() {
       _publish_global_signal.send(true);
     }
   }
+  // cumulativeGraph.print("因子圖內容: ");
+  // // 使用 saveGraph 保存為 Graphviz DOT 文件
+  // std::ofstream os("factor_graph.dot");
+  // // 使用 GraphvizFormatting 保存 .dot 文件
+  // gtsam::GraphvizFormatting graphvizFormatting;
+  // cumulativeGraph.saveGraph(os, isamCurrentEstimate);
+  // os.close();
 }

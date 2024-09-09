@@ -63,6 +63,8 @@ struct ProjectionOut
   pcl::PointCloud<PointType>::Ptr segmented_cloud;
   pcl::PointCloud<PointType>::Ptr outlier_cloud;
   cloud_msgs::msg::CloudInfo seg_msg;
+  // Alex
+  std::vector<double> Gk_star;
 };
 
 
@@ -72,6 +74,8 @@ struct AssociationOut
   pcl::PointCloud<PointType>::Ptr cloud_corner_last;
   pcl::PointCloud<PointType>::Ptr cloud_surf_last;
   nav_msgs::msg::Odometry laser_odometry;
+  // Alex
+  std::vector<double> Gk_star;
 };
 
 struct RollPitchYaw{

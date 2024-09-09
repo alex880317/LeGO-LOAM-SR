@@ -26,6 +26,8 @@ class FeatureAssociation : public rclcpp::Node {
   float _surf_threshold;
   float _nearest_feature_dist_sqr;
   int _mapping_frequency_div;
+  // Alex
+  std::vector<double> _Gk_star;
 
   std::thread _run_thread;
 

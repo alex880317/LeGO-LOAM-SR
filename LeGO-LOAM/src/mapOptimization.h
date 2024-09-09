@@ -47,6 +47,9 @@ class MapOptimization : public rclcpp::Node {
   gtsam::ISAM2 *isam;
   gtsam::Values isamCurrentEstimate;
 
+  // 創建累積的因子圖
+  gtsam::NonlinearFactorGraph cumulativeGraph;
+
   bool _loop_closure_enabled;
 
   float _surrounding_keyframe_search_radius;
@@ -55,6 +58,9 @@ class MapOptimization : public rclcpp::Node {
   int   _history_keyframe_search_num;
   float _history_keyframe_fitness_score;
   float _global_map_visualization_search_radius;
+
+  // Alex
+  std::vector<double> _Gk_star;
 
   Channel<AssociationOut>& _input_channel;
   std::thread _run_thread;
