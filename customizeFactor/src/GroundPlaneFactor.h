@@ -37,21 +37,21 @@ public:
         // 計算法向量誤差
         gtsam::Vector3 initialNormal(0.0, 0.0, 1.0);
 
-        gtsam::Pose3 p_inv = pose.inverse();
-        gtsam::Matrix3 R_k_W = p_inv.rotation().matrix();
-        gtsam::Vector3 t_k_W = p_inv.translation();
+        // gtsam::Pose3 p_inv = pose.inverse();
+        gtsam::Matrix3 R_k_W = pose.rotation().matrix();
+        gtsam::Vector3 t_k_W = pose.translation();
         // // 打印三個分量
         // std::cout << "Translation vector(t_k_W): ["
         //   << t_k_W.x() << ", "  // X 分量
         //   << t_k_W.y() << ", "  // Y 分量
         //   << t_k_W.z() << "]"   // Z 分量
         //   << std::endl;
-        gtsam::Vector3 measuredNormal_W = R_k_W * measuredNormal_;
+        gtsam::Vector3 measuredNormal_W = R_k_W.transpose() * measuredNormal_;
 
         // 計算法向量參數化 \(\tau(G^W_k)\)
         double theta = std::atan2(measuredNormal_W.y(), measuredNormal_W.x());            // 方位角
         double phi = std::atan2(measuredNormal_W.z(), measuredNormal_W.head<3>().norm()); // 俯仰角
-        double d_k_prime = measuredDistance_ - (t_k_W.transpose() * measuredNormal_W);    // 直接使用測量的距離值
+        double d_k_prime = measuredDistance_ + (t_k_W.transpose() * measuredNormal_W);    // 直接使用測量的距離值
 
         gtsam::Vector3 tau_measured(theta, phi, d_k_prime); // 參數化後的測量值
 
@@ -81,10 +81,10 @@ public:
 
             // 使用反對稱矩陣構建旋轉的雅可比
             gtsam::Matrix H_right(4, 6);
-            gtsam::Matrix3 skew_RWGk = gtsam::skewSymmetric(R_k_W * G_k);
+            gtsam::Matrix3 skew_RWGk = gtsam::skewSymmetric(R_k_W.transpose() * G_k);
 
             // 使用 GTSAM 的 Logmap 函數將 Pose3 轉換為小 se(3)
-            Eigen::Matrix<double, 6, 1> se3 = gtsam::Pose3::Logmap(p_inv);
+            Eigen::Matrix<double, 6, 1> se3 = gtsam::Pose3::Logmap(pose);
             Eigen::Vector3d so3 = se3.head<3>();
             Eigen::Vector3d rho = se3.tail<3>(); // question what is the order of se3 in gtsam????
             // 提取旋轉軸（單位向量）
@@ -106,10 +106,10 @@ public:
                 sig_phi1[1], sig_phi2[1], sig_phi3[1],
                 sig_phi1[2], sig_phi2[2], sig_phi3[2];
 
-            H_right.block<3, 3>(0, 0) = -skew_RWGk;                                                                              // 上三行
+            H_right.block<3, 3>(0, 0) = skew_RWGk;                                                                              // 上三行
             H_right.block<3, 3>(0, 3).setZero();                                                                                 // 空矩陣 0_{3x3}
-            H_right.block<1, 3>(3, 0) = -(J_rho_diff.transpose() * (R_k_W * G_k)).transpose() + (t_k_W.transpose() * skew_RWGk); // // 1x3  because of the inner product,{J_rho_diff} should be transposed
-            H_right.block<1, 3>(3, 3) = (-R_k_W * G_k).transpose() * J;                                                          // 1x3 負的轉置
+            H_right.block<1, 3>(3, 0) = (J_rho_diff.transpose() * (R_k_W.transpose() * G_k)).transpose() + (t_k_W.transpose() * skew_RWGk); // // 1x3  because of the inner product,{J_rho_diff} should be transposed
+            H_right.block<1, 3>(3, 3) = (R_k_W.transpose() * G_k).transpose() * J;                                                          // 1x3 負的轉置
 
             // H_right.block<3, 3>(0, 3).setZero();                                                                                  // 空矩陣 0_{3x3}
             // H_right.block<3, 3>(0, 0).setZero();                                                                               // 上三行

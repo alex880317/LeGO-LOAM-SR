@@ -1441,13 +1441,13 @@ void MapOptimization::saveKeyFramesAndFactor()
                      transformAftMapped[4])));
     // std::cout << "Number of key poses: " << cloudKeyPoses3D->points.size() << std::endl; // state
   }
-  RCLCPP_INFO(this->get_logger(), "key = %lu", cloudKeyPoses3D->points.size());
+  // RCLCPP_INFO(this->get_logger(), "key = %lu", cloudKeyPoses3D->points.size());
   /**
    * update iSAM
    */
   isam->update(gtSAMgraph, initialEstimate);
   isam->update();
-  RCLCPP_INFO(this->get_logger(), "gtsam update");
+  // RCLCPP_INFO(this->get_logger(), "gtsam update");
 
   // 將新的因子添加到累積的因子圖中
   // cumulativeGraph.add(gtSAMgraph);
@@ -1463,7 +1463,7 @@ void MapOptimization::saveKeyFramesAndFactor()
   Pose3 latestEstimate;
 
   isamCurrentEstimate = isam->calculateEstimate();
-  RCLCPP_INFO(this->get_logger(), "calculate Estimate");
+  // RCLCPP_INFO(this->get_logger(), "calculate Estimate");
   latestEstimate =
       isamCurrentEstimate.at<Pose3>(isamCurrentEstimate.size() - 1);
   // gtsam::Marginals marginals(gtSAMgraph, isamCurrentEstimate);
@@ -1471,7 +1471,7 @@ void MapOptimization::saveKeyFramesAndFactor()
   // gtsam::Key key = static_cast<gtsam::Key>(cloudKeyPoses3D->points.size());
   // gtsam::Matrix jointMarginal = marginals.jointMarginalCovariance(gtsam::KeyVector{key}).fullMatrix();
   // std::cout << "Joint Jacobian: \n" << jointMarginal << std::endl;
-  isamCurrentEstimate.print("Values: ");
+  // isamCurrentEstimate.print("Values: ");
 
   thisPose3D.x = latestEstimate.translation().y();
   thisPose3D.y = latestEstimate.translation().z();
