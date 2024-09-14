@@ -134,7 +134,7 @@ public:
 
         std::stringstream ss;
         ss << error.transpose().format(CleanFmt);
-        RCLCPP_INFO(node_->get_logger(), "error = %s", ss.str().c_str());
+        // RCLCPP_INFO(node_->get_logger(), "error = %s", ss.str().c_str());
 
         // std::cout << "weightedError = " << weightedError.transpose() << std::endl;
 
