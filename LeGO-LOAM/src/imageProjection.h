@@ -39,6 +39,7 @@ class ImageProjection : public rclcpp::Node {
   std::vector<std::shared_ptr<GRANSAC::AbstractParameter>> ConvertPointCloudToGRANSAC(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud,
                                                                                       const std::vector<int>& original_indices = std::vector<int>());
   double calculateDistance(const std::vector<double>& p, const std::vector<double>& Gk);
+  double dotProduct(const std::vector<double>& vec1, const std::vector<double>& vec2);
 
   pcl::PointCloud<PointType>::Ptr _laser_cloud_in;
 
@@ -83,6 +84,7 @@ class ImageProjection : public rclcpp::Node {
   Eigen::Matrix<int8_t,Eigen::Dynamic,Eigen::Dynamic> _ground_mat;  // ground matrix for ground cloud marking
 
   std::vector<double> _Gk_star;
+  std::vector<double> Gk_ref{0.0, 0.0, 1.0};
 
 };
 

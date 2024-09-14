@@ -138,9 +138,7 @@
     "typeinfo": "cpp",
     "variant": "cpp",
     "bit": "cpp",
-    "*.ipp": "cpp",
-    "core": "cpp",
-    "numericaldiff": "cpp"
+    "*.ipp": "cpp"
   },
   "cmake.ignoreCMakeListsMissing": true
 }

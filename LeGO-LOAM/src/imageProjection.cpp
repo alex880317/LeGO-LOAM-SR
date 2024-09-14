@@ -359,6 +359,13 @@ void ImageProjection::groundRemoval() {
       }
   }
 
+  // 設置點雲的 width 和 height 屬性
+  Ground_Plane->width = Ground_Plane->points.size();  // 點的數量
+  Ground_Plane->height = 1;  // 非結構化點雲
+  Ground_Plane->is_dense = false;  // 如果點雲可能包含無效點（例如 NaN）
+  // 儲存為 .pcd 檔案
+  pcl::io::savePCDFileASCII("Ground_Plane.pcd", *Ground_Plane);
+
   auto BestPlane = Estimator.GetBestModel();
   std::vector<double> Gk(4);
   for (int i = 0; i < 4; i++)
@@ -369,13 +376,22 @@ void ImageProjection::groundRemoval() {
   std::vector<double> original = {0.0, 0.0, 0.0};
   double dk_star = calculateDistance(original, Gk);
 
-
+  
   _Gk_star.resize(4);
+  std::vector<double> vec;
   // 將 Gk 的前三個值複製到 _Gk_star
   for (int i = 0; i < 3; i++)
   {
-      _Gk_star[i] = Gk[i];
+    _Gk_star[i] = Gk[i];
   }
+  vec.assign(_Gk_star.begin(), _Gk_star.begin() + 3);
+  double angle = dotProduct(Gk_ref, vec);
+  if (angle < 0.0){
+    for (auto& element : _Gk_star) {
+        element = -element;
+    }
+  }
+  
   // 將 dk_star 填入 _Gk_star 的最後一個位置
   _Gk_star[3] = dk_star;
   // std::cout << "Ground Plane Coefficient = ";
@@ -619,4 +635,16 @@ std::vector<std::shared_ptr<GRANSAC::AbstractParameter>> ImageProjection::Conver
 double ImageProjection::calculateDistance(const std::vector<double>& p, const std::vector<double>& Gk) {
     return std::abs(Gk[0]*p[0] + Gk[1]*p[1] + Gk[2]*p[2] + Gk[3]) / 
            std::sqrt(Gk[0]*Gk[0] + Gk[1]*Gk[1] + Gk[2]*Gk[2]);
+}
+
+double ImageProjection::dotProduct(const std::vector<double>& vec1, const std::vector<double>& vec2) {
+    if (vec1.size() != vec2.size()) {
+        throw std::invalid_argument("兩個向量的大小不同，無法計算內積");
+    }
+
+    double result = 0.0;
+    for (size_t i = 0; i < vec1.size(); ++i) {
+        result += vec1[i] * vec2[i];  // 逐個相乘並相加
+    }
+    return result;
 }

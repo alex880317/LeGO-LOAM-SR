@@ -6,6 +6,8 @@
 #include <gtsam/geometry/Point3.h>           // 引入Point3幾何類
 #include <gtsam/geometry/Rot3.h>
 #include <Eigen/Dense>
+#include <rclcpp/rclcpp.hpp>
+#include <sstream>  // for std::stringstream
 
 class GroundPlaneFactor : public gtsam::NoiseModelFactor1<gtsam::Pose3>
 {
@@ -16,11 +18,15 @@ public:
     // 合併的噪聲模型
     gtsam::SharedNoiseModel noiseModel_;
 
+    using NoiseModelFactor1<gtsam::Pose3>::evaluateError;
+
+    typedef std::shared_ptr<GroundPlaneFactor> shared_ptr;
+
     GroundPlaneFactor(gtsam::Key key, const gtsam::Point3 &normal, const double &distance,
-                      const gtsam::SharedNoiseModel &noiseModel)
+                      const gtsam::SharedNoiseModel &noiseModel, rclcpp::Node::SharedPtr node)
         : gtsam::NoiseModelFactor1<gtsam::Pose3>(noiseModel, key),
           measuredNormal_(normal), measuredDistance_(distance),
-          noiseModel_(noiseModel) {}
+          noiseModel_(noiseModel), node_(node) {}
 
     gtsam::Vector evaluateError(const gtsam::Pose3 &pose,
                                 boost::optional<gtsam::Matrix &> H = boost::none) const override
@@ -31,13 +37,21 @@ public:
         // 計算法向量誤差
         gtsam::Vector3 initialNormal(0.0, 0.0, 1.0);
 
-        gtsam::Matrix3 R_k_W = pose.rotation().matrix();
+        gtsam::Pose3 p_inv = pose.inverse();
+        gtsam::Matrix3 R_k_W = p_inv.rotation().matrix();
+        gtsam::Vector3 t_k_W = p_inv.translation();
+        // // 打印三個分量
+        // std::cout << "Translation vector(t_k_W): ["
+        //   << t_k_W.x() << ", "  // X 分量
+        //   << t_k_W.y() << ", "  // Y 分量
+        //   << t_k_W.z() << "]"   // Z 分量
+        //   << std::endl;
         gtsam::Vector3 measuredNormal_W = R_k_W * measuredNormal_;
 
         // 計算法向量參數化 \(\tau(G^W_k)\)
-        double theta = std::atan2(measuredNormal_W.y(), measuredNormal_W.x());                      // 方位角
-        double phi = std::atan2(measuredNormal_W.z(), measuredNormal_W.head<3>().norm());           // 俯仰角
-        double d_k_prime = measuredDistance_ - (pose.translation().transpose() * measuredNormal_W); // 直接使用測量的距離值
+        double theta = std::atan2(measuredNormal_W.y(), measuredNormal_W.x());            // 方位角
+        double phi = std::atan2(measuredNormal_W.z(), measuredNormal_W.head<3>().norm()); // 俯仰角
+        double d_k_prime = measuredDistance_ - (t_k_W.transpose() * measuredNormal_W);    // 直接使用測量的距離值
 
         gtsam::Vector3 tau_measured(theta, phi, d_k_prime); // 參數化後的測量值
 
@@ -49,6 +63,7 @@ public:
         gtsam::Vector3 tau_initial(initial_theta, initial_phi, initial_d_k_prime); // 參數化後的預測值
 
         gtsam::Vector3 error = tau_measured - tau_initial;
+        // std::cout << "error = " << error.transpose() << std::endl;
 
         // 如果需要雅可比矩陣 H，則計算
         if (H)
@@ -61,25 +76,23 @@ public:
             // 構建雅可比矩陣
             gtsam::Matrix H_left(3, 4);
             H_left << -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0, 0,
-                -G_k_W(0) * G_k_W(2) / G_k_W.norm(), -G_k_W(1) * G_k_W(2) / G_k_W.norm(), (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)) / G_k_W.norm(), 0,
+                (-G_k_W(0) * G_k_W(2)) / G_k_W.squaredNorm(), (-G_k_W(1) * G_k_W(2)) / G_k_W.squaredNorm(), (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)) / G_k_W.squaredNorm(), 0,
                 0, 0, 0, 1;
 
             // 使用反對稱矩陣構建旋轉的雅可比
             gtsam::Matrix H_right(4, 6);
             gtsam::Matrix3 skew_RWGk = gtsam::skewSymmetric(R_k_W * G_k);
 
-            // gtsam::Rot3 SO3 = gtsam::Rot3(R_k_W);
-            // // 將李群轉換為李代數 (so(3))，使用 GTSAM 的 Logmap
-            // Eigen::Vector3d so3 = gtsam::Rot3::Logmap(SO3);
             // 使用 GTSAM 的 Logmap 函數將 Pose3 轉換為小 se(3)
-            Eigen::Matrix<double, 6, 1> se3 = gtsam::Pose3::Logmap(pose);
-            Eigen::Vector3d so3 = se3.tail<3>();
-            Eigen::Vector3d rho = se3.head<3>();
+            Eigen::Matrix<double, 6, 1> se3 = gtsam::Pose3::Logmap(p_inv);
+            Eigen::Vector3d so3 = se3.head<3>();
+            Eigen::Vector3d rho = se3.tail<3>(); // question what is the order of se3 in gtsam????
             // 提取旋轉軸（單位向量）
             Eigen::Vector3d a = so3.normalized();
             gtsam::Matrix3 a_hat = gtsam::skewSymmetric(a);
             // 提取旋轉角度（弧度）
             double angle = so3.norm();
+            // std::cout << "angle = " << angle << std::endl;
 
             gtsam::Matrix3 J = (std::sin(angle) / angle) * Eigen::Matrix3d::Identity() +
                                ((1 - std::sin(angle) / angle) * (a * a.transpose())) +
@@ -93,33 +106,57 @@ public:
                 sig_phi1[1], sig_phi2[1], sig_phi3[1],
                 sig_phi1[2], sig_phi2[2], sig_phi3[2];
 
-            // H_right.block<3, 3>(0, 0).setZero();                                                                                  // 空矩陣 0_{3x3}
-            // H_right.block<3, 3>(0, 3) = -skew_RWGk;                                                                     // 上三行
-            // H_right.block<1, 3>(3, 0) = -(R_k_W * G_k).transpose() * J;                                                           // 1x3 負的轉置
-            // H_right.block<1, 3>(3, 3) = -(J_rho_diff * (R_k_W * G_k)).transpose() + (pose.translation().transpose() * skew_RWGk); // 1x3          
-            H_right.block<3, 3>(0, 0).setZero();                                                                                  // 空矩陣 0_{3x3}
-            H_right.block<3, 3>(0, 3).setZero();                                                                               // 上三行
-            H_right.block<1, 3>(3, 0) = -(R_k_W * G_k).transpose() * J;                                                           // 1x3 負的轉置
-            H_right.block<1, 3>(3, 3).setZero(); // 1x3
+            H_right.block<3, 3>(0, 0) = -skew_RWGk;                                                                              // 上三行
+            H_right.block<3, 3>(0, 3).setZero();                                                                                 // 空矩陣 0_{3x3}
+            H_right.block<1, 3>(3, 0) = -(J_rho_diff.transpose() * (R_k_W * G_k)).transpose() + (t_k_W.transpose() * skew_RWGk); // // 1x3  because of the inner product,{J_rho_diff} should be transposed
+            H_right.block<1, 3>(3, 3) = (-R_k_W * G_k).transpose() * J;                                                          // 1x3 負的轉置
+
+            // H_right.block<3, 3>(0, 3).setZero();                                                                                  // 空矩陣 0_{3x3}
+            // H_right.block<3, 3>(0, 0).setZero();                                                                               // 上三行
+            // H_right.block<1, 3>(3, 3) = -(R_k_W * G_k).transpose() * J;                                                           // 1x3 負的轉置
+            // H_right.block<1, 3>(3, 0).setZero(); // 1x3
 
             // 最終的雅可比矩陣是兩個矩陣的乘積
             *H = H_left * H_right;
-        }
 
+            // std::cout << "Jacobian H1:\n"
+            //           << H_left << std::endl;
+            // std::cout << "Jacobian H2:\n"
+            //           << H_right << std::endl;
+        }
+        error[0] = 0;
         // 將兩個誤差結合成一個
         gtsam::Vector weightedError(3); // 假設殘差是 3 維
         weightedError = noiseModel_->whiten(error);
 
-        return weightedError;
+        // 假設 error 是一個 gtsam::Vector
+        Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
+
+        std::stringstream ss;
+        ss << error.transpose().format(CleanFmt);
+        RCLCPP_INFO(node_->get_logger(), "error = %s", ss.str().c_str());
+
+        // std::cout << "weightedError = " << weightedError.transpose() << std::endl;
+
+        // return weightedError;
+        return error;
+    }
+
+    gtsam::NonlinearFactor::shared_ptr clone() const override
+    {
+        return boost::static_pointer_cast<gtsam::NonlinearFactor>(
+            gtsam::NonlinearFactor::shared_ptr(new GroundPlaneFactor(*this)));
     }
 
 private:
+    rclcpp::Node::SharedPtr node_;
+
     // 輔助函數：計算 sigma_phi1 向量結果
     std::vector<double> calculate_sigma_phi1(double rho1, double rho2, double rho3, double phi1, double phi2, double phi3) const
     {
         std::vector<double> result(3);
 
-        const double epsilon = 1e-10;  // 防止數值不穩定的 epsilon
+        const double epsilon = 1e-10; // 防止數值不穩定的 epsilon
 
         // 計算 sigma_17
         double sigma17 = pow(abs(phi1), 2) + pow(abs(phi2), 2) + pow(abs(phi3), 2);
@@ -143,7 +180,6 @@ private:
         double sigma10 = (phi2 * phi3 * (sigma16 - sigma15)) / safe_sigma17;
         double sigma11 = (phi1 * phi3 * (sigma16 - sigma15)) / safe_sigma17;
         double sigma12 = (phi1 * phi2 * (sigma16 - sigma15)) / safe_sigma17;
-        
 
         // 計算向量結果
         result[0] = rho3 * (sigma5 - sigma11 - (phi3 * sigma14) / safe_sigma17 + sigma2 + sigma8) - rho1 * ((pow(phi1, 2) * (sigma16 - sigma15)) / safe_sigma17 + (2 * phi1 * sigma14) / safe_sigma17 - sigma16 + sigma15 - (2 * pow(phi1, 2) * abs(phi1) * std::copysign(1.0, phi1) * sigma14) / pow(safe_sigma17, 2)) - rho2 * ((phi2 * sigma14) / safe_sigma17 - sigma13 / safe_sigma17 + sigma12 + sigma6 + sigma3 - sigma9);
@@ -156,11 +192,11 @@ private:
     }
 
     // 輔助函數：計算向量結果
-    std::vector<double> calculate_sigma_phi2 (double rho1, double rho2, double rho3, double phi1, double phi2, double phi3) const
+    std::vector<double> calculate_sigma_phi2(double rho1, double rho2, double rho3, double phi1, double phi2, double phi3) const
     {
         std::vector<double> result(3);
 
-        const double epsilon = 1e-10;  // 防止數值不穩定的 epsilon
+        const double epsilon = 1e-10; // 防止數值不穩定的 epsilon
 
         // 計算 sigma_17
         double sigma17 = pow(abs(phi1), 2) + pow(abs(phi2), 2) + pow(abs(phi3), 2);
@@ -184,7 +220,6 @@ private:
         double sigma10 = (phi2 * phi3 * (sigma16 - sigma15)) / safe_sigma17;
         double sigma11 = (phi1 * phi3 * (sigma16 - sigma15)) / safe_sigma17;
         double sigma12 = (phi1 * phi2 * (sigma16 - sigma15)) / safe_sigma17;
-        
 
         // 計算向量結果
         result[0] = rho3 * (sigma5 - sigma11 - sigma13 / safe_sigma17 + sigma2 + sigma8) - rho1 * (pow(phi1, 2) * (sigma16 - sigma15) / safe_sigma17 - sigma16 + sigma15 - 2 * pow(phi1, 2) * abs(phi2) * std::copysign(1.0, phi2) * sigma14 / pow(safe_sigma17, 2)) - rho2 * ((phi1 * sigma14) / safe_sigma17 + sigma12 + sigma6 + sigma3 - sigma9);
@@ -197,11 +232,11 @@ private:
     }
 
     // 輔助函數：計算 sigma_phi3 向量結果
-    std::vector<double> calculate_sigma_phi3 (double rho1, double rho2, double rho3, double phi1, double phi2, double phi3) const
+    std::vector<double> calculate_sigma_phi3(double rho1, double rho2, double rho3, double phi1, double phi2, double phi3) const
     {
         std::vector<double> result(3);
 
-        const double epsilon = 1e-10;  // 防止數值不穩定的 epsilon
+        const double epsilon = 1e-10; // 防止數值不穩定的 epsilon
 
         // 計算 sigma_17
         double sigma17 = pow(abs(phi1), 2) + pow(abs(phi2), 2) + pow(abs(phi3), 2);
@@ -225,7 +260,6 @@ private:
         double sigma10 = (phi2 * phi3 * (sigma16 - sigma15)) / safe_sigma17;
         double sigma11 = (phi1 * phi3 * (sigma16 - sigma15)) / safe_sigma17;
         double sigma12 = (phi1 * phi2 * (sigma16 - sigma15)) / safe_sigma17;
-        
 
         // 計算向量結果
         result[0] = rho3 * (sigma5 - sigma11 - (phi1 * sigma14) / safe_sigma17 + sigma2 + sigma8) - rho2 * (sigma12 + sigma6 + sigma3 - sigma9) - rho1 * (pow(phi1, 2) * (sigma16 - sigma15) / safe_sigma17 - sigma16 + sigma15 - 2 * pow(phi1, 2) * abs(phi3) * std::copysign(1.0, phi3) * sigma14 / pow(safe_sigma17, 2));
