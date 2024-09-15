@@ -1398,7 +1398,7 @@ void MapOptimization::saveKeyFramesAndFactor()
 
     // 假設法向量測量的兩個角度誤差（theta, phi）的標準差是 0.1，距離誤差的標準差是 0.05
     gtsam::Vector sigmas(3);
-    sigmas << 0.1, 0.1, 0.05; // 3 維向量：法向量兩個角度的標準差和距離的標準差
+    sigmas << 0.1, 0.1, 0.0005; // 3 維向量：法向量兩個角度的標準差和距離的標準差
     // 創建對角噪聲模型，使用 GTSAM 的 noiseModel::Diagonal::Sigmas
     gtsam::SharedNoiseModel noiseModel = gtsam::noiseModel::Diagonal::Sigmas(sigmas);
 

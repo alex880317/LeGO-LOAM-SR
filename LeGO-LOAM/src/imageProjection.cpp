@@ -297,12 +297,18 @@ void ImageProjection::groundRemoval() {
   int index = 0;  // 用來追蹤點的索引
   for (const auto& pcl_point : _full_cloud->points) {
       // std::cout << "z value : " << pcl_point.z << std::endl;
-      if (pcl_point.z >= -0.05-0.035-0.05 && pcl_point.z <= 0.05-0.035-0.05) {
+      if (pcl_point.z >= -1 && pcl_point.z <= 1) { //pcl_point.z >= -0.05-0.035-0.05 && pcl_point.z <= 0.05-0.035-0.05
           Point pt = {pcl_point.x, pcl_point.y, pcl_point.z, index};
           custom_cloud.push_back(pt);
       }
       index++;
   }
+  // 設置點雲的 width 和 height 屬性
+  _full_cloud->width = _full_cloud->points.size();  // 點的數量
+  _full_cloud->height = 1;  // 非結構化點雲
+  _full_cloud->is_dense = false;  // 如果點雲可能包含無效點（例如 NaN）
+  // 儲存為 .pcd 檔案
+  pcl::io::savePCDFileASCII("full_cloud.pcd", *_full_cloud);
   
   // 將 custom_cloud 轉換為 PCL 格式
   pcl::PointCloud<pcl::PointXYZ>::Ptr filtered_cloud(new pcl::PointCloud<pcl::PointXYZ>);
