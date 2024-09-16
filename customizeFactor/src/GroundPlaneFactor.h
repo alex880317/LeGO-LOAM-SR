@@ -32,7 +32,7 @@ public:
                                 boost::optional<gtsam::Matrix &> H = boost::none) const override
     {
         // 計算距離誤差
-        double initialDistance = 0;
+        double initialDistance = 0.12;
 
         // 計算法向量誤差
         gtsam::Vector3 initialNormal(0.0, 0.0, 1.0);
@@ -46,12 +46,15 @@ public:
         //   << t_k_W.y() << ", "  // Y 分量
         //   << t_k_W.z() << "]"   // Z 分量
         //   << std::endl;
-        gtsam::Vector3 measuredNormal_W = R_k_W.transpose() * measuredNormal_;
+
+        // measuredNormal_ << 0.0, 0.0, 1.0;
+        // measuredDistance_ = 0.0;
+        gtsam::Vector3 measuredNormal_W = R_k_W * measuredNormal_.normalized();
 
         // 計算法向量參數化 \(\tau(G^W_k)\)
         double theta = std::atan2(measuredNormal_W.y(), measuredNormal_W.x());            // 方位角
         double phi = std::acos(measuredNormal_W.z() / measuredNormal_W.head<3>().norm()); // 俯仰角
-        double d_k_prime = measuredDistance_ + (t_k_W.transpose() * measuredNormal_W);    // 直接使用測量的距離值
+        double d_k_prime = (measuredDistance_ + (t_k_W.transpose() * measuredNormal_W));    // 直接使用測量的距離值
 
         gtsam::Vector3 tau_measured(theta, phi, d_k_prime); // 參數化後的測量值
 
@@ -60,7 +63,7 @@ public:
         double initial_phi = std::acos(initialNormal.z() / initialNormal.head<3>().norm());
         double initial_d_k_prime = initialDistance;
 
-        gtsam::Vector3 tau_initial(initial_theta, initial_phi, initial_d_k_prime); // 參數化後的預測值
+        gtsam::Vector3 tau_initial(initial_theta, initial_phi, initial_d_k_prime);
 
         gtsam::Vector3 error = tau_measured - tau_initial;
         // std::cout << "error = " << error.transpose() << std::endl;
@@ -70,8 +73,8 @@ public:
         {
             H->setZero(3, 6); // Jacobian 大小是 3x6
 
-            gtsam::Vector3 G_k = measuredNormal_;
-            gtsam::Vector3 G_k_W = measuredNormal_W; // 假設地面法向量是 G_k_W
+            gtsam::Vector3 G_k = measuredNormal_.normalized();
+            gtsam::Vector3 G_k_W = measuredNormal_W;
 
             // 構建雅可比矩陣
             gtsam::Matrix H_left(3, 4);
@@ -88,12 +91,11 @@ public:
             {
                 H_left << -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0, 0,
                           0, 0, 0, 0,
-                          0, 0, 0, 1;
+                          0, 0, 0, 1;   // 1 / (1 + pow(G_k_W(1) / G_k_W(2), 2.0))
             }else{
                 H_left << -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0, 0,
                           (G_k_W(2) * G_k_W(0)) / denominator, (G_k_W(2) * G_k_W(1)) / denominator, -((G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1))) / denominator, 0,
-                          0, 0, 0, 1;
-
+                          0, 0, 0, 1;   
             }
             
 
@@ -101,7 +103,7 @@ public:
 
             // 使用反對稱矩陣構建旋轉的雅可比
             gtsam::Matrix H_right(4, 6);
-            gtsam::Matrix3 skew_RWGk = gtsam::skewSymmetric(R_k_W.transpose() * G_k);
+            gtsam::Matrix3 skew_RWGk = gtsam::skewSymmetric(R_k_W * G_k);
 
             // 使用 GTSAM 的 Logmap 函數將 Pose3 轉換為小 se(3)
             Eigen::Matrix<double, 6, 1> se3 = gtsam::Pose3::Logmap(pose);
@@ -126,10 +128,10 @@ public:
                 sig_phi1[1], sig_phi2[1], sig_phi3[1],
                 sig_phi1[2], sig_phi2[2], sig_phi3[2];
 
-            H_right.block<3, 3>(0, 0) = skew_RWGk;                                                                                          // 上三行
+            H_right.block<3, 3>(0, 0) = -skew_RWGk;                                                                                          // 上三行
             H_right.block<3, 3>(0, 3).setZero();                                                                                            // 空矩陣 0_{3x3}
-            H_right.block<1, 3>(3, 0) = (J_rho_diff.transpose() * (R_k_W.transpose() * G_k)).transpose() + (t_k_W.transpose() * skew_RWGk); // // 1x3  because of the inner product,{J_rho_diff} should be transposed
-            H_right.block<1, 3>(3, 3) = (R_k_W.transpose() * G_k).transpose() * J;                                                          // 1x3 負的轉置
+            H_right.block<1, 3>(3, 0) = (J_rho_diff.transpose() * (R_k_W * G_k)).transpose() - (t_k_W.transpose() * skew_RWGk); // // 1x3  because of the inner product,{J_rho_diff} should be transposed
+            H_right.block<1, 3>(3, 3) = (R_k_W * G_k).transpose() * J;                                                          // 1x3 負的轉置
 
             // H_right.block<3, 3>(0, 3).setZero();                                                                                  // 空矩陣 0_{3x3}
             // H_right.block<3, 3>(0, 0).setZero();                                                                               // 上三行
@@ -157,8 +159,11 @@ public:
         // RCLCPP_INFO(node_->get_logger(), "error = %s", ss.str().c_str());
 
         // std::cout << "weightedError = " << weightedError.transpose() << std::endl;
+        
+        gtsam::Vector2 error_star = error.tail<2>();
 
         // return weightedError;
+        // return error_star;
         return error;
     }
 

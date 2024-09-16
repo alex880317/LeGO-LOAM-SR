@@ -1398,16 +1398,22 @@ void MapOptimization::saveKeyFramesAndFactor()
 
     // 假設法向量測量的兩個角度誤差（theta, phi）的標準差是 0.1，距離誤差的標準差是 0.05
     gtsam::Vector sigmas(3);
-    sigmas << 0.1, 0.1, 0.0005; // 3 維向量：法向量兩個角度的標準差和距離的標準差
+    sigmas << 0.1, 0.1, 100000; // 3 維向量：法向量兩個角度的標準差和距離的標準差
     // 創建對角噪聲模型，使用 GTSAM 的 noiseModel::Diagonal::Sigmas
     gtsam::SharedNoiseModel noiseModel = gtsam::noiseModel::Diagonal::Sigmas(sigmas);
 
-    gtsam::Key currentKey = cloudKeyPoses3D->points.size()-1;
+    gtsam::Key currentKey = cloudKeyPoses3D->points.size() - 1;
     // 提取 measuredNormal 和 measuredDistance
     gtsam::Vector3 measuredNormal(_Gk_star[0], _Gk_star[1], _Gk_star[2]); // 前三個元素作為法向量
     double measuredDistance = _Gk_star[3];                                // 第四個元素作為距離
     gtSAMgraph.add(boost::make_shared<GroundPlaneFactor>(
         currentKey, measuredNormal, measuredDistance, noiseModel, shared_from_this()));
+
+    // // 打印出 measuredNormal 和 measuredDistance
+    // RCLCPP_INFO(
+    //     this->get_logger(),
+    //     "Measured Normal: [%.6f, %.6f, %.6f], Measured Distance: %.6f",
+    //     measuredNormal[0], measuredNormal[1], measuredNormal[2], measuredDistance);
 
     // test odometry factor's jacobian
     // auto factor = BetweenFactor<Pose3>(
@@ -1423,13 +1429,12 @@ void MapOptimization::saveKeyFramesAndFactor()
     //           << H2_actual << std::endl;
 
     // gtsam::Vector3 t_k_W = poseTo.translation();
-        // // 打印三個分量
-        // std::cout << "Translation vector(t_k_W): [" 
-        //   << t_k_W.x() << ", "  // X 分量
-        //   << t_k_W.y() << ", "  // Y 分量
-        //   << t_k_W.z() << "]"   // Z 分量
-        //   << std::endl;
-    
+    // // 打印三個分量
+    // std::cout << "Translation vector(t_k_W): ["
+    //   << t_k_W.x() << ", "  // X 分量
+    //   << t_k_W.y() << ", "  // Y 分量
+    //   << t_k_W.z() << "]"   // Z 分量
+    //   << std::endl;
 
     //////////////////////////////////////////////////////////////////////////////////
 
