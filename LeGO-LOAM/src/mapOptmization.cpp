@@ -42,6 +42,9 @@
 #include <gtsam/nonlinear/NonlinearFactorGraph.h>
 #include <gtsam/nonlinear/Marginals.h>
 #include <fstream>
+#include <gtsam/linear/GaussianFactorGraph.h>     // 線性化後的因子圖
+#include <gtsam/inference/Symbol.h>               // 鍵值管理
+#include <gtsam/nonlinear/Values.h>               // 儲存估計值
 
 using namespace gtsam;
 
@@ -1398,11 +1401,11 @@ void MapOptimization::saveKeyFramesAndFactor()
 
     // 假設法向量測量的兩個角度誤差（theta, phi）的標準差是 0.1，距離誤差的標準差是 0.05
     gtsam::Vector sigmas(3);
-    sigmas << 0.1, 0.1, 100000; // 3 維向量：法向量兩個角度的標準差和距離的標準差
+    sigmas << 0.1, 0.1, 0.1; // 3 維向量：法向量兩個角度的標準差和距離的標準差
     // 創建對角噪聲模型，使用 GTSAM 的 noiseModel::Diagonal::Sigmas
     gtsam::SharedNoiseModel noiseModel = gtsam::noiseModel::Diagonal::Sigmas(sigmas);
 
-    gtsam::Key currentKey = cloudKeyPoses3D->points.size() - 1;
+    gtsam::Key currentKey = cloudKeyPoses3D->points.size();
     // 提取 measuredNormal 和 measuredDistance
     gtsam::Vector3 measuredNormal(_Gk_star[0], _Gk_star[1], _Gk_star[2]); // 前三個元素作為法向量
     double measuredDistance = _Gk_star[3];                                // 第四個元素作為距離
@@ -1428,13 +1431,16 @@ void MapOptimization::saveKeyFramesAndFactor()
     // std::cout << "Jacobian w.r.t. p2 (Analytical):\n"
     //           << H2_actual << std::endl;
 
-    // gtsam::Vector3 t_k_W = poseTo.translation();
-    // // 打印三個分量
-    // std::cout << "Translation vector(t_k_W): ["
-    //   << t_k_W.x() << ", "  // X 分量
-    //   << t_k_W.y() << ", "  // Y 分量
-    //   << t_k_W.z() << "]"   // Z 分量
-    //   << std::endl;
+    gtsam::Vector3 t_k_W = poseTo.translation();
+    // 打印三個分量
+    RCLCPP_INFO(this->get_logger(), "Translation vector(t_k_W): [%.6f, %.6f, %.6f]", 
+            t_k_W.x(),  // X 分量
+            t_k_W.y(),  // Y 分量
+            t_k_W.z()); // Z 分量
+    RCLCPP_INFO(this->get_logger(), "Translation vector(transformAftMapped): [%.6f, %.6f, %.6f]", 
+            transformAftMapped[5],  // X 分量
+            transformAftMapped[3],  // Y 分量
+            transformAftMapped[4]); // Z 分量
 
     //////////////////////////////////////////////////////////////////////////////////
 
@@ -1477,6 +1483,16 @@ void MapOptimization::saveKeyFramesAndFactor()
   // gtsam::Matrix jointMarginal = marginals.jointMarginalCovariance(gtsam::KeyVector{key}).fullMatrix();
   // std::cout << "Joint Jacobian: \n" << jointMarginal << std::endl;
   // isamCurrentEstimate.print("Values: ");
+
+  // // 線性化整個因子圖，並獲取雅可比矩陣
+  // GaussianFactorGraph::shared_ptr linearizedGraph = isam->getFactorsUnsafe().linearize(isamCurrentEstimate);
+
+  // // 獲取整體雅可比矩陣
+  // Eigen::MatrixXd fullJacobian = linearizedGraph->jacobian().first;
+
+  // // 打印整體雅可比矩陣
+  // std::cout << "Full Jacobian Matrix: \n"
+  //           << fullJacobian << std::endl;
 
   thisPose3D.x = latestEstimate.translation().y();
   thisPose3D.y = latestEstimate.translation().z();
