@@ -1400,8 +1400,8 @@ void MapOptimization::saveKeyFramesAndFactor()
     // auto normalVectorNoiseModel = gtsam::noiseModel::Diagonal::Sigmas(gtsam::Vector3(0.1, 0.1, 0.1));  // 3維法向量噪聲
 
     // 假設法向量測量的兩個角度誤差（theta, phi）的標準差是 0.1，距離誤差的標準差是 0.05
-    gtsam::Vector sigmas(3);
-    sigmas << 0.1, 0.1, 0.1; // 3 維向量：法向量兩個角度的標準差和距離的標準差
+    gtsam::Vector sigmas(2);
+    sigmas <<  0.1, 0.1; // 3 維向量：法向量兩個角度的標準差和距離的標準差
     // 創建對角噪聲模型，使用 GTSAM 的 noiseModel::Diagonal::Sigmas
     gtsam::SharedNoiseModel noiseModel = gtsam::noiseModel::Diagonal::Sigmas(sigmas);
 
@@ -1432,15 +1432,15 @@ void MapOptimization::saveKeyFramesAndFactor()
     //           << H2_actual << std::endl;
 
     gtsam::Vector3 t_k_W = poseTo.translation();
-    // 打印三個分量
-    RCLCPP_INFO(this->get_logger(), "Translation vector(t_k_W): [%.6f, %.6f, %.6f]", 
-            t_k_W.x(),  // X 分量
-            t_k_W.y(),  // Y 分量
-            t_k_W.z()); // Z 分量
-    RCLCPP_INFO(this->get_logger(), "Translation vector(transformAftMapped): [%.6f, %.6f, %.6f]", 
-            transformAftMapped[5],  // X 分量
-            transformAftMapped[3],  // Y 分量
-            transformAftMapped[4]); // Z 分量
+    // // 打印三個分量
+    // RCLCPP_INFO(this->get_logger(), "Translation vector(t_k_W): [%.6f, %.6f, %.6f]", 
+    //         t_k_W.x(),  // X 分量
+    //         t_k_W.y(),  // Y 分量
+    //         t_k_W.z()); // Z 分量
+    // RCLCPP_INFO(this->get_logger(), "Translation vector(transformAftMapped): [%.6f, %.6f, %.6f]", 
+    //         transformAftMapped[5],  // X 分量
+    //         transformAftMapped[3],  // Y 分量
+    //         transformAftMapped[4]); // Z 分量
 
     //////////////////////////////////////////////////////////////////////////////////
 

@@ -31,13 +31,7 @@ public:
     gtsam::Vector evaluateError(const gtsam::Pose3 &pose,
                                 boost::optional<gtsam::Matrix &> H = boost::none) const override
     {
-        gtsam::Vector3 t_k = pose.translation();
-        // 打印三個分量
-        RCLCPP_INFO(node_->get_logger(), "Translation vector(t_k_W)(inside): [%.6f, %.6f, %.6f]",
-                    t_k.x(),  // X 分量
-                    t_k.y(),  // Y 分量
-                    t_k.z()); // Z 分量
-        // 計算距離誤差
+        
         double initialDistance = 0.12; // 0.12
 
         // 計算法向量誤差
@@ -46,15 +40,9 @@ public:
         // gtsam::Pose3 p_inv = pose.inverse();
         gtsam::Matrix3 R_k_W = pose.rotation().matrix();
         gtsam::Vector3 t_k_W = pose.translation();
-        // // 打印三個分量
-        // std::cout << "Translation vector(t_k_W): ["
-        //   << t_k_W.x() << ", "  // X 分量
-        //   << t_k_W.y() << ", "  // Y 分量
-        //   << t_k_W.z() << "]"   // Z 分量
-        //   << std::endl;
+        
 
-        // measuredNormal_ << 0.0, 0.0, 1.0;
-        // measuredDistance_ = 0.0;
+
         gtsam::Vector3 measuredNormal_W = R_k_W * measuredNormal_.normalized();
 
         // 計算法向量參數化 \(\tau(G^W_k)\)
@@ -72,18 +60,17 @@ public:
         gtsam::Vector3 tau_initial(initial_theta, initial_phi, initial_d_k_prime);
 
         gtsam::Vector3 error = tau_measured - tau_initial;
-        // std::cout << "error = " << error.transpose() << std::endl;
 
         // 如果需要雅可比矩陣 H，則計算
         if (H)
         {
-            H->setZero(3, 6); // Jacobian 大小是 3x6
+            H->setZero(2, 6); // Jacobian 大小是 3x6
 
             gtsam::Vector3 G_k = measuredNormal_.normalized();
             gtsam::Vector3 G_k_W = measuredNormal_W;
 
             // 構建雅可比矩陣
-            gtsam::Matrix H_left(3, 4);
+            gtsam::Matrix H_left(2, 4);
             // H_left << -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0, 0,
             //     (-G_k_W(0) * G_k_W(2)) / G_k_W.squaredNorm(), (-G_k_W(1) * G_k_W(2)) / G_k_W.squaredNorm(), (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)) / G_k_W.squaredNorm(), 0,
             //     0, 0, 0, 1;
@@ -92,25 +79,29 @@ public:
             // 計算 denominator
             double sqrt_term = std::sqrt(1 - (G_k_W(2) * G_k_W(2)) / (G_k_W.norm() * G_k_W.norm()));
             double denominator = pow(G_k_W.norm(), 3.0) * sqrt_term;
+            // RCLCPP_INFO(node_->get_logger(), "denominator = %f", denominator);
+
+            const double epsilon = 1e-6;
             // 避免分母為零的情況
-            if (denominator == 0.0)
+            if (std::abs(denominator) < epsilon)
             {
-                H_left << -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0.0, 0.0,
+                H_left << 
                     0.0, 0.0, 0.0, 0.0,
-                    0.0, 0.0, 0.0, 1.0; // 1 / (1 + pow(G_k_W(1) / G_k_W(2), 2.0))
+                    0.0, 0.0, 0.0, 1.0; // 1 / (1 + pow(G_k_W(1) / G_k_W(2), 2.0)) // -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0.0, 0.0,
+                // RCLCPP_INFO(node_->get_logger(), "denominator = 0");
             }
             else
             {
-                H_left << -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0.0, 0.0,
+                H_left << 
                     (G_k_W(2) * G_k_W(0)) / denominator, (G_k_W(2) * G_k_W(1)) / denominator, -((G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1))) / denominator, 0.0,
-                    0.0, 0.0, 0.0, 1.0;
+                    0.0, 0.0, 0.0, 1.0; // -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0.0, 0.0,
             }
 
             ///////////////////////////////////////////////////////////////////////////////////////////////////
 
             // 使用反對稱矩陣構建旋轉的雅可比
             gtsam::Matrix H_right(4, 6);
-            gtsam::Matrix3 skew_RWGk = gtsam::skewSymmetric(R_k_W * G_k);
+            gtsam::Matrix3 skew_RWGk = R_k_W * gtsam::skewSymmetric(G_k);
 
             // 使用 GTSAM 的 Logmap 函數將 Pose3 轉換為小 se(3)
             Eigen::Matrix<double, 6, 1> se3 = gtsam::Pose3::Logmap(pose);
@@ -152,26 +143,28 @@ public:
             //           << H_left << std::endl;
             // std::cout << "Jacobian H2:\n"
             //           << H_right << std::endl;
+            RCLCPP_INFO(node_->get_logger(), "G_k_W = [%.6f, %.6f, %.6f]", G_k_W(0), G_k_W(1), G_k_W(2));
         }
         // error[0] = 0;
         // 將兩個誤差結合成一個
-        gtsam::Vector weightedError(3); // 假設殘差是 3 維
-        weightedError = noiseModel_->whiten(error);
+        // gtsam::Vector weightedError(3); // 假設殘差是 3 維
+        // weightedError = noiseModel_->whiten(error);
 
         // 假設 error 是一個 gtsam::Vector
         Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
 
         std::stringstream ss;
         ss << error.transpose().format(CleanFmt);
-        // RCLCPP_INFO(node_->get_logger(), "error = %s", ss.str().c_str());
+        RCLCPP_INFO(node_->get_logger(), "error = %s", ss.str().c_str());
+        
 
         // std::cout << "weightedError = " << weightedError.transpose() << std::endl;
 
         gtsam::Vector2 error_star = error.tail<2>();
 
         // return weightedError;
-        // return error_star;
-        return error;
+        return error_star;
+        // return error;
     }
 
     gtsam::NonlinearFactor::shared_ptr clone() const override

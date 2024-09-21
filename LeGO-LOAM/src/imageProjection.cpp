@@ -297,7 +297,7 @@ void ImageProjection::groundRemoval() {
   int index = 0;  // 用來追蹤點的索引
   for (const auto& pcl_point : _full_cloud->points) {
       // std::cout << "z value : " << pcl_point.z << std::endl;
-      if (pcl_point.z >= -1 && pcl_point.z <= 1) { //pcl_point.z >= -0.05-0.035-0.05 && pcl_point.z <= 0.05-0.035-0.05
+      if (pcl_point.z >= -0.1-0.035-0.05 && pcl_point.z <= 0.1-0.035-0.05) { //pcl_point.z >= -0.05-0.035-0.05 && pcl_point.z <= 0.05-0.035-0.05
           Point pt = {pcl_point.x, pcl_point.y, pcl_point.z, index};
           custom_cloud.push_back(pt);
       }
