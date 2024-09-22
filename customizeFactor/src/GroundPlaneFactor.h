@@ -28,7 +28,10 @@ public:
         : gtsam::NoiseModelFactor1<gtsam::Pose3>(noiseModel, key),
           G_k(normal.normalized()),  // 在構造函數中初始化 G_k_ 
           measuredNormal_(normal), measuredDistance_(distance),
-          noiseModel_(noiseModel), node_(node) {}
+          noiseModel_(noiseModel), node_(node) {RCLCPP_INFO(node_->get_logger(), "out : Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f]", node_->now().seconds(), 
+            G_k(0), G_k(1), G_k(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2));}
+
+    
 
     gtsam::Vector evaluateError(const gtsam::Pose3 &pose,
                                 boost::optional<gtsam::Matrix &> H = boost::none) const override
@@ -42,6 +45,9 @@ public:
         // gtsam::Pose3 p_inv = pose.inverse();
         gtsam::Matrix3 R_k_W = pose.rotation().matrix();
         gtsam::Vector3 t_k_W = pose.translation();
+
+        RCLCPP_INFO(node_->get_logger(), "up : Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f]", node_->now().seconds(), 
+            G_k(0), G_k(1), G_k(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2));
         
 
 
@@ -159,7 +165,7 @@ public:
         std::stringstream ss;
         ss << error.transpose().format(CleanFmt);
         // RCLCPP_INFO(node_->get_logger(), "Time: %f, error = %s", node_->now().seconds(), ss.str().c_str());
-        RCLCPP_INFO(node_->get_logger(), "Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f], error = [%.6f, %.6f, %.6f]", node_->now().seconds(), 
+        RCLCPP_INFO(node_->get_logger(), "down : Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f], error = [%.6f, %.6f, %.6f]", node_->now().seconds(), 
             G_k(0), G_k(1), G_k(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2), error[0], error[1], error[2]);
         
 
