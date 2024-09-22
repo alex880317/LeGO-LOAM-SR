@@ -1328,6 +1328,7 @@ void MapOptimization::scan2MapOptimization()
 
 void MapOptimization::saveKeyFramesAndFactor()
 {
+  // std::lock_guard<std::mutex> lock(GkMutex);
   currentRobotPosPoint.x = transformAftMapped[3];
   currentRobotPosPoint.y = transformAftMapped[4];
   currentRobotPosPoint.z = transformAftMapped[5];
@@ -1452,7 +1453,9 @@ void MapOptimization::saveKeyFramesAndFactor()
                      transformAftMapped[4])));
     // std::cout << "Number of key poses: " << cloudKeyPoses3D->points.size() << std::endl; // state
   }
-  // RCLCPP_INFO(this->get_logger(), "key = %lu", cloudKeyPoses3D->points.size());
+  RCLCPP_INFO(this->get_logger(), "key = %lu", cloudKeyPoses3D->points.size());
+
+  
   /**
    * update iSAM
    */
@@ -1472,11 +1475,15 @@ void MapOptimization::saveKeyFramesAndFactor()
   PointType thisPose3D;
   PointTypePose thisPose6D;
   Pose3 latestEstimate;
-
+  // GkMutex.lock();
   isamCurrentEstimate = isam->calculateEstimate();
+  // // 如果需要手動釋放鎖，可以這樣做
+  // GkMutex.unlock();
   // RCLCPP_INFO(this->get_logger(), "calculate Estimate");
   latestEstimate =
       isamCurrentEstimate.at<Pose3>(isamCurrentEstimate.size() - 1);
+      
+  
   // gtsam::Marginals marginals(gtSAMgraph, isamCurrentEstimate);
   // // gtsam::Key key = gtsam::Symbol('x', cloudKeyPoses3D->points.size());
   // gtsam::Key key = static_cast<gtsam::Key>(cloudKeyPoses3D->points.size());
@@ -1543,6 +1550,8 @@ void MapOptimization::saveKeyFramesAndFactor()
   cornerCloudKeyFrames.push_back(thisCornerKeyFrame);
   surfCloudKeyFrames.push_back(thisSurfKeyFrame);
   outlierCloudKeyFrames.push_back(thisOutlierKeyFrame);
+
+  
 }
 
 void MapOptimization::correctPoses()
@@ -1595,6 +1604,8 @@ void MapOptimization::run()
     AssociationOut association;
     _input_channel.receive(association);
     _Gk_star = association.Gk_star;
+    RCLCPP_INFO(this->get_logger(), "Time: %.6f, Gk_star = [%.6f, %.6f, %.6f]", this->now().seconds(), 
+            _Gk_star[0], _Gk_star[1], _Gk_star[2]);
     // TODO -Gk_star
     // std::cout << "[MapOptimization]Ground Plane Coefficient = ";
     // for (const auto& value : _Gk_star) {

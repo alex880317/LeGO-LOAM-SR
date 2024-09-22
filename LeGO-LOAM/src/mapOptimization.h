@@ -47,6 +47,7 @@ class MapOptimization : public rclcpp::Node {
   gtsam::Values initialEstimate;
   gtsam::ISAM2 *isam;
   gtsam::Values isamCurrentEstimate;
+  std::mutex GkMutex;
 
   // 創建累積的因子圖
   gtsam::NonlinearFactorGraph cumulativeGraph;

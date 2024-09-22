@@ -14,6 +14,7 @@ class GroundPlaneFactor : public gtsam::NoiseModelFactor1<gtsam::Pose3>
 public:
     gtsam::Vector3 measuredNormal_; // 地面法向量測量
     double measuredDistance_;       // 地面距離測量
+    const gtsam::Vector3 G_k;             // 固定法向量           
 
     // 合併的噪聲模型
     gtsam::SharedNoiseModel noiseModel_;
@@ -25,6 +26,7 @@ public:
     GroundPlaneFactor(gtsam::Key key, const gtsam::Point3 &normal, const double &distance,
                       const gtsam::SharedNoiseModel &noiseModel, rclcpp::Node::SharedPtr node)
         : gtsam::NoiseModelFactor1<gtsam::Pose3>(noiseModel, key),
+          G_k(normal.normalized()),  // 在構造函數中初始化 G_k_ 
           measuredNormal_(normal), measuredDistance_(distance),
           noiseModel_(noiseModel), node_(node) {}
 
@@ -61,13 +63,14 @@ public:
 
         gtsam::Vector3 error = tau_measured - tau_initial;
 
+        // G_k = measuredNormal_.normalized();
+        gtsam::Vector3 G_k_W = measuredNormal_W;
+
         // 如果需要雅可比矩陣 H，則計算
         if (H)
         {
             H->setZero(2, 6); // Jacobian 大小是 3x6
 
-            gtsam::Vector3 G_k = measuredNormal_.normalized();
-            gtsam::Vector3 G_k_W = measuredNormal_W;
 
             // 構建雅可比矩陣
             gtsam::Matrix H_left(2, 4);
@@ -143,7 +146,7 @@ public:
             //           << H_left << std::endl;
             // std::cout << "Jacobian H2:\n"
             //           << H_right << std::endl;
-            RCLCPP_INFO(node_->get_logger(), "G_k_W = [%.6f, %.6f, %.6f]", G_k_W(0), G_k_W(1), G_k_W(2));
+            // RCLCPP_INFO(node_->get_logger(), "Time: %.6f, G_k = [%.6f, %.6f, %.6f]", node_->now().seconds(), G_k(0), G_k(1), G_k(2));
         }
         // error[0] = 0;
         // 將兩個誤差結合成一個
@@ -155,7 +158,9 @@ public:
 
         std::stringstream ss;
         ss << error.transpose().format(CleanFmt);
-        RCLCPP_INFO(node_->get_logger(), "error = %s", ss.str().c_str());
+        // RCLCPP_INFO(node_->get_logger(), "Time: %f, error = %s", node_->now().seconds(), ss.str().c_str());
+        RCLCPP_INFO(node_->get_logger(), "Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f], error = [%.6f, %.6f, %.6f]", node_->now().seconds(), 
+            G_k(0), G_k(1), G_k(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2), error[0], error[1], error[2]);
         
 
         // std::cout << "weightedError = " << weightedError.transpose() << std::endl;
