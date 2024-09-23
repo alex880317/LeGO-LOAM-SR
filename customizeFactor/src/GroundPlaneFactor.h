@@ -11,13 +11,13 @@
 
 class GroundPlaneFactor : public gtsam::NoiseModelFactor1<gtsam::Pose3>
 {
+private:
+    gtsam::Vector3 measuredNormal_;         // 地面法向量測量
+    double measuredDistance_;               // 地面距離測量
+    const gtsam::Vector3 G_k;               // 固定法向量 
+    gtsam::SharedNoiseModel noiseModel_;    // 噪声模型
+    
 public:
-    gtsam::Vector3 measuredNormal_; // 地面法向量測量
-    double measuredDistance_;       // 地面距離測量
-    const gtsam::Vector3 G_k;             // 固定法向量           
-
-    // 合併的噪聲模型
-    gtsam::SharedNoiseModel noiseModel_;
 
     using NoiseModelFactor1<gtsam::Pose3>::evaluateError;
 
@@ -26,10 +26,15 @@ public:
     GroundPlaneFactor(gtsam::Key key, const gtsam::Point3 &normal, const double &distance,
                       const gtsam::SharedNoiseModel &noiseModel, rclcpp::Node::SharedPtr node)
         : gtsam::NoiseModelFactor1<gtsam::Pose3>(noiseModel, key),
+          measuredNormal_(normal), 
+          measuredDistance_(distance),
           G_k(normal.normalized()),  // 在構造函數中初始化 G_k_ 
-          measuredNormal_(normal), measuredDistance_(distance),
-          noiseModel_(noiseModel), node_(node) {RCLCPP_INFO(node_->get_logger(), "out : Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f]", node_->now().seconds(), 
-            G_k(0), G_k(1), G_k(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2));}
+          noiseModel_(noiseModel), 
+          node_(node) 
+          {
+            RCLCPP_INFO(node_->get_logger(), "out : Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f]", node_->now().seconds(), 
+            G_k(0), G_k(1), G_k(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2));
+          }
 
     
 
@@ -46,12 +51,12 @@ public:
         gtsam::Matrix3 R_k_W = pose.rotation().matrix();
         gtsam::Vector3 t_k_W = pose.translation();
 
-        RCLCPP_INFO(node_->get_logger(), "up : Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f]", node_->now().seconds(), 
+        RCLCPP_INFO(node_->get_logger(), "up : Time: %.6f, Key: %lu, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f]", node_->now().seconds(), this->key(),
             G_k(0), G_k(1), G_k(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2));
         
 
 
-        gtsam::Vector3 measuredNormal_W = R_k_W * measuredNormal_.normalized();
+        gtsam::Vector3 measuredNormal_W = R_k_W * G_k;
 
         // 計算法向量參數化 \(\tau(G^W_k)\)
         double theta = std::atan2(measuredNormal_W.y(), measuredNormal_W.x());            // 方位角

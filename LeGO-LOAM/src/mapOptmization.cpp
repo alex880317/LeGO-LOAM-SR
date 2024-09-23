@@ -1410,8 +1410,10 @@ void MapOptimization::saveKeyFramesAndFactor()
     // 提取 measuredNormal 和 measuredDistance
     gtsam::Vector3 measuredNormal(_Gk_star[0], _Gk_star[1], _Gk_star[2]); // 前三個元素作為法向量
     double measuredDistance = _Gk_star[3];                                // 第四個元素作為距離
+    RCLCPP_INFO(this->get_logger(), "before add");
     gtSAMgraph.add(boost::make_shared<GroundPlaneFactor>(
         currentKey, measuredNormal, measuredDistance, noiseModel, shared_from_this()));
+    RCLCPP_INFO(this->get_logger(), "after add");
 
     // // 打印出 measuredNormal 和 measuredDistance
     // RCLCPP_INFO(
@@ -1459,7 +1461,9 @@ void MapOptimization::saveKeyFramesAndFactor()
   /**
    * update iSAM
    */
+  RCLCPP_INFO(this->get_logger(), "before update");
   isam->update(gtSAMgraph, initialEstimate);
+  RCLCPP_INFO(this->get_logger(), "before update2");
   isam->update();
   // RCLCPP_INFO(this->get_logger(), "gtsam update");
 
@@ -1476,7 +1480,9 @@ void MapOptimization::saveKeyFramesAndFactor()
   PointTypePose thisPose6D;
   Pose3 latestEstimate;
   // GkMutex.lock();
+  RCLCPP_INFO(this->get_logger(), "before calculateEstimate");
   isamCurrentEstimate = isam->calculateEstimate();
+  RCLCPP_INFO(this->get_logger(), "after calculateEstimate");
   // // 如果需要手動釋放鎖，可以這樣做
   // GkMutex.unlock();
   // RCLCPP_INFO(this->get_logger(), "calculate Estimate");
