@@ -32,8 +32,8 @@ public:
           noiseModel_(noiseModel), 
           node_(node) 
           {
-            RCLCPP_INFO(node_->get_logger(), "out : Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f]", node_->now().seconds(), 
-            G_k(0), G_k(1), G_k(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2));
+            // RCLCPP_INFO(node_->get_logger(), "out : Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f]", node_->now().seconds(), 
+            // G_k(0), G_k(1), G_k(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2));
           }
 
     
@@ -42,7 +42,7 @@ public:
                                 boost::optional<gtsam::Matrix &> H = boost::none) const override
     {
         
-        double initialDistance = 0.12; // 0.12
+        double initialDistance = 0.44; // 0.12
 
         // 計算法向量誤差
         gtsam::Vector3 initialNormal(0.0, 0.0, 1.0);
@@ -51,8 +51,8 @@ public:
         gtsam::Matrix3 R_k_W = pose.rotation().matrix();
         gtsam::Vector3 t_k_W = pose.translation();
 
-        RCLCPP_INFO(node_->get_logger(), "up : Time: %.6f, Key: %lu, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f]", node_->now().seconds(), this->key(),
-            G_k(0), G_k(1), G_k(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2));
+        // RCLCPP_INFO(node_->get_logger(), "up : Time: %.6f, Key: %lu, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f]", node_->now().seconds(), this->key(),
+        //     G_k(0), G_k(1), G_k(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2));
         
 
 
@@ -74,7 +74,7 @@ public:
 
         gtsam::Vector3 error = tau_measured - tau_initial;
 
-        // G_k = measuredNormal_.normalized();
+
         gtsam::Vector3 G_k_W = measuredNormal_W;
 
         // 如果需要雅可比矩陣 H，則計算
@@ -170,8 +170,8 @@ public:
         std::stringstream ss;
         ss << error.transpose().format(CleanFmt);
         // RCLCPP_INFO(node_->get_logger(), "Time: %f, error = %s", node_->now().seconds(), ss.str().c_str());
-        RCLCPP_INFO(node_->get_logger(), "down : Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f], error = [%.6f, %.6f, %.6f]", node_->now().seconds(), 
-            G_k(0), G_k(1), G_k(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2), error[0], error[1], error[2]);
+        // RCLCPP_INFO(node_->get_logger(), "down : Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f], error = [%.6f, %.6f, %.6f]", node_->now().seconds(), 
+        //     G_k(0), G_k(1), G_k(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2), error[0], error[1], error[2]);
         
 
         // std::cout << "weightedError = " << weightedError.transpose() << std::endl;
