@@ -12,13 +12,12 @@
 class GroundPlaneFactor : public gtsam::NoiseModelFactor1<gtsam::Pose3>
 {
 private:
-    gtsam::Vector3 measuredNormal_;         // 地面法向量測量
-    double measuredDistance_;               // 地面距離測量
-    const gtsam::Vector3 G_k;               // 固定法向量 
-    gtsam::SharedNoiseModel noiseModel_;    // 噪声模型
-    
-public:
+    gtsam::Vector3 measuredNormal_;      // 地面法向量測量
+    double measuredDistance_;            // 地面距離測量
+    const gtsam::Vector3 G_k;            // 固定法向量
+    gtsam::SharedNoiseModel noiseModel_; // 噪声模型
 
+public:
     using NoiseModelFactor1<gtsam::Pose3>::evaluateError;
 
     typedef std::shared_ptr<GroundPlaneFactor> shared_ptr;
@@ -26,23 +25,21 @@ public:
     GroundPlaneFactor(gtsam::Key key, const gtsam::Point3 &normal, const double &distance,
                       const gtsam::SharedNoiseModel &noiseModel, rclcpp::Node::SharedPtr node)
         : gtsam::NoiseModelFactor1<gtsam::Pose3>(noiseModel, key),
-          measuredNormal_(normal), 
+          measuredNormal_(normal),
           measuredDistance_(distance),
-          G_k(normal.normalized()),  // 在構造函數中初始化 G_k_ 
-          noiseModel_(noiseModel), 
-          node_(node) 
-          {
-            // RCLCPP_INFO(node_->get_logger(), "out : Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f]", node_->now().seconds(), 
-            // G_k(0), G_k(1), G_k(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2));
-          }
-
-    
+          G_k(normal.normalized()), // 在構造函數中初始化 G_k_
+          noiseModel_(noiseModel),
+          node_(node)
+    {
+        // RCLCPP_INFO(node_->get_logger(), "out : Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f]", node_->now().seconds(),
+        // G_k(0), G_k(1), G_k(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2));
+    }
 
     gtsam::Vector evaluateError(const gtsam::Pose3 &pose,
                                 boost::optional<gtsam::Matrix &> H = boost::none) const override
     {
-        
-        double initialDistance = 0.44; // 0.12
+
+        double initialDistance = 0.12; // 0.12
 
         // 計算法向量誤差
         gtsam::Vector3 initialNormal(0.0, 0.0, 1.0);
@@ -51,12 +48,15 @@ public:
         gtsam::Matrix3 R_k_W = pose.rotation().matrix();
         gtsam::Vector3 t_k_W = pose.translation();
 
+        std::cout << "R_k_W = " << R_k_W << std::endl;
+        std::cout << "t_k_W = " << t_k_W << std::endl;
+
         // RCLCPP_INFO(node_->get_logger(), "up : Time: %.6f, Key: %lu, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f]", node_->now().seconds(), this->key(),
         //     G_k(0), G_k(1), G_k(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2));
-        
-
 
         gtsam::Vector3 measuredNormal_W = R_k_W * G_k;
+
+        std::cout << "G_k = " << G_k << std::endl;
 
         // 計算法向量參數化 \(\tau(G^W_k)\)
         double theta = std::atan2(measuredNormal_W.y(), measuredNormal_W.x());            // 方位角
@@ -74,6 +74,7 @@ public:
 
         gtsam::Vector3 error = tau_measured - tau_initial;
 
+        std::cout << "residual = " << error << std::endl;
 
         gtsam::Vector3 G_k_W = measuredNormal_W;
 
@@ -81,7 +82,6 @@ public:
         if (H)
         {
             H->setZero(2, 6); // Jacobian 大小是 3x6
-
 
             // 構建雅可比矩陣
             gtsam::Matrix H_left(2, 4);
@@ -99,15 +99,13 @@ public:
             // 避免分母為零的情況
             if (std::abs(denominator) < epsilon)
             {
-                H_left << 
-                    0.0, 0.0, 0.0, 0.0,
+                H_left << 0.0, 0.0, 0.0, 0.0,
                     0.0, 0.0, 0.0, 1.0; // 1 / (1 + pow(G_k_W(1) / G_k_W(2), 2.0)) // -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0.0, 0.0,
                 // RCLCPP_INFO(node_->get_logger(), "denominator = 0");
             }
             else
             {
-                H_left << 
-                    (G_k_W(2) * G_k_W(0)) / denominator, (G_k_W(2) * G_k_W(1)) / denominator, -((G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1))) / denominator, 0.0,
+                H_left << (G_k_W(2) * G_k_W(0)) / denominator, (G_k_W(2) * G_k_W(1)) / denominator, -((G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1))) / denominator, 0.0,
                     0.0, 0.0, 0.0, 1.0; // -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0.0, 0.0,
             }
 
@@ -153,10 +151,10 @@ public:
             // 最終的雅可比矩陣是兩個矩陣的乘積
             *H = H_left * H_right;
 
-            // std::cout << "Jacobian H1:\n"
-            //           << H_left << std::endl;
-            // std::cout << "Jacobian H2:\n"
-            //           << H_right << std::endl;
+            std::cout << "Jacobian H1:\n"
+                      << H_left << std::endl;
+            std::cout << "Jacobian H2:\n"
+                      << H_right << std::endl;
             // RCLCPP_INFO(node_->get_logger(), "Time: %.6f, G_k = [%.6f, %.6f, %.6f]", node_->now().seconds(), G_k(0), G_k(1), G_k(2));
         }
         // error[0] = 0;
@@ -170,9 +168,8 @@ public:
         std::stringstream ss;
         ss << error.transpose().format(CleanFmt);
         // RCLCPP_INFO(node_->get_logger(), "Time: %f, error = %s", node_->now().seconds(), ss.str().c_str());
-        // RCLCPP_INFO(node_->get_logger(), "down : Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f], error = [%.6f, %.6f, %.6f]", node_->now().seconds(), 
+        // RCLCPP_INFO(node_->get_logger(), "down : Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f], error = [%.6f, %.6f, %.6f]", node_->now().seconds(),
         //     G_k(0), G_k(1), G_k(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2), error[0], error[1], error[2]);
-        
 
         // std::cout << "weightedError = " << weightedError.transpose() << std::endl;
 
@@ -201,7 +198,7 @@ private:
 
         // 計算 sigma_17
         double sigma17 = pow(abs(phi1), 2) + pow(abs(phi2), 2) + pow(abs(phi3), 2);
-        double safe_sigma17 = std::max(sigma17, epsilon);
+        double safe_sigma17 = std::max(sigma17, epsilon); // 用 epsilon 防止 sigma17 為 0
 
         // 計算 sigma_1 到 sigma_16
         double sigma13 = cos(sqrt(safe_sigma17)) - 1;
@@ -222,12 +219,12 @@ private:
         double sigma11 = (phi1 * phi3 * (sigma16 - sigma15)) / safe_sigma17;
         double sigma12 = (phi1 * phi2 * (sigma16 - sigma15)) / safe_sigma17;
 
-        // 計算向量結果
-        result[0] = rho3 * (sigma5 - sigma11 - (phi3 * sigma14) / safe_sigma17 + sigma2 + sigma8) - rho1 * ((pow(phi1, 2) * (sigma16 - sigma15)) / safe_sigma17 + (2 * phi1 * sigma14) / safe_sigma17 - sigma16 + sigma15 - (2 * pow(phi1, 2) * abs(phi1) * std::copysign(1.0, phi1) * sigma14) / pow(safe_sigma17, 2)) - rho2 * ((phi2 * sigma14) / safe_sigma17 - sigma13 / safe_sigma17 + sigma12 + sigma6 + sigma3 - sigma9);
+        // 計算向量結果，根據您提供的正確公式進行更改
+        result[0] = rho3 * (sigma5 - sigma11 - (phi3 * sigma14) / safe_sigma17 + sigma2 + sigma8) - rho2 * ((phi2 * sigma14) / safe_sigma17 + sigma12 + sigma4 + sigma1 - sigma9) - rho1 * ((pow(phi1, 2) * (sigma16 - sigma15)) / safe_sigma17 + (2 * phi1 * sigma14) / safe_sigma17 - sigma16 + sigma15 - (2 * pow(phi1, 2) * abs(phi1) * std::copysign(1.0, phi1) * sigma14) / pow(safe_sigma17, 2));
 
-        result[1] = -rho3 * (sigma10 + sigma4 + sigma1 - sigma7) - rho2 * ((pow(phi2, 2) * (sigma16 - sigma15)) / safe_sigma17 - sigma16 + sigma15 - (2 * pow(phi2, 2) * abs(phi1) * std::copysign(1.0, phi1) * sigma14) / pow(safe_sigma17, 2)) - rho1 * (sigma13 / safe_sigma17 + (phi2 * sigma14) / safe_sigma17 + sigma12 - sigma6 - sigma3 - sigma9);
+        result[1] = rho1 * (sigma4 - sigma12 - (phi2 * sigma14) / safe_sigma17 + sigma1 + sigma9) - rho2 * ((pow(phi2, 2) * (sigma16 - sigma15)) / safe_sigma17 - sigma16 + sigma15 - (2 * pow(phi2, 2) * abs(phi1) * std::copysign(1.0, phi1) * sigma14) / pow(safe_sigma17, 2)) - rho3 * (sigma10 - (sigma13 / safe_sigma17) + sigma6 + sigma3 - sigma7);
 
-        result[2] = rho2 * (sigma4 - sigma10 + sigma1 + sigma7) - rho1 * ((phi3 * sigma14) / safe_sigma17 + sigma11 + sigma5 + sigma2 - sigma8) - rho3 * ((pow(phi3, 2) * (sigma16 - sigma15)) / safe_sigma17 - sigma16 + sigma15 - (2 * pow(phi3, 2) * abs(phi1) * std::copysign(1.0, phi1) * sigma14) / pow(safe_sigma17, 2));
+        result[2] = rho2 * (sigma6 - sigma10 - (sigma13 / safe_sigma17) + sigma3 + sigma7) - rho3 * ((pow(phi3, 2) * (sigma16 - sigma15)) / safe_sigma17 - sigma16 + sigma15 - (2 * pow(phi3, 2) * abs(phi1) * std::copysign(1.0, phi1) * sigma14) / pow(safe_sigma17, 2)) - rho1 * ((phi3 * sigma14) / safe_sigma17 + sigma11 + sigma5 + sigma2 - sigma8);
 
         return result;
     }
@@ -241,7 +238,7 @@ private:
 
         // 計算 sigma_17
         double sigma17 = pow(abs(phi1), 2) + pow(abs(phi2), 2) + pow(abs(phi3), 2);
-        double safe_sigma17 = std::max(sigma17, epsilon);
+        double safe_sigma17 = std::max(sigma17, epsilon); // 用 epsilon 防止 sigma17 為 0
 
         // 計算 sigma_1 到 sigma_16
         double sigma13 = cos(sqrt(safe_sigma17)) - 1;
@@ -262,12 +259,12 @@ private:
         double sigma11 = (phi1 * phi3 * (sigma16 - sigma15)) / safe_sigma17;
         double sigma12 = (phi1 * phi2 * (sigma16 - sigma15)) / safe_sigma17;
 
-        // 計算向量結果
-        result[0] = rho3 * (sigma5 - sigma11 - sigma13 / safe_sigma17 + sigma2 + sigma8) - rho1 * (pow(phi1, 2) * (sigma16 - sigma15) / safe_sigma17 - sigma16 + sigma15 - 2 * pow(phi1, 2) * abs(phi2) * std::copysign(1.0, phi2) * sigma14 / pow(safe_sigma17, 2)) - rho2 * ((phi1 * sigma14) / safe_sigma17 + sigma12 + sigma6 + sigma3 - sigma9);
+        // 計算向量結果，根據您提供的正確公式進行更改
+        result[0] = rho3 * (sigma5 - sigma11 - (sigma13 / safe_sigma17) + sigma2 + sigma8) - rho1 * ((pow(phi1, 2) * (sigma16 - sigma15)) / safe_sigma17 - sigma16 + sigma15 - (2 * pow(phi1, 2) * abs(phi2) * std::copysign(1.0, phi2) * sigma14) / pow(safe_sigma17, 2)) - rho2 * ((phi1 * sigma14) / safe_sigma17 + sigma12 + sigma4 + sigma1 - sigma9);
 
-        result[1] = rho1 * (sigma6 - sigma12 - (phi1 * sigma14) / safe_sigma17 + sigma3 + sigma9) - rho3 * (phi3 * sigma14 / safe_sigma17 + sigma10 + sigma4 + sigma1 - sigma7) - rho2 * (pow(phi2, 2) * (sigma16 - sigma15) / safe_sigma17 + 2 * phi2 * sigma14 / safe_sigma17 - sigma16 + sigma15 - 2 * pow(phi2, 2) * abs(phi2) * std::copysign(1.0, phi2) * sigma14 / pow(safe_sigma17, 2));
+        result[1] = rho1 * (sigma4 - sigma12 - (phi1 * sigma14) / safe_sigma17 + sigma1 + sigma9) - rho3 * ((phi3 * sigma14) / safe_sigma17 + sigma10 + sigma6 + sigma3 - sigma7) - rho2 * ((pow(phi2, 2) * (sigma16 - sigma15)) / safe_sigma17 + (2 * phi2 * sigma14) / safe_sigma17 - sigma16 + sigma15 - (2 * pow(phi2, 2) * abs(phi2) * std::copysign(1.0, phi2) * sigma14) / pow(safe_sigma17, 2));
 
-        result[2] = rho2 * (sigma4 - sigma10 - (phi3 * sigma14) / safe_sigma17 + sigma1 + sigma7) - rho3 * (pow(phi3, 2) * (sigma16 - sigma15) / safe_sigma17 - sigma16 + sigma15 - 2 * pow(phi3, 2) * abs(phi2) * std::copysign(1.0, phi2) * sigma14 / pow(safe_sigma17, 2)) - rho1 * (sigma11 - sigma13 / safe_sigma17 + sigma5 + sigma2 - sigma8);
+        result[2] = rho2 * (sigma6 - sigma10 - (phi3 * sigma14) / safe_sigma17 + sigma3 + sigma7) - rho3 * ((pow(phi3, 2) * (sigma16 - sigma15)) / safe_sigma17 - sigma16 + sigma15 - (2 * pow(phi3, 2) * abs(phi2) * std::copysign(1.0, phi2) * sigma14) / pow(safe_sigma17, 2)) - rho1 * (sigma11 - sigma13 / safe_sigma17 + sigma5 + sigma2 - sigma8);
 
         return result;
     }
@@ -281,9 +278,9 @@ private:
 
         // 計算 sigma_17
         double sigma17 = pow(abs(phi1), 2) + pow(abs(phi2), 2) + pow(abs(phi3), 2);
-        double safe_sigma17 = std::max(sigma17, epsilon);
+        double safe_sigma17 = std::max(sigma17, epsilon); // 防止 sigma17 為 0
 
-        // 計算 sigma_13 到 sigma_16
+        // 計算 sigma_1 到 sigma_16
         double sigma13 = cos(sqrt(safe_sigma17)) - 1;
         double sigma14 = (sin(sqrt(safe_sigma17)) / sqrt(safe_sigma17)) - 1;
 
@@ -302,12 +299,12 @@ private:
         double sigma11 = (phi1 * phi3 * (sigma16 - sigma15)) / safe_sigma17;
         double sigma12 = (phi1 * phi2 * (sigma16 - sigma15)) / safe_sigma17;
 
-        // 計算向量結果
-        result[0] = rho3 * (sigma5 - sigma11 - (phi1 * sigma14) / safe_sigma17 + sigma2 + sigma8) - rho2 * (sigma12 + sigma6 + sigma3 - sigma9) - rho1 * (pow(phi1, 2) * (sigma16 - sigma15) / safe_sigma17 - sigma16 + sigma15 - 2 * pow(phi1, 2) * abs(phi3) * std::copysign(1.0, phi3) * sigma14 / pow(safe_sigma17, 2));
+        // 計算向量結果，根據新的公式進行調整
+        result[0] = rho3 * (sigma5 - sigma11 - (phi1 * sigma14) / safe_sigma17 + sigma2 + sigma8) - rho1 * (pow(phi1, 2) * (sigma16 - sigma15) / safe_sigma17 - sigma16 + sigma15 - (2 * pow(phi1, 2) * abs(phi3) * std::copysign(1.0, phi3) * sigma14) / pow(safe_sigma17, 2)) - rho2 * (sigma12 - (sigma13 / safe_sigma17) + sigma4 + sigma1 - sigma9);
 
-        result[1] = rho1 * (sigma6 - sigma12 + sigma3 + sigma9) - rho2 * (pow(phi2, 2) * (sigma16 - sigma15) / safe_sigma17 - sigma16 + sigma15 - 2 * pow(phi2, 2) * abs(phi3) * std::copysign(1.0, phi3) * sigma14 / pow(safe_sigma17, 2)) - rho3 * (phi2 * sigma14 / safe_sigma17 - sigma13 / safe_sigma17 + sigma10 + sigma4 + sigma1 - sigma7);
+        result[1] = rho1 * (sigma4 - sigma12 - (sigma13 / safe_sigma17) + sigma1 + sigma9) - rho2 * (pow(phi2, 2) * (sigma16 - sigma15) / safe_sigma17 - sigma16 + sigma15 - (2 * pow(phi2, 2) * abs(phi3) * std::copysign(1.0, phi3) * sigma14) / pow(safe_sigma17, 2)) - rho3 * ((phi2 * sigma14) / safe_sigma17 + sigma10 + sigma6 + sigma3 - sigma7);
 
-        result[2] = -rho1 * (phi1 * sigma14 / safe_sigma17 + sigma11 + sigma5 + sigma2 - sigma8) - rho3 * (pow(phi3, 2) * (sigma16 - sigma15) / safe_sigma17 + 2 * phi3 * sigma14 / safe_sigma17 - sigma16 + sigma15 - 2 * pow(phi3, 2) * abs(phi3) * std::copysign(1.0, phi3) * sigma14 / pow(safe_sigma17, 2)) - rho2 * (sigma13 / safe_sigma17 + phi2 * sigma14 / safe_sigma17 + sigma10 - sigma4 - sigma1 - sigma7);
+        result[2] = rho2 * (sigma6 - sigma10 - (phi2 * sigma14) / safe_sigma17 + sigma3 + sigma7) - rho1 * ((phi1 * sigma14) / safe_sigma17 + sigma11 + sigma5 + sigma2 - sigma8) - rho3 * (pow(phi3, 2) * (sigma16 - sigma15) / safe_sigma17 + (2 * phi3 * sigma14) / safe_sigma17 - sigma16 + sigma15 - (2 * pow(phi3, 2) * abs(phi3) * std::copysign(1.0, phi3) * sigma14) / pow(safe_sigma17, 2));
 
         return result;
     }

@@ -64,6 +64,17 @@ MapOptimization::MapOptimization(const std::string &name, Channel<AssociationOut
   parameters.relinearizeSkip = 1;
   parameters.enableDetailedResults = true;
   parameters.evaluateNonlinearError = true;
+
+  // 創建 ISAM2DoglegParams 變數，並進行調整
+  gtsam::ISAM2DoglegParams doglegParams;
+  doglegParams.initialDelta = 0.25;                                           // 調整初始信任區域半徑
+  doglegParams.wildfireThreshold = 0.001;                                     // 調整野火閾值
+  doglegParams.adaptationMode = DoglegOptimizerImpl::ONE_STEP_PER_ITERATION; // 設置信任區域調整模式
+  doglegParams.verbose = true;                                               // 開啟詳細輸出
+
+  // 將調整好的 DoglegParams 賦值給 ISAM2Params 的 optimizationParams
+  parameters.optimizationParams = doglegParams;
+
   isam = new ISAM2(parameters);
   parameters.print();
 
@@ -1419,10 +1430,10 @@ void MapOptimization::saveKeyFramesAndFactor()
     // RCLCPP_INFO(this->get_logger(), "after add");
 
     // // 打印出 measuredNormal 和 measuredDistance
-    RCLCPP_INFO(
-        this->get_logger(),
-        "Measured Normal: [%.6f, %.6f, %.6f], Measured Distance: %.6f",
-        measuredNormal[0], measuredNormal[1], measuredNormal[2], measuredDistance);
+    // RCLCPP_INFO(
+    //     this->get_logger(),
+    //     "Measured Normal: [%.6f, %.6f, %.6f], Measured Distance: %.6f",
+    //     measuredNormal[0], measuredNormal[1], measuredNormal[2], measuredDistance);
 
     // test odometry factor's jacobian
     // auto factor = BetweenFactor<Pose3>(
@@ -1494,7 +1505,6 @@ void MapOptimization::saveKeyFramesAndFactor()
   {
     result.detail = gtsam::ISAM2Result::DetailedResults();
   }
-    
 
   // 將新的因子添加到累積的因子圖中
   // cumulativeGraph.add(gtSAMgraph);

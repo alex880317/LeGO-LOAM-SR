@@ -70,13 +70,17 @@ set(dependencies
 
 add_executable(${PROJECT_NAME} src/imageProjection.cpp src/featureAssociation.cpp src/mapOptmization.cpp src/transformFusion.cpp src/main.cpp)
 add_executable(AGPC test/AGPC_Detection.cpp)
+add_executable(GroundPlaneFactor_test test/GroundPlaneFactor_test.cpp)
 target_link_libraries(${PROJECT_NAME} ${PCL_LIBRARIES} ${colcon_INCLUDE_DIRS} ${OpenCV_LIBS} gtsam)
 target_link_libraries(AGPC ${PCL_LIBRARIES} ${colcon_INCLUDE_DIRS} ${OpenCV_LIBS} gtsam )
+target_link_libraries(GroundPlaneFactor_test ${PCL_LIBRARIES} ${colcon_INCLUDE_DIRS} ${OpenCV_LIBS} gtsam)
 ament_target_dependencies(${PROJECT_NAME} ${dependencies} Eigen3)
 ament_target_dependencies(AGPC ${dependencies} Eigen3)
+ament_target_dependencies(GroundPlaneFactor_test ${dependencies} Eigen3)
 
 install(TARGETS
   ${PROJECT_NAME}
+  GroundPlaneFactor_test
   DESTINATION lib/${PROJECT_NAME}
 )
 
