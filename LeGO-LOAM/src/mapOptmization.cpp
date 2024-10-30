@@ -37,7 +37,8 @@
 #include "mapOptimization.h"
 #include <future>
 
-#include "GroundPlaneFactor.h"
+// #include "ADGroundPlaneFactor.h"
+#include "expressions.h"
 
 #include <gtsam/nonlinear/NonlinearFactorGraph.h>
 #include <gtsam/nonlinear/Marginals.h>
@@ -65,15 +66,15 @@ MapOptimization::MapOptimization(const std::string &name, Channel<AssociationOut
   parameters.enableDetailedResults = true;
   parameters.evaluateNonlinearError = true;
 
-  // 創建 ISAM2DoglegParams 變數，並進行調整
-  gtsam::ISAM2DoglegParams doglegParams;
-  doglegParams.initialDelta = 0.25;                                           // 調整初始信任區域半徑
-  doglegParams.wildfireThreshold = 0.001;                                     // 調整野火閾值
-  doglegParams.adaptationMode = DoglegOptimizerImpl::ONE_STEP_PER_ITERATION; // 設置信任區域調整模式
-  doglegParams.verbose = true;                                               // 開啟詳細輸出
+  // // 創建 ISAM2DoglegParams 變數，並進行調整
+  // gtsam::ISAM2DoglegParams doglegParams;
+  // doglegParams.initialDelta = 0.25;                                          // 調整初始信任區域半徑
+  // doglegParams.wildfireThreshold = 0.001;                                    // 調整野火閾值
+  // doglegParams.adaptationMode = DoglegOptimizerImpl::ONE_STEP_PER_ITERATION; // 設置信任區域調整模式
+  // doglegParams.verbose = true;                                               // 開啟詳細輸出
 
-  // 將調整好的 DoglegParams 賦值給 ISAM2Params 的 optimizationParams
-  parameters.optimizationParams = doglegParams;
+  // // 將調整好的 DoglegParams 賦值給 ISAM2Params 的 optimizationParams
+  // parameters.optimizationParams = doglegParams;
 
   isam = new ISAM2(parameters);
   parameters.print();
@@ -1402,85 +1403,114 @@ void MapOptimization::saveKeyFramesAndFactor()
         cloudKeyPoses3D->points.size() - 1, cloudKeyPoses3D->points.size(),
         poseFrom.between(poseTo), odometryNoise));
     //////////////////////////////////////////////////////////////////////////////////
-    // // 假設 transformAftMapped 是一個包含 6 個元素的數組或向量
-    // std::cout << "Roll (transformAftMapped[2]): " << transformAftMapped[2] << std::endl;
-    // std::cout << "Pitch (transformAftMapped[0]): " << transformAftMapped[0] << std::endl;
-    // std::cout << "Yaw (transformAftMapped[1]): " << transformAftMapped[1] << std::endl;
-    // std::cout << "X (transformAftMapped[5]): " << transformAftMapped[5] << std::endl;
-    // std::cout << "Y (transformAftMapped[3]): " << transformAftMapped[3] << std::endl;
-    // std::cout << "Z (transformAftMapped[4]): " << transformAftMapped[4] << std::endl;
-    // Alex
-    // // 創建噪聲模型，對應於 GroundPlaneFactor 的距離和法向量的噪聲
-    // auto distanceNoiseModel = gtsam::noiseModel::Diagonal::Sigmas(gtsam::Vector1(0.1));  // 1維距離噪聲
-    // auto normalVectorNoiseModel = gtsam::noiseModel::Diagonal::Sigmas(gtsam::Vector3(0.1, 0.1, 0.1));  // 3維法向量噪聲
 
-    // 假設法向量測量的兩個角度誤差（theta, phi）的標準差是 0.1，距離誤差的標準差是 0.05
-    gtsam::Vector sigmas(2);
-    sigmas << 0.1, 0.1; // 3 維向量：法向量兩個角度的標準差和距離的標準差
-    // 創建對角噪聲模型，使用 GTSAM 的 noiseModel::Diagonal::Sigmas
-    gtsam::SharedNoiseModel noiseModel = gtsam::noiseModel::Diagonal::Sigmas(sigmas);
+    // gtsam::Key currentKey = cloudKeyPoses3D->points.size();
 
-    gtsam::Key currentKey = cloudKeyPoses3D->points.size();
-    // 提取 measuredNormal 和 measuredDistance
-    gtsam::Vector3 measuredNormal(_Gk_star[0], _Gk_star[1], _Gk_star[2]); // 前三個元素作為法向量
-    double measuredDistance = _Gk_star[3];                                // 第四個元素作為距離
-    // RCLCPP_INFO(this->get_logger(), "before add");
-    gtSAMgraph.add(boost::make_shared<GroundPlaneFactor>(
-        currentKey, measuredNormal, measuredDistance, noiseModel, shared_from_this()));
-    // RCLCPP_INFO(this->get_logger(), "after add");
+    // // 定義測量的法向量和距離
+    // gtsam::Vector3 measuredNormal(_Gk_star[0], _Gk_star[1], _Gk_star[2]); // 前三個元素作為法向量
+    // double measuredDistance = _Gk_star[3];                                // 第四個元素作為距離
+    // // gtsam::Vector3 measuredNormal(0.0, 0.0, 1.0);
+    // // double measuredDistance = 0.12;
 
-    // // 打印出 measuredNormal 和 measuredDistance
-    // RCLCPP_INFO(
-    //     this->get_logger(),
-    //     "Measured Normal: [%.6f, %.6f, %.6f], Measured Distance: %.6f",
-    //     measuredNormal[0], measuredNormal[1], measuredNormal[2], measuredDistance);
+    // gtsam::Vector3 refValue(0.0, 0.0, 0.12);
 
-    // test odometry factor's jacobian
-    // auto factor = BetweenFactor<Pose3>(
-    //     cloudKeyPoses3D->points.size() - 1, cloudKeyPoses3D->points.size(),
-    //     poseFrom.between(poseTo), odometryNoise);
-    // Matrix H1_actual, H2_actual;
-    // factor.evaluateError(poseFrom, poseTo, H1_actual, H2_actual);
-    // // 打印解析和數值雅可比矩陣
-    // std::cout << "Jacobian w.r.t. p1 (Analytical):\n"
-    //           << H1_actual << std::endl;
+    // // 使用表達式來包裝 GroundPlane 的投影
+    // auto groundPlaneExpr = gtsamexpressions::projectGroundPlane_(
+    //     currentKey,
+    //     gtsam::Expression<gtsam::Vector3>(measuredNormal),
+    //     gtsam::Expression<double>(measuredDistance));
 
-    // std::cout << "Jacobian w.r.t. p2 (Analytical):\n"
-    //           << H2_actual << std::endl;
+    // // 定義噪聲模型
+    // gtsam::Vector sigmas(3);
+    // sigmas << 0.1, 0.1, 0.1; // 3 維向量：法向量兩個角度的標準差和距離的標準差
+    // // 創建對角噪聲模型，使用 GTSAM 的 noiseModel::Diagonal::Sigmas
+    // gtsam::SharedNoiseModel noiseModel = gtsam::noiseModel::Diagonal::Sigmas(sigmas);
 
-    // 创建因子实例
-    auto factor = boost::make_shared<GroundPlaneFactor>(
-        currentKey, measuredNormal, measuredDistance, noiseModel, shared_from_this());
-
-    // 准备雅可比矩阵
-    gtsam::Matrix H_actual;
-
-    // factor.evaluateError(poseTo, H_actual);
-    // 调用 evaluateError 获取误差和雅可比矩阵
-    gtsam::Vector error = factor->evaluateError(poseTo, H_actual);
-
-    Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
-    std::stringstream ss;
-    ss << H_actual.format(CleanFmt);
-    RCLCPP_INFO(this->get_logger(), "Jacobian:\n%s", ss.str().c_str());
-
-    Eigen::IOFormat CleanFmt2(4, 0, ", ", "\n", "[", "]");
-    std::stringstream ss_error;
-    ss_error << error.transpose().format(CleanFmt2);
-    RCLCPP_INFO(this->get_logger(), "Error vector:\n%s", ss_error.str().c_str());
-
-    gtsam::Vector3 t_k_W = poseTo.translation();
-    // // 打印三個分量
-    // RCLCPP_INFO(this->get_logger(), "Translation vector(t_k_W): [%.6f, %.6f, %.6f]",
-    //         t_k_W.x(),  // X 分量
-    //         t_k_W.y(),  // Y 分量
-    //         t_k_W.z()); // Z 分量
-    // RCLCPP_INFO(this->get_logger(), "Translation vector(transformAftMapped): [%.6f, %.6f, %.6f]",
-    //         transformAftMapped[5],  // X 分量
-    //         transformAftMapped[3],  // Y 分量
-    //         transformAftMapped[4]); // Z 分量
+    // // 添加 Expression 因子
+    // gtSAMgraph.addExpressionFactor(groundPlaneExpr, refValue, noiseModel);
 
     //////////////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////////////
+    // // // 假設 transformAftMapped 是一個包含 6 個元素的數組或向量
+    // // std::cout << "Roll (transformAftMapped[2]): " << transformAftMapped[2] << std::endl;
+    // // std::cout << "Pitch (transformAftMapped[0]): " << transformAftMapped[0] << std::endl;
+    // // std::cout << "Yaw (transformAftMapped[1]): " << transformAftMapped[1] << std::endl;
+    // // std::cout << "X (transformAftMapped[5]): " << transformAftMapped[5] << std::endl;
+    // // std::cout << "Y (transformAftMapped[3]): " << transformAftMapped[3] << std::endl;
+    // // std::cout << "Z (transformAftMapped[4]): " << transformAftMapped[4] << std::endl;
+    // // Alex
+    // // // 創建噪聲模型，對應於 ADGroundPlaneFactor 的距離和法向量的噪聲
+    // // auto distanceNoiseModel = gtsam::noiseModel::Diagonal::Sigmas(gtsam::Vector1(0.1));  // 1維距離噪聲
+    // // auto normalVectorNoiseModel = gtsam::noiseModel::Diagonal::Sigmas(gtsam::Vector3(0.1, 0.1, 0.1));  // 3維法向量噪聲
+
+    // // 假設法向量測量的兩個角度誤差（theta, phi）的標準差是 0.1，距離誤差的標準差是 0.05
+    // gtsam::Vector sigmas(2);
+    // sigmas << 0.1, 0.1; // 3 維向量：法向量兩個角度的標準差和距離的標準差
+    // // 創建對角噪聲模型，使用 GTSAM 的 noiseModel::Diagonal::Sigmas
+    // gtsam::SharedNoiseModel noiseModel = gtsam::noiseModel::Diagonal::Sigmas(sigmas);
+
+    // gtsam::Key currentKey = cloudKeyPoses3D->points.size();
+    // // 提取 measuredNormal 和 measuredDistance
+    // gtsam::Vector3 measuredNormal(_Gk_star[0], _Gk_star[1], _Gk_star[2]); // 前三個元素作為法向量
+    // double measuredDistance = _Gk_star[3];                                // 第四個元素作為距離
+    // // RCLCPP_INFO(this->get_logger(), "before add");
+    // gtSAMgraph.add(boost::make_shared<ADGroundPlaneFactor>(
+    //     currentKey, measuredNormal, measuredDistance, noiseModel, shared_from_this()));
+    // // RCLCPP_INFO(this->get_logger(), "after add");
+
+    // // // 打印出 measuredNormal 和 measuredDistance
+    // // RCLCPP_INFO(
+    // //     this->get_logger(),
+    // //     "Measured Normal: [%.6f, %.6f, %.6f], Measured Distance: %.6f",
+    // //     measuredNormal[0], measuredNormal[1], measuredNormal[2], measuredDistance);
+
+    // // test odometry factor's jacobian
+    // // auto factor = BetweenFactor<Pose3>(
+    // //     cloudKeyPoses3D->points.size() - 1, cloudKeyPoses3D->points.size(),
+    // //     poseFrom.between(poseTo), odometryNoise);
+    // // Matrix H1_actual, H2_actual;
+    // // factor.evaluateError(poseFrom, poseTo, H1_actual, H2_actual);
+    // // // 打印解析和數值雅可比矩陣
+    // // std::cout << "Jacobian w.r.t. p1 (Analytical):\n"
+    // //           << H1_actual << std::endl;
+
+    // // std::cout << "Jacobian w.r.t. p2 (Analytical):\n"
+    // //           << H2_actual << std::endl;
+
+    // // 创建因子实例
+    // auto factor = boost::make_shared<ADGroundPlaneFactor>(
+    //     currentKey, measuredNormal, measuredDistance, noiseModel, shared_from_this());
+
+    // // 准备雅可比矩阵
+    // gtsam::Matrix H_actual;
+
+    // // factor.evaluateError(poseTo, H_actual);
+    // // 调用 evaluateError 获取误差和雅可比矩阵
+    // gtsam::Vector error = factor->evaluateError(poseTo, H_actual);
+
+    // Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
+    // std::stringstream ss;
+    // ss << H_actual.format(CleanFmt);
+    // RCLCPP_INFO(this->get_logger(), "Jacobian:\n%s", ss.str().c_str());
+
+    // Eigen::IOFormat CleanFmt2(4, 0, ", ", "\n", "[", "]");
+    // std::stringstream ss_error;
+    // ss_error << error.transpose().format(CleanFmt2);
+    // RCLCPP_INFO(this->get_logger(), "Error vector:\n%s", ss_error.str().c_str());
+
+    // // gtsam::Vector3 t_k_W = poseTo.translation();
+    // // // 打印三個分量
+    // // RCLCPP_INFO(this->get_logger(), "Translation vector(t_k_W): [%.6f, %.6f, %.6f]",
+    // //         t_k_W.x(),  // X 分量
+    // //         t_k_W.y(),  // Y 分量
+    // //         t_k_W.z()); // Z 分量
+    // // RCLCPP_INFO(this->get_logger(), "Translation vector(transformAftMapped): [%.6f, %.6f, %.6f]",
+    // //         transformAftMapped[5],  // X 分量
+    // //         transformAftMapped[3],  // Y 分量
+    // //         transformAftMapped[4]); // Z 分量
+
+    // //////////////////////////////////////////////////////////////////////////////////
 
     initialEstimate.insert(
         cloudKeyPoses3D->points.size(),
@@ -1490,7 +1520,7 @@ void MapOptimization::saveKeyFramesAndFactor()
                      transformAftMapped[4])));
     // std::cout << "Number of key poses: " << cloudKeyPoses3D->points.size() << std::endl; // state
   }
-  RCLCPP_INFO(this->get_logger(), "key = %lu", cloudKeyPoses3D->points.size());
+  // RCLCPP_INFO(this->get_logger(), "key = %lu", cloudKeyPoses3D->points.size());
 
   /**
    * update iSAM
@@ -1500,11 +1530,11 @@ void MapOptimization::saveKeyFramesAndFactor()
   // RCLCPP_INFO(this->get_logger(), "before update2");
   isam->update();
   // RCLCPP_INFO(this->get_logger(), "gtsam update");
-  result.print();
-  if (isam->params().enableDetailedResults)
-  {
-    result.detail = gtsam::ISAM2Result::DetailedResults();
-  }
+  // result.print();
+  // if (isam->params().enableDetailedResults)
+  // {
+  //   result.detail = gtsam::ISAM2Result::DetailedResults();
+  // }
 
   // 將新的因子添加到累積的因子圖中
   // cumulativeGraph.add(gtSAMgraph);
@@ -1528,25 +1558,27 @@ void MapOptimization::saveKeyFramesAndFactor()
   latestEstimate =
       isamCurrentEstimate.at<Pose3>(isamCurrentEstimate.size() - 1);
 
-  if (result.errorBefore)
-  {
-    double errorBefore = result.errorBefore.get(); // 只有當有值時，才使用 .get() 取得值
-    std::cout << "Error before: " << errorBefore << std::endl;
-  }
-  else
-  {
-    std::cout << "errorBefore 未初始化" << std::endl;
-  }
+  // if (result.errorBefore)
+  // {
+  //   double errorBefore = result.errorBefore.get(); // 只有當有值時，才使用 .get() 取得值
+  //   std::cout << "Error before: " << errorBefore << std::endl;
+  // }
+  // else
+  // {
+  //   std::cout << "errorBefore 未初始化" << std::endl;
+  // }
 
-  if (result.errorAfter)
-  {
-    double errorAfter = result.errorAfter.get(); // 只有當有值時，才使用 .get() 取得值
-    std::cout << "Error after: " << errorAfter << std::endl;
-  }
-  else
-  {
-    std::cout << "errorAfter 未初始化" << std::endl;
-  }
+  // if (result.errorAfter)
+  // {
+  //   double errorAfter = result.errorAfter.get(); // 只有當有值時，才使用 .get() 取得值
+  //   std::cout << "Error after: " << errorAfter << std::endl;
+  // }
+  // else
+  // {
+  //   std::cout << "errorAfter 未初始化" << std::endl;
+  // }
+
+
   // // 访问更新前后的非线性误差
   // double errorBefore = result.errorBefore.get();
   // double errorAfter = result.errorAfter.get();

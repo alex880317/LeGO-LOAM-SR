@@ -68,9 +68,18 @@ set(dependencies
   rosbag2_cpp
 )
 
+# Alex
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../customizeFactor ${CMAKE_CURRENT_BINARY_DIR}/customizeFactor)
+
 add_executable(${PROJECT_NAME} src/imageProjection.cpp src/featureAssociation.cpp src/mapOptmization.cpp src/transformFusion.cpp src/main.cpp)
 add_executable(AGPC test/AGPC_Detection.cpp)
 add_executable(GroundPlaneFactor_test test/GroundPlaneFactor_test.cpp)
+
+# 將 customizeFactor 中的檔案添加到主程式的目標中
+target_sources(lego_loam_sr PRIVATE ${CUSTOMIZE_FACTOR_SOURCES})
+# 設定包含路徑，以便可以在程式中引用 customizeFactor 的頭文件
+target_include_directories(lego_loam_sr PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../customizeFactor/src)
+
 target_link_libraries(${PROJECT_NAME} ${PCL_LIBRARIES} ${colcon_INCLUDE_DIRS} ${OpenCV_LIBS} gtsam)
 target_link_libraries(AGPC ${PCL_LIBRARIES} ${colcon_INCLUDE_DIRS} ${OpenCV_LIBS} gtsam )
 target_link_libraries(GroundPlaneFactor_test ${PCL_LIBRARIES} ${colcon_INCLUDE_DIRS} ${OpenCV_LIBS} gtsam)

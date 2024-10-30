@@ -15,6 +15,8 @@
 #include <gtsam/slam/PriorFactor.h>
 #include <gtsam/nonlinear/ISAM2.h>
 
+#include <gtsam/nonlinear/ExpressionFactorGraph.h>
+
 inline gtsam::Pose3 pclPointTogtsamPose3(PointTypePose thisPoint) {
   // camera frame to lidar frame
   return gtsam::Pose3(
@@ -42,8 +44,8 @@ class MapOptimization : public rclcpp::Node {
   void run();
 
  private:
-  gtsam::NonlinearFactorGraph gtSAMgraph;
-//   gtsam::ExpressionFactorGraph gtSAMgraph;
+//   gtsam::NonlinearFactorGraph gtSAMgraph;
+  gtsam::ExpressionFactorGraph gtSAMgraph;
   gtsam::Values initialEstimate;
   gtsam::ISAM2 *isam;
   gtsam::Values isamCurrentEstimate;
