@@ -185,7 +185,8 @@ void ImageProjection::cloudHandler(
   // Range image projection
   projectPointCloud();
   // Mark ground points
-  groundRemoval();
+  // groundRemoval();
+  groundRemovalRANSAC();
   // Point cloud segmentation
   cloudSegmentation();
   // publish (optionally)
@@ -273,8 +274,6 @@ void ImageProjection::groundRemoval()
   // -1, no valid info to check if ground of not
   //  0, initial value, after validation, means not ground
   //  1, ground
-
-  /////////////////////////////////////////////////////////////////////////////////////
   for (int j = 0; j < _horizontal_scans; ++j)
   {
     for (int i = 0; i < _ground_scan_index; ++i)
@@ -290,94 +289,183 @@ void ImageProjection::groundRemoval()
         continue;
       }
 
-      // float dX =
-      //     _full_cloud->points[upperInd].x - _full_cloud->points[lowerInd].x;
-      // float dY =
-      //     _full_cloud->points[upperInd].y - _full_cloud->points[lowerInd].y;
-      // float dZ =
-      //     _full_cloud->points[upperInd].z - _full_cloud->points[lowerInd].z;
+      float dX =
+          _full_cloud->points[upperInd].x - _full_cloud->points[lowerInd].x;
+      float dY =
+          _full_cloud->points[upperInd].y - _full_cloud->points[lowerInd].y;
+      float dZ =
+          _full_cloud->points[upperInd].z - _full_cloud->points[lowerInd].z;
 
-      // float vertical_angle = std::atan2(dZ , sqrt(dX * dX + dY * dY + dZ * dZ));
+      float vertical_angle = std::atan2(dZ, sqrt(dX * dX + dY * dY + dZ * dZ));
 
-      // // TODO: review this change
+      // TODO: review this change
 
-      // if ( (vertical_angle - _sensor_mount_angle) <= 10 * DEG_TO_RAD) {
-      //   _ground_mat(i, j) = 1;
-      //   _ground_mat(i + 1, j) = 1;
-      // }
+      if ((vertical_angle - _sensor_mount_angle) <= 10 * DEG_TO_RAD)
+      {
+        _ground_mat(i, j) = 1;
+        _ground_mat(i + 1, j) = 1;
+      }
     }
   }
+  // extract ground cloud (_ground_mat == 1)
+  // mark entry that doesn't need to label (ground and invalid point) for
+  // segmentation note that ground remove is from 0~_N_scan-1, need _range_mat
+  // for mark label matrix for the 16th scan
+  for (int i = 0; i < _vertical_scans; ++i)
+  {
+    for (int j = 0; j < _horizontal_scans; ++j)
+    {
+      if (_ground_mat(i, j) == 1 ||
+          _range_mat(i, j) == FLT_MAX)
+      {
+        _label_mat(i, j) = -1;
+      }
+    }
+  }
+
+  for (int i = 0; i <= _ground_scan_index; ++i)
+  {
+    for (int j = 0; j < _horizontal_scans; ++j)
+    {
+      if (_ground_mat(i, j) == 1)
+        _ground_cloud->push_back(_full_cloud->points[j + i * _horizontal_scans]);
+    }
+  }
+}
+
+void ImageProjection::groundRemovalRANSAC()
+{
+  // _ground_mat
+  // -1, no valid info to check if ground of not
+  //  0, initial value, after validation, means not ground
+  //  1, ground
+
+  /////////////////////////////////////////////////////////////////////////////////////
+
+  pcl::PointCloud<pcl::PointXYZ>::Ptr GroundPlane_cloud(new pcl::PointCloud<pcl::PointXYZ>);
+
+  for (int j = 0; j < _horizontal_scans; ++j)
+  {
+    for (int i = 0; i < _ground_scan_index; ++i)
+    {
+      int lowerInd = j + (i)*_horizontal_scans;
+      int upperInd = j + (i + 1) * _horizontal_scans;
+
+      if (_full_cloud->points[lowerInd].intensity == -1 ||
+          _full_cloud->points[upperInd].intensity == -1)
+      {
+        // no info to check, invalid points
+        _ground_mat(i, j) = -1;
+        continue;
+      }
+
+      float dX =
+          _full_cloud->points[upperInd].x - _full_cloud->points[lowerInd].x;
+      float dY =
+          _full_cloud->points[upperInd].y - _full_cloud->points[lowerInd].y;
+      float dZ =
+          _full_cloud->points[upperInd].z - _full_cloud->points[lowerInd].z;
+
+      float vertical_angle = std::atan2(dZ , sqrt(dX * dX + dY * dY + dZ * dZ));
+
+      // TODO: review this change
+
+      if ((vertical_angle - _sensor_mount_angle) <= 10 * DEG_TO_RAD)
+      {
+        _ground_mat(i, j) = 1;
+        _ground_mat(i + 1, j) = 1;
+
+        // 將符合條件的 lowerInd 和 upperInd 點加入到 GroundPlane_cloud
+        pcl::PointXYZ pcl_point_lower, pcl_point_upper;
+        pcl_point_lower.x = _full_cloud->points[lowerInd].x;
+        pcl_point_lower.y = _full_cloud->points[lowerInd].y;
+        pcl_point_lower.z = _full_cloud->points[lowerInd].z;
+        GroundPlane_cloud->points.push_back(pcl_point_lower);
+
+        pcl_point_upper.x = _full_cloud->points[upperInd].x;
+        pcl_point_upper.y = _full_cloud->points[upperInd].y;
+        pcl_point_upper.z = _full_cloud->points[upperInd].z;
+        GroundPlane_cloud->points.push_back(pcl_point_upper);
+      }
+    }
+  }
+
+  // 設置 filtered_cloud 的點雲參數
+  GroundPlane_cloud->width = GroundPlane_cloud->points.size();
+  GroundPlane_cloud->height = 1;      // 非結構化點雲
+  GroundPlane_cloud->is_dense = true; // 假設所有點都有效
+
   /////////////////////////////////////////////////////////////////////////////////////
 
   /////////////////////////////////////////////////////////////////////////////////////
-  // Alex ransac extract ground plane
-  // 從剛才提取的點雲中轉換成我們的自定義 Point 結構並進行濾波
-  std::vector<Point> custom_cloud;
-  int index = 0; // 用來追蹤點的索引
-  for (const auto &pcl_point : _full_cloud->points)
-  {
-    // std::cout << "z value : " << pcl_point.z << std::endl;
-    if (pcl_point.z >= -0.3 - 0.12 && pcl_point.z <= 0.3 - 0.12)
-    { // pcl_point.z >= -0.05-0.035-0.05 && pcl_point.z <= 0.05-0.035-0.05
-      Point pt = {pcl_point.x, pcl_point.y, pcl_point.z, index};
-      custom_cloud.push_back(pt);
-    }
-    index++;
-  }
-  // 設置點雲的 width 和 height 屬性
-  _full_cloud->width = _full_cloud->points.size(); // 點的數量
-  _full_cloud->height = 1;                         // 非結構化點雲
-  _full_cloud->is_dense = false;                   // 如果點雲可能包含無效點（例如 NaN）
-  // 儲存為 .pcd 檔案
-  pcl::io::savePCDFileASCII("full_cloud.pcd", *_full_cloud);
+  // // Alex ransac extract ground plane
+  // // 從剛才提取的點雲中轉換成我們的自定義 Point 結構並進行濾波
+  // std::vector<Point> custom_cloud;
+  // int index = 0; // 用來追蹤點的索引
+  // for (const auto &pcl_point : _full_cloud->points)
+  // {
+  //   // std::cout << "z value : " << pcl_point.z << std::endl;
+  //   if (pcl_point.z >= -0.3 - 0.12 && pcl_point.z <= 0.3 - 0.12)
+  //   { // pcl_point.z >= -0.05-0.035-0.05 && pcl_point.z <= 0.05-0.035-0.05
+  //     Point pt = {pcl_point.x, pcl_point.y, pcl_point.z, index};
+  //     custom_cloud.push_back(pt);
+  //   }
+  //   index++;
+  // }
+  // // 設置點雲的 width 和 height 屬性
+  // _full_cloud->width = _full_cloud->points.size(); // 點的數量
+  // _full_cloud->height = 1;                         // 非結構化點雲
+  // _full_cloud->is_dense = false;                   // 如果點雲可能包含無效點（例如 NaN）
+  // // 儲存為 .pcd 檔案
+  // pcl::io::savePCDFileASCII("full_cloud.pcd", *_full_cloud);
 
-  // 將 custom_cloud 轉換為 PCL 格式
-  pcl::PointCloud<pcl::PointXYZRGB>::Ptr filtered_cloud_rgb(new pcl::PointCloud<pcl::PointXYZRGB>);
-  pcl::PointCloud<pcl::PointXYZ>::Ptr filtered_cloud_xyz(new pcl::PointCloud<pcl::PointXYZ>);
-  std::vector<int> filteredclouds_idx;
+  // // 將 custom_cloud 轉換為 PCL 格式
+  // pcl::PointCloud<pcl::PointXYZRGB>::Ptr filtered_cloud_rgb(new pcl::PointCloud<pcl::PointXYZRGB>);
+  // pcl::PointCloud<pcl::PointXYZ>::Ptr filtered_cloud_xyz(new pcl::PointCloud<pcl::PointXYZ>);
+  // std::vector<int> filteredclouds_idx;
 
-  for (const auto &pt : custom_cloud)
-  {
-    // 處理帶有 RGB 的點
-    pcl::PointXYZRGB pcl_point_rgb;
-    pcl_point_rgb.x = pt.x;
-    pcl_point_rgb.y = pt.y;
-    pcl_point_rgb.z = pt.z;
+  // for (const auto &pt : custom_cloud)
+  // {
+  //   // 處理帶有 RGB 的點
+  //   pcl::PointXYZRGB pcl_point_rgb;
+  //   pcl_point_rgb.x = pt.x;
+  //   pcl_point_rgb.y = pt.y;
+  //   pcl_point_rgb.z = pt.z;
 
-    // 指定 RGB 顏色（範圍 0-255）
-    pcl_point_rgb.r = 255; // 紅色
-    pcl_point_rgb.g = 182; // 綠色
-    pcl_point_rgb.b = 193; // 藍色
+  //   // 指定 RGB 顏色（範圍 0-255）
+  //   pcl_point_rgb.r = 255; // 紅色
+  //   pcl_point_rgb.g = 182; // 綠色
+  //   pcl_point_rgb.b = 193; // 藍色
 
-    filtered_cloud_rgb->points.push_back(pcl_point_rgb);
+  //   filtered_cloud_rgb->points.push_back(pcl_point_rgb);
 
-    // 處理不帶 RGB 的點
-    pcl::PointXYZ pcl_point_xyz;
-    pcl_point_xyz.x = pt.x;
-    pcl_point_xyz.y = pt.y;
-    pcl_point_xyz.z = pt.z;
+  //   // 處理不帶 RGB 的點
+  //   pcl::PointXYZ pcl_point_xyz;
+  //   pcl_point_xyz.x = pt.x;
+  //   pcl_point_xyz.y = pt.y;
+  //   pcl_point_xyz.z = pt.z;
 
-    filtered_cloud_xyz->points.push_back(pcl_point_xyz);
+  //   filtered_cloud_xyz->points.push_back(pcl_point_xyz);
 
-    filteredclouds_idx.push_back(pt.index);
-  }
+  //   filteredclouds_idx.push_back(pt.index);
+  // }
 
-  // 設置有 RGB 點雲的 width 和 height 屬性
-  filtered_cloud_rgb->width = filtered_cloud_rgb->points.size(); // 點的數量
-  filtered_cloud_rgb->height = 1;                                // 非結構化點雲
-  filtered_cloud_rgb->is_dense = false;                          // 如果點雲可能包含無效點（例如 NaN）
+  // // 設置有 RGB 點雲的 width 和 height 屬性
+  // filtered_cloud_rgb->width = filtered_cloud_rgb->points.size(); // 點的數量
+  // filtered_cloud_rgb->height = 1;                                // 非結構化點雲
+  // filtered_cloud_rgb->is_dense = false;                          // 如果點雲可能包含無效點（例如 NaN）
 
-  // 設置無 RGB 點雲的 width 和 height 屬性
-  filtered_cloud_xyz->width = filtered_cloud_xyz->points.size(); // 點的數量
-  filtered_cloud_xyz->height = 1;                                // 非結構化點雲
-  filtered_cloud_xyz->is_dense = false;                          // 如果點雲可能包含無效點（例如 NaN）
+  // // 設置無 RGB 點雲的 width 和 height 屬性
+  // filtered_cloud_xyz->width = filtered_cloud_xyz->points.size(); // 點的數量
+  // filtered_cloud_xyz->height = 1;                                // 非結構化點雲
+  // filtered_cloud_xyz->is_dense = false;                          // 如果點雲可能包含無效點（例如 NaN）
 
   // 儲存帶有 RGB 的點雲
-  pcl::io::savePCDFileASCII("filtered_pointcloud.pcd", *filtered_cloud_rgb);
+  pcl::io::savePCDFileASCII("GroundPlane_cloud.pcd", *GroundPlane_cloud);
   // std::cout << "Saved filtered point cloud to filtered_pointcloud.pcd" << std::endl;
 
   // convert to <GRANSAC::AbstractParameter>
-  std::vector<std::shared_ptr<GRANSAC::AbstractParameter>> Qk = ConvertPointCloudToGRANSAC(filtered_cloud_xyz, filteredclouds_idx);
+  std::vector<std::shared_ptr<GRANSAC::AbstractParameter>> Qk = ConvertPointCloudToGRANSAC(GroundPlane_cloud);
 
   // caculate RANSAC
   GRANSAC::RANSAC<PlaneModel, 3> Estimator;
@@ -419,14 +507,14 @@ void ImageProjection::groundRemoval()
       Ground_Plane_XYZ->points.push_back(pcl_point_xyz);
       Ground_Plane_RGB->points.push_back(pcl_point_rgb);
 
-      int index = point->m_Index;
+      // int index = point->m_Index;
 
-      // 使用 std::div 函數計算商和餘數
-      div_t result = std::div(index, _horizontal_scans);
-      int i = result.quot;
-      int j = result.rem;
+      // // 使用 std::div 函數計算商和餘數
+      // div_t result = std::div(index, _horizontal_scans);
+      // int i = result.quot;
+      // int j = result.rem;
 
-      _ground_mat(i, j) = 1;
+      // _ground_mat(i, j) = 1;
     }
   }
 
@@ -725,7 +813,7 @@ void ImageProjection::publishClouds()
 // Alex
 std::vector<std::shared_ptr<GRANSAC::AbstractParameter>> ImageProjection::ConvertPointCloudToGRANSAC(
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud,
-    const std::vector<int> &original_indices)
+    const std::vector<int>& original_indices)
 {
   std::vector<std::shared_ptr<GRANSAC::AbstractParameter>> CandPoints;
   CandPoints.resize(cloud->points.size());

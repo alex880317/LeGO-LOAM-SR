@@ -33,11 +33,12 @@ class ImageProjection : public rclcpp::Node {
   void resetParameters();
   void projectPointCloud();
   void groundRemoval();
+  void groundRemovalRANSAC();
   void cloudSegmentation();
   void labelComponents(int row, int col);
   void publishClouds();
   std::vector<std::shared_ptr<GRANSAC::AbstractParameter>> ConvertPointCloudToGRANSAC(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud,
-                                                                                      const std::vector<int>& original_indices = std::vector<int>());
+                                                                                      const std::vector<int> &original_indices = {});
   double calculateDistance(const std::vector<double>& p, const std::vector<double>& Gk);
   double dotProduct(const std::vector<double>& vec1, const std::vector<double>& vec2);
 

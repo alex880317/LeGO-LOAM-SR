@@ -32,6 +32,8 @@
 
 #include "transformFusion.h"
 
+const std::string POSE_SAVE_PATH = "mapping.pose_save_path";
+
 TransformFusion::TransformFusion(const std::string &name) : Node(name) {
   pubLaserOdometry2 = this->create_publisher<nav_msgs::msg::Odometry>("/integrated_to_init", 5);
   subLaserOdometry = this->create_subscription<nav_msgs::msg::Odometry>(
@@ -44,6 +46,11 @@ TransformFusion::TransformFusion(const std::string &name) : Node(name) {
 
   laserOdometryTrans.header.frame_id = "camera_init";
   laserOdometryTrans.child_frame_id = "camera";
+
+  this->declare_parameter(POSE_SAVE_PATH);
+  if (!this->get_parameter(POSE_SAVE_PATH, poseSaveDirectory)) {
+  RCLCPP_WARN(this->get_logger(), "Parameter %s not found", poseSaveDirectory.c_str());
+  } 
 
   tfBroadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(this);
 

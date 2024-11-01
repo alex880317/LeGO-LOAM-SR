@@ -13,6 +13,8 @@ class TransformFusion : public rclcpp::Node {
   geometry_msgs::msg::TransformStamped laserOdometryTrans;
   std::shared_ptr<tf2_ros::TransformBroadcaster> tfBroadcaster;
 
+  std::string poseSaveDirectory;
+
   float transformSum[6];
   float transformIncre[6];
   float transformMapped[6];
