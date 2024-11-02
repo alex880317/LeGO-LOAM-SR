@@ -1024,11 +1024,16 @@ void MapOptimization::performLoopClosure()
 {
 
   if (cloudKeyPoses3D->points.empty() == true)
+  {
+    std::cout << "Check Keyframe" << std::endl;
     return;
+  }
+    
 
   // try to find close key frame if there are any
   if (potentialLoopFlag == false)
   {
+    std::cout << "Find Keyframe" << std::endl;
     if (detectLoopClosure() == true)
     {
       potentialLoopFlag = true; // find some key frames that is old enough or
@@ -1108,6 +1113,8 @@ void MapOptimization::performLoopClosure()
   isam->update(gtSAMgraph);
   isam->update();
   gtSAMgraph.resize(0);
+
+  std::cout << "loop closure" << std::endl;
 
   aLoopIsClosed = true;
 }
