@@ -47,6 +47,8 @@
 #include <gtsam/inference/Symbol.h>           // 鍵值管理
 #include <gtsam/nonlinear/Values.h>           // 儲存估計值
 
+#include <gtsam/nonlinear/ExpressionFactorGraph.h>
+
 using namespace gtsam;
 
 using std::string;
@@ -76,16 +78,19 @@ MapOptimization::MapOptimization(const std::string &name, Channel<AssociationOut
   parameters.relinearizeSkip = 1;
   parameters.enableDetailedResults = true;
   parameters.evaluateNonlinearError = true;
+  parameters.factorization = gtsam::ISAM2Params::QR;
 
-  // // 創建 ISAM2DoglegParams 變數，並進行調整
-  // gtsam::ISAM2DoglegParams doglegParams;
+  // 創建 ISAM2DoglegParams 變數，並進行調整
+  gtsam::ISAM2DoglegParams doglegParams;
   // doglegParams.initialDelta = 0.25;                                          // 調整初始信任區域半徑
   // doglegParams.wildfireThreshold = 0.001;                                    // 調整野火閾值
-  // doglegParams.adaptationMode = DoglegOptimizerImpl::ONE_STEP_PER_ITERATION; // 設置信任區域調整模式
+  doglegParams.adaptationMode = DoglegOptimizerImpl::ONE_STEP_PER_ITERATION; // 設置信任區域調整模式
+  // 啟用 verbose 模式
+  // doglegParams.setVerbose(true);
   // doglegParams.verbose = true;                                               // 開啟詳細輸出
 
-  // // 將調整好的 DoglegParams 賦值給 ISAM2Params 的 optimizationParams
-  // parameters.optimizationParams = doglegParams;
+  // 將調整好的 DoglegParams 賦值給 ISAM2Params 的 optimizationParams
+  parameters.optimizationParams = doglegParams;
 
   isam = new ISAM2(parameters);
   parameters.print();
@@ -168,7 +173,6 @@ MapOptimization::MapOptimization(const std::string &name, Channel<AssociationOut
   {
     RCLCPP_WARN(this->get_logger(), "Parameter %s not found", fileSaveDirectory.c_str());
   }
-
 
   if (!this->get_parameter(PARAM_ENABLE_LOOP, _loop_closure_enabled))
   {
@@ -364,8 +368,9 @@ void MapOptimization::loopClosureThread()
 
 void MapOptimization::cloudHandlerMap(const sensor_msgs::msg::PointCloud2::SharedPtr laserCloudMsg)
 {
-  if (!_laser_cloud_input) {
-      _laser_cloud_input = boost::make_shared<pcl::PointCloud<pcl::PointXYZI>>();
+  if (!_laser_cloud_input)
+  {
+    _laser_cloud_input = boost::make_shared<pcl::PointCloud<pcl::PointXYZI>>();
   }
 
   _laser_cloud_input->clear();
@@ -480,9 +485,9 @@ void MapOptimization::saveMapService(const geometry_msgs::msg::Twist::SharedPtr 
     Eigen::Quaternionf quaternion = yawAngle * pitchAngle * rollAngle;
 
     // 確保每行的輸出符合TUM格式，且用空格分隔
-    ofs << timestamp << " " 
+    ofs << timestamp << " "
         << x << " " << y << " " << z << " "
-        << quaternion.x() << " " << quaternion.y() << " " 
+        << quaternion.x() << " " << quaternion.y() << " "
         << quaternion.z() << " " << quaternion.w() << "\n";
   }
 
@@ -988,7 +993,7 @@ bool MapOptimization::detectLoopClosure()
   *latestSurfKeyFrameCloud +=
       *transformPointCloud(surfCloudKeyFrames[latestFrameIDLoopCloure],
                            &cloudKeyPoses6D->points[latestFrameIDLoopCloure]);
-  
+
   // *latestSurfKeyFrameCloud +=
   //     *transformPointCloud(outlierCloudKeyFrames[latestFrameIDLoopCloure],
   //                          &cloudKeyPoses6D->points[latestFrameIDLoopCloure]);
@@ -1673,7 +1678,8 @@ void MapOptimization::saveKeyFramesAndFactor()
   currentRobotPosPoint.z = transformAftMapped[5];
 
   gtsam::Vector Vector6(6);
-  Vector6 << 1e-6, 1e-6, 1e-6, 1e-8, 1e-8, 1e-6;
+  // Vector6 << 1e-6, 1e-6, 1e-6, 1e-8, 1e-8, 1e-6;
+  Vector6 << 1, 1, 1, 1, 1, 1;
   auto priorNoise = noiseModel::Diagonal::Variances(Vector6);
   auto odometryNoise = noiseModel::Diagonal::Variances(Vector6);
 
@@ -1712,9 +1718,12 @@ void MapOptimization::saveKeyFramesAndFactor()
     for (int i = 0; i < 6; ++i)
       transformLast[i] = transformTobeMapped[i];
     // std::cout << "cloudKeyPoses3D is empty" << std::endl;
+    // RCLCPP_INFO(this->get_logger(), "initial");
+    // gtSAMgraph.print();
   }
   else
   {
+    // RCLCPP_INFO(this->get_logger(), "pose odom");
     gtsam::Pose3 poseFrom = Pose3(
         Rot3::RzRyRx(transformLast[2], transformLast[0], transformLast[1]),
         Point3(transformLast[5], transformLast[3], transformLast[4]));
@@ -1726,32 +1735,49 @@ void MapOptimization::saveKeyFramesAndFactor()
     gtSAMgraph.add(BetweenFactor<Pose3>(
         cloudKeyPoses3D->points.size() - 1, cloudKeyPoses3D->points.size(),
         poseFrom.between(poseTo), odometryNoise));
+
+    // gtSAMgraph.print();
     //////////////////////////////////////////////////////////////////////////////////
 
-    // gtsam::Key currentKey = cloudKeyPoses3D->points.size();
+    gtsam::Key currentKey = cloudKeyPoses3D->points.size();
+    // RCLCPP_INFO(this->get_logger(), "currentKey: %ld", currentKey);
+    RCLCPP_INFO(this->get_logger(), "poseTo: [%f, %f, %f]", poseTo.x(), poseTo.y(), poseTo.z());
+    // RCLCPP_INFO(this->get_logger(), "poseTo transformAftMapped : [%f, %f, %f]", transformAftMapped[4], transformAftMapped[3], transformAftMapped[5]);
 
-    // // 定義測量的法向量和距離
-    // gtsam::Vector3 measuredNormal(_Gk_star[0], _Gk_star[1], _Gk_star[2]); // 前三個元素作為法向量
-    // double measuredDistance = _Gk_star[3];                                // 第四個元素作為距離
-    // // gtsam::Vector3 measuredNormal(0.0, 0.0, 1.0);
-    // // double measuredDistance = 0.12;
+    // 獲取旋轉部分的 Roll, Pitch, Yaw
+    double roll = poseTo.rotation().roll();
+    double pitch = poseTo.rotation().pitch();
+    double yaw = poseTo.rotation().yaw();
 
-    // gtsam::Vector3 refValue(0.0, 0.0, 1.78);
+    // 打印位姿的旋轉角度
+    // RCLCPP_INFO(this->get_logger(), "poseTo rotation (roll, pitch, yaw): [%f, %f, %f]", roll, pitch, yaw);
+    RCLCPP_INFO(this->get_logger(), "poseTo transformAftMapped rotation (roll, pitch, yaw): [%f, %f, %f]", transformAftMapped[1], transformAftMapped[0], transformAftMapped[2]);
 
-    // // 使用表達式來包裝 GroundPlane 的投影
-    // auto groundPlaneExpr = gtsamexpressions::projectGroundPlane_(
-    //     currentKey,
-    //     gtsam::Expression<gtsam::Vector3>(measuredNormal),
-    //     gtsam::Expression<double>(measuredDistance));
 
-    // // 定義噪聲模型
-    // gtsam::Vector sigmas(3);
-    // sigmas << 0.1, 0.1, 0.1; // 3 維向量：法向量兩個角度的標準差和距離的標準差
-    // // 創建對角噪聲模型，使用 GTSAM 的 noiseModel::Diagonal::Sigmas
-    // gtsam::SharedNoiseModel noiseModel = gtsam::noiseModel::Diagonal::Sigmas(sigmas);
+    // 定義測量的法向量和距離
+    gtsam::Vector3 measuredNormal(_Gk_star[0], _Gk_star[1], _Gk_star[2]); // 前三個元素作為法向量
+    double measuredDistance = _Gk_star[3]; // 第四個元素作為距離
+    RCLCPP_INFO(this->get_logger(), "G_k: [%f, %f, %f, %f]", measuredNormal[0], measuredNormal[1], measuredNormal[2], measuredDistance);
 
-    // // 添加 Expression 因子
-    // gtSAMgraph.addExpressionFactor(groundPlaneExpr, refValue, noiseModel);
+
+    gtsam::Point2 refValue(0.0, 0.0);
+
+    // 使用表達式來包裝 GroundPlane 的投影
+    auto groundPlaneExpr = gtsamexpressions::projectGroundPlane_(
+        gtsam::Pose3_(cloudKeyPoses3D->points.size()),
+        gtsam::Vector3(measuredNormal),
+        double(measuredDistance));
+
+    // 定義噪聲模型
+    gtsam::Vector sigmas(2);
+    sigmas << 1, 1; // 3 維向量：法向量兩個角度的標準差和距離的標準差
+    // 創建對角噪聲模型，使用 GTSAM 的 noiseModel::Diagonal::Sigmas
+    gtsam::SharedNoiseModel noiseModel = gtsam::noiseModel::Diagonal::Sigmas(sigmas);
+
+    // 添加 Expression 因子
+    gtSAMgraph.addExpressionFactor(groundPlaneExpr, refValue, noiseModel);
+
+    // gtSAMgraph.print();
 
     //////////////////////////////////////////////////////////////////////////////////
 
@@ -1843,18 +1869,77 @@ void MapOptimization::saveKeyFramesAndFactor()
               Point3(transformAftMapped[5], transformAftMapped[3],
                      transformAftMapped[4])));
     // std::cout << "Number of key poses: " << cloudKeyPoses3D->points.size() << std::endl; // state
+    // for (const auto &factor : gtSAMgraph)
+    // {
+    //   for (const auto &key : factor->keys())
+    //   {
+    //     if (!initialEstimate.exists(key))
+    //     {
+    //       std::cerr << "Error: Missing initial estimate for key: " << key << std::endl;
+    //       // 可以選擇初始化缺失的鍵或提前退出
+    //     }
+    //   }
+    // }
   }
-  // RCLCPP_INFO(this->get_logger(), "key = %lu", cloudKeyPoses3D->points.size());
+
+  initialEstimate_full.insert(
+      cloudKeyPoses3D->points.size(),
+      Pose3(Rot3::RzRyRx(transformAftMapped[2], transformAftMapped[0],
+                         transformAftMapped[1]),
+            Point3(transformAftMapped[5], transformAftMapped[3],
+                   transformAftMapped[4])));
+
+  // 在調用 update 之前打印整個系統的 Jacobian
+  gtsam::GaussianFactorGraph::shared_ptr linearizedGraph = gtSAMgraph.linearize(initialEstimate_full);
+
+  // 遍歷每個因子並使用 ROS 的 RCLCPP_INFO 打印 Jacobian
+  for (const auto &factor : *linearizedGraph)
+  {
+    if (auto jacobianFactor = boost::dynamic_pointer_cast<gtsam::JacobianFactor>(factor))
+    {
+      // 打印因子的鍵
+      std::ostringstream keysStream;
+      keysStream << "Jacobian for factor on keys: ";
+      for (const auto &key : jacobianFactor->keys())
+      {
+        keysStream << key << " ";
+      }
+      RCLCPP_INFO(rclcpp::get_logger("MapOptimization"), "%s", keysStream.str().c_str());
+
+      // 打印 A 矩陣
+      std::ostringstream aMatrixStream;
+      aMatrixStream << "A matrix:\n"
+                    << jacobianFactor->getA();
+      RCLCPP_INFO(rclcpp::get_logger("MapOptimization"), "%s", aMatrixStream.str().c_str());
+
+      // 打印 b 向量
+      std::ostringstream bVectorStream;
+      bVectorStream << "b vector:\n"
+                    << jacobianFactor->getb();
+      RCLCPP_INFO(rclcpp::get_logger("MapOptimization"), "%s", bVectorStream.str().c_str());
+    }
+  }
 
   /**
    * update iSAM
    */
-  // RCLCPP_INFO(this->get_logger(), "before update");
   gtsam::ISAM2Result result = isam->update(gtSAMgraph, initialEstimate);
-  // RCLCPP_INFO(this->get_logger(), "before update2");
   isam->update();
-  // RCLCPP_INFO(this->get_logger(), "gtsam update");
+
+  // for (int i = 0; i < 100; ++i) {
+  //   // 逐步添加新觀測或因子（如果有的話）
+  //   isam->update();
+
+  //   // 獲取當前優化後的變量估計值
+  //   isamCurrentEstimate = isam->calculateEstimate();
+
+  //   // 遍歷並列出每個變量的當前值
+  //   std::cout << "Iteration " << i << " results:\n";
+  //   // isamCurrentEstimate.print();
+  // }
+
   // result.print();
+
   // if (isam->params().enableDetailedResults)
   // {
   //   result.detail = gtsam::ISAM2Result::DetailedResults();
@@ -1862,6 +1947,36 @@ void MapOptimization::saveKeyFramesAndFactor()
 
   // 將新的因子添加到累積的因子圖中
   // cumulativeGraph.add(gtSAMgraph);
+
+  // //////////////////////////////////////////////////////////////////
+  // Values currentEstimate = isam->calculateEstimate();
+  // NonlinearFactorGraph graph = isam->getFactorsUnsafe();
+
+  // // 計算每個因子的殘差
+  // for (size_t i = 0; i < graph.size(); i++)
+  // {
+  //   // 獲取單個因子
+  //   boost::shared_ptr<NonlinearFactor> factor = graph.at(i);
+  //   if (!factor)
+  //     continue;
+
+  //   // 計算該因子的誤差
+  //   double error = factor->error(currentEstimate);
+
+  //   // // 如果需要,也可以獲取具體的殘差向量
+  //   // Vector residual;
+  //   // if (factor->dim() > 0)
+  //   // {
+  //   //   residual = factor->unwhitenedError(currentEstimate);
+  //   // }
+
+  //   std::cout << "Factor " << i << " error: " << error << std::endl;
+  //   // if (residual.size() > 0)
+  //   // {
+  //   //   std::cout << "Residual: " << residual.transpose() << std::endl;
+  //   // }
+  // }
+  // //////////////////////////////////////////////////////////////////
 
   gtSAMgraph.resize(0);
   initialEstimate.clear();
@@ -1872,7 +1987,7 @@ void MapOptimization::saveKeyFramesAndFactor()
   PointType thisPose3D;
   PointTypePose thisPose6D;
   Pose3 latestEstimate;
-  // GkMutex.lock();
+
   // RCLCPP_INFO(this->get_logger(), "before calculateEstimate");
   isamCurrentEstimate = isam->calculateEstimate();
   // RCLCPP_INFO(this->get_logger(), "after calculateEstimate");
@@ -1902,7 +2017,6 @@ void MapOptimization::saveKeyFramesAndFactor()
   //   std::cout << "errorAfter 未初始化" << std::endl;
   // }
 
-
   // // 访问更新前后的非线性误差
   // double errorBefore = result.errorBefore.get();
   // double errorAfter = result.errorAfter.get();
@@ -1914,6 +2028,7 @@ void MapOptimization::saveKeyFramesAndFactor()
   // std::cout << "Joint Jacobian: \n" << jointMarginal << std::endl;
   // isamCurrentEstimate.print("Values: ");
 
+  // //////////////////////////////////////////////////////////////////////////////////
   // // 線性化整個因子圖，並獲取雅可比矩陣
   // GaussianFactorGraph::shared_ptr linearizedGraph = isam->getFactorsUnsafe().linearize(isamCurrentEstimate);
 
@@ -1923,6 +2038,7 @@ void MapOptimization::saveKeyFramesAndFactor()
   // // 打印整體雅可比矩陣
   // std::cout << "Full Jacobian Matrix: \n"
   //           << fullJacobian << std::endl;
+  // //////////////////////////////////////////////////////////////////////////////////
 
   thisPose3D.x = latestEstimate.translation().y();
   thisPose3D.y = latestEstimate.translation().z();
@@ -2147,3 +2263,206 @@ void MapOptimization::run()
   // cumulativeGraph.saveGraph(os, isamCurrentEstimate);
   // os.close();
 }
+
+// void MapOptimization::saveKeyFramesAndFactor()
+// {
+//   // std::lock_guard<std::mutex> lock(GkMutex);
+//   currentRobotPosPoint.x = transformAftMapped[3];
+//   currentRobotPosPoint.y = transformAftMapped[4];
+//   currentRobotPosPoint.z = transformAftMapped[5];
+
+//   gtsam::Vector Vector6(6);
+//   Vector6 << 1e-6, 1e-6, 1e-6, 1e-8, 1e-8, 1e-6;
+//   auto priorNoise = noiseModel::Diagonal::Variances(Vector6);
+//   auto odometryNoise = noiseModel::Diagonal::Variances(Vector6);
+
+//   bool saveThisKeyFrame = true;
+//   if (sqrt((previousRobotPosPoint.x - currentRobotPosPoint.x) *
+//                (previousRobotPosPoint.x - currentRobotPosPoint.x) +
+//            (previousRobotPosPoint.y - currentRobotPosPoint.y) *
+//                (previousRobotPosPoint.y - currentRobotPosPoint.y) +
+//            (previousRobotPosPoint.z - currentRobotPosPoint.z) *
+//                (previousRobotPosPoint.z - currentRobotPosPoint.z)) < 0.3)
+//   {
+//     saveThisKeyFrame = false;
+//   }
+
+//   if (saveThisKeyFrame == false && !cloudKeyPoses3D->points.empty())
+//     return;
+
+//   previousRobotPosPoint = currentRobotPosPoint;
+//   /**
+//    * update gtsam graph
+//    */
+//   if (cloudKeyPoses3D->points.empty())
+//   {
+//     gtSAMgraph.add(PriorFactor<Pose3>(
+//         0,
+//         Pose3(Rot3::RzRyRx(transformTobeMapped[2], transformTobeMapped[0],
+//                            transformTobeMapped[1]),
+//               Point3(transformTobeMapped[5], transformTobeMapped[3],
+//                      transformTobeMapped[4])),
+//         priorNoise));
+//     initialEstimate.insert(
+//         0, Pose3(Rot3::RzRyRx(transformTobeMapped[2], transformTobeMapped[0],
+//                               transformTobeMapped[1]),
+//                  Point3(transformTobeMapped[5], transformTobeMapped[3],
+//                         transformTobeMapped[4])));
+//     for (int i = 0; i < 6; ++i)
+//       transformLast[i] = transformTobeMapped[i];
+//     // std::cout << "cloudKeyPoses3D is empty" << std::endl;
+//     // RCLCPP_INFO(this->get_logger(), "initial");
+//     // gtSAMgraph.print();
+//   }
+//   else
+//   {
+//     // RCLCPP_INFO(this->get_logger(), "pose odom");
+//     gtsam::Pose3 poseFrom = Pose3(
+//         Rot3::RzRyRx(transformLast[2], transformLast[0], transformLast[1]),
+//         Point3(transformLast[5], transformLast[3], transformLast[4]));
+//     gtsam::Pose3 poseTo =
+//         Pose3(Rot3::RzRyRx(transformAftMapped[2], transformAftMapped[0],
+//                            transformAftMapped[1]),
+//               Point3(transformAftMapped[5], transformAftMapped[3],
+//                      transformAftMapped[4]));
+//     gtSAMgraph.add(BetweenFactor<Pose3>(
+//         cloudKeyPoses3D->points.size() - 1, cloudKeyPoses3D->points.size(),
+//         poseFrom.between(poseTo), odometryNoise));
+
+//     // gtSAMgraph.print();
+//     //////////////////////////////////////////////////////////////////////////////////
+
+//     gtsam::Key currentKey = cloudKeyPoses3D->points.size();
+//     // RCLCPP_INFO(this->get_logger(), "currentKey: %ld", currentKey);
+//     RCLCPP_INFO(this->get_logger(), "poseTo: [%f, %f, %f]", poseTo.x(), poseTo.y(), poseTo.z());
+
+//     // std::ostringstream oss;
+//     // oss << poseTo.translation();
+//     // RCLCPP_INFO(this->get_logger(), "poseTo translation: %s", oss.str().c_str());
+
+//     // 定義測量的法向量和距離
+//     gtsam::Vector3 measuredNormal(_Gk_star[0], _Gk_star[1], _Gk_star[2]); // 前三個元素作為法向量
+//     // gtsam::Vector3 measuredNormal(0.0, 0.0, 1.0);
+//     double measuredDistance = _Gk_star[3];                                // 第四個元素作為距離
+//     // gtsam::Vector3 measuredNormal(0.0, 0.0, 1.0);
+//     // double measuredDistance = 0.12;
+
+//     gtsam::Point2 refValue(0.0, 0.0);
+
+//     // 使用表達式來包裝 GroundPlane 的投影
+//     auto groundPlaneExpr = gtsamexpressions::projectGroundPlane_(
+//         gtsam::Pose3_(cloudKeyPoses3D->points.size()),
+//         gtsam::Vector3(measuredNormal),
+//         double(measuredDistance));
+
+//     // 定義噪聲模型
+//     gtsam::Vector sigmas(2);
+//     sigmas << 1e-8, 1e-15; // 3 維向量：法向量兩個角度的標準差和距離的標準差
+//     // 創建對角噪聲模型，使用 GTSAM 的 noiseModel::Diagonal::Sigmas
+//     gtsam::SharedNoiseModel noiseModel = gtsam::noiseModel::Diagonal::Sigmas(sigmas);
+
+//     // 添加 Expression 因子
+//     gtSAMgraph.addExpressionFactor(groundPlaneExpr, refValue, noiseModel);
+
+//     // gtSAMgraph.print();
+
+//     //////////////////////////////////////////////////////////////////////////////////
+
+//     initialEstimate.insert(
+//         cloudKeyPoses3D->points.size(),
+//         Pose3(Rot3::RzRyRx(transformAftMapped[2], transformAftMapped[0],
+//                            transformAftMapped[1]),
+//               Point3(transformAftMapped[5], transformAftMapped[3],
+//                      transformAftMapped[4])));
+
+//     // 在調用 update 之前打印整個系統的 Jacobian
+//     gtsam::GaussianFactorGraph::shared_ptr linearizedGraph = gtSAMgraph.linearize(initialEstimate);
+
+//     // 遍歷每個因子並打印 Jacobian
+//     for (const auto &factor : *linearizedGraph)
+//     {
+//       if (auto jacobianFactor = boost::dynamic_pointer_cast<gtsam::JacobianFactor>(factor))
+//       {
+//         std::cout << "Jacobian for factor on keys: ";
+//         for (const auto &key : jacobianFactor->keys())
+//         {
+//           std::cout << key << " ";
+//         }
+//         std::cout << "\nA matrix:\n"
+//                   << jacobianFactor->getA() << "\nb vector:\n"
+//                   << jacobianFactor->getb() << "\n";
+//       }
+//     }
+//   }
+
+//   /**
+//    * update iSAM
+//    */
+//   gtsam::ISAM2Result result = isam->update(gtSAMgraph, initialEstimate);
+//   isam->update();
+
+//   gtSAMgraph.resize(0);
+//   initialEstimate.clear();
+
+//   /**
+//    * save key poses
+//    */
+//   PointType thisPose3D;
+//   PointTypePose thisPose6D;
+//   Pose3 latestEstimate;
+
+//   isamCurrentEstimate = isam->calculateEstimate();
+
+//   latestEstimate =
+//       isamCurrentEstimate.at<Pose3>(isamCurrentEstimate.size() - 1);
+
+//   thisPose3D.x = latestEstimate.translation().y();
+//   thisPose3D.y = latestEstimate.translation().z();
+//   thisPose3D.z = latestEstimate.translation().x();
+//   thisPose3D.intensity =
+//       cloudKeyPoses3D->points.size(); // this can be used as index
+//   cloudKeyPoses3D->push_back(thisPose3D);
+
+//   thisPose6D.x = thisPose3D.x;
+//   thisPose6D.y = thisPose3D.y;
+//   thisPose6D.z = thisPose3D.z;
+//   thisPose6D.intensity = thisPose3D.intensity; // this can be used as index
+//   thisPose6D.roll = latestEstimate.rotation().pitch();
+//   thisPose6D.pitch = latestEstimate.rotation().yaw();
+//   thisPose6D.yaw = latestEstimate.rotation().roll(); // in camera frame
+//   thisPose6D.time = timeLaserOdometry.seconds();
+//   cloudKeyPoses6D->push_back(thisPose6D);
+//   /**
+//    * save updated transform
+//    */
+//   if (cloudKeyPoses3D->points.size() > 1)
+//   {
+//     transformAftMapped[0] = latestEstimate.rotation().pitch();
+//     transformAftMapped[1] = latestEstimate.rotation().yaw();
+//     transformAftMapped[2] = latestEstimate.rotation().roll();
+//     transformAftMapped[3] = latestEstimate.translation().y();
+//     transformAftMapped[4] = latestEstimate.translation().z();
+//     transformAftMapped[5] = latestEstimate.translation().x();
+
+//     for (int i = 0; i < 6; ++i)
+//     {
+//       transformLast[i] = transformAftMapped[i];
+//       transformTobeMapped[i] = transformAftMapped[i];
+//     }
+//   }
+
+//   pcl::PointCloud<PointType>::Ptr thisCornerKeyFrame(
+//       new pcl::PointCloud<PointType>());
+//   pcl::PointCloud<PointType>::Ptr thisSurfKeyFrame(
+//       new pcl::PointCloud<PointType>());
+//   pcl::PointCloud<PointType>::Ptr thisOutlierKeyFrame(
+//       new pcl::PointCloud<PointType>());
+
+//   pcl::copyPointCloud(*laserCloudCornerLastDS, *thisCornerKeyFrame);
+//   pcl::copyPointCloud(*laserCloudSurfLastDS, *thisSurfKeyFrame);
+//   pcl::copyPointCloud(*laserCloudOutlierLastDS, *thisOutlierKeyFrame);
+
+//   cornerCloudKeyFrames.push_back(thisCornerKeyFrame);
+//   surfCloudKeyFrames.push_back(thisSurfKeyFrame);
+//   outlierCloudKeyFrames.push_back(thisOutlierKeyFrame);
+// }

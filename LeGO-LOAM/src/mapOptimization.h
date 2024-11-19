@@ -73,6 +73,7 @@ class MapOptimization : public rclcpp::Node {
 //   gtsam::NonlinearFactorGraph gtSAMgraph;
   gtsam::ExpressionFactorGraph gtSAMgraph;
   gtsam::Values initialEstimate;
+  gtsam::Values initialEstimate_full;
   gtsam::ISAM2 *isam;
   gtsam::Values isamCurrentEstimate;
   std::mutex GkMutex;
