@@ -70,8 +70,8 @@ class MapOptimization : public rclcpp::Node {
   void visualcloudHandler(const sensor_msgs::msg::PointCloud2::SharedPtr laserCloudMsg);
 
  private:
-//   gtsam::NonlinearFactorGraph gtSAMgraph;
-  gtsam::ExpressionFactorGraph gtSAMgraph;
+  gtsam::NonlinearFactorGraph gtSAMgraph;
+//   gtsam::ExpressionFactorGraph gtSAMgraph;
   gtsam::Values initialEstimate;
   gtsam::Values initialEstimate_full;
   gtsam::ISAM2 *isam;

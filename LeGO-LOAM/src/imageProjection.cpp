@@ -559,11 +559,11 @@ void ImageProjection::groundRemovalRANSAC()
 
   // 將 dk_star 填入 _Gk_star 的最後一個位置
   _Gk_star[3] = dk_star;
-  // std::cout << "Ground Plane Coefficient = ";
-  // for (const auto& value : _Gk_star) {
-  //     std::cout << value << " ";
-  // }
-  // std::cout << std::endl;
+  std::cout << "Ground Plane Coefficient = ";
+  for (const auto& value : _Gk_star) {
+      std::cout << value << " ";
+  }
+  std::cout << std::endl;
   /////////////////////////////////////////////////////////////////////////////////////
 
   // extract ground cloud (_ground_mat == 1)
