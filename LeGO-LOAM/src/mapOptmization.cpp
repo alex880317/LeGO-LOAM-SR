@@ -70,6 +70,9 @@ const std::string PARAM_HISTORY_SEARCH_NUM = "mapping.history_keyframe_search_nu
 const std::string PARAM_HISTORY_SCORE = "mapping.history_keyframe_fitness_score";
 const std::string PARAM_GLOBAL_SEARCH_RADIUS = "mapping.global_map_visualization_search_radius";
 
+const std::string PGO_COV_PARAM = "mapping.PGO_cov_param";
+const std::string GROUND_PLANE_PARAM = "mapping.Ground_Plane_param";
+
 MapOptimization::MapOptimization(const std::string &name, Channel<AssociationOut> &input_channel)
     : Node(name), _input_channel(input_channel), _publish_global_signal(false), _loop_closure_signal(false)
 {
@@ -155,6 +158,10 @@ MapOptimization::MapOptimization(const std::string &name, Channel<AssociationOut
   this->declare_parameter(PARAM_HISTORY_SCORE);
   this->declare_parameter(PARAM_GLOBAL_SEARCH_RADIUS);
 
+  this->declare_parameter<std::vector<double>>(PGO_COV_PARAM, {1e-6, 1e-6, 1e-6, 1e-8, 1e-8, 1e-6});
+  this->declare_parameter<std::vector<double>>(GROUND_PLANE_PARAM, {1e-4, 1e-4, 1e-8});
+
+
   // Read parameters
   // if (!this->get_parameter(ITER_COUNT_THRES, _iter_count_thres)) {
   //   RCLCPP_WARN(this->get_logger(), "Parameter %s not found", ITER_COUNT_THRES.c_str());
@@ -202,6 +209,21 @@ MapOptimization::MapOptimization(const std::string &name, Channel<AssociationOut
   {
     RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PARAM_GLOBAL_SEARCH_RADIUS.c_str());
   }
+
+  if (!this->get_parameter(PGO_COV_PARAM, _PGO_cov_param))
+  {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s not found", PGO_COV_PARAM.c_str());
+  }
+  if (!this->get_parameter(GROUND_PLANE_PARAM, _Ground_Plane_param))
+  {
+    RCLCPP_WARN(this->get_logger(), "Parameter %s not found", GROUND_PLANE_PARAM.c_str());
+  }
+  // // 確認讀取的值
+  // RCLCPP_INFO(this->get_logger(), "PGO_cov_param: [%f, %f, %f, %f, %f, %f]",
+  //             _PGO_cov_param[0], _PGO_cov_param[1], _PGO_cov_param[2],
+  //             _PGO_cov_param[3], _PGO_cov_param[4], _PGO_cov_param[5]);
+  // RCLCPP_INFO(this->get_logger(), "Ground_Plane_param: [%f, %f, %f]",
+  //             _Ground_Plane_param[0], _Ground_Plane_param[1], _Ground_Plane_param[2]);
 
   allocateMemory();
 
@@ -1678,7 +1700,9 @@ void MapOptimization::saveKeyFramesAndFactor()
   currentRobotPosPoint.z = transformAftMapped[5];
 
   gtsam::Vector Vector6(6);
-  Vector6 << 1e-6, 1e-6, 1e-6, 1e-8, 1e-8, 1e-6;
+  Vector6 << _PGO_cov_param[0], _PGO_cov_param[1], _PGO_cov_param[2],
+             _PGO_cov_param[3], _PGO_cov_param[4], _PGO_cov_param[5];
+  // Vector6 << 1e-6, 1e-6, 1e-6, 1e-8, 1e-8, 1e-6;
   // Vector6 << 1, 1, 1, 1, 1, 1;
   auto priorNoise = noiseModel::Diagonal::Variances(Vector6);
   auto odometryNoise = noiseModel::Diagonal::Variances(Vector6);
@@ -1739,34 +1763,27 @@ void MapOptimization::saveKeyFramesAndFactor()
     // gtSAMgraph.print();
     
 
-    ////////////////////////////////////////////////////////////////////////////////
-    // // 假設 transformAftMapped 是一個包含 6 個元素的數組或向量
-    // std::cout << "Roll (transformAftMapped[2]): " << transformAftMapped[2] << std::endl;
-    // std::cout << "Pitch (transformAftMapped[0]): " << transformAftMapped[0] << std::endl;
-    // std::cout << "Yaw (transformAftMapped[1]): " << transformAftMapped[1] << std::endl;
-    // std::cout << "X (transformAftMapped[5]): " << transformAftMapped[5] << std::endl;
-    // std::cout << "Y (transformAftMapped[3]): " << transformAftMapped[3] << std::endl;
-    // std::cout << "Z (transformAftMapped[4]): " << transformAftMapped[4] << std::endl;
-    // Alex
-    // // 創建噪聲模型，對應於 ADGroundPlaneFactor 的距離和法向量的噪聲
-    // auto distanceNoiseModel = gtsam::noiseModel::Diagonal::Sigmas(gtsam::Vector1(0.1));  // 1維距離噪聲
-    // auto normalVectorNoiseModel = gtsam::noiseModel::Diagonal::Sigmas(gtsam::Vector3(0.1, 0.1, 0.1));  // 3維法向量噪聲
-
-    // 假設法向量測量的兩個角度誤差（theta, phi）的標準差是 0.1，距離誤差的標準差是 0.05
-    gtsam::Vector sigmas(3);
-    sigmas <<  1e-4, 1e-4, 1e-8; // 3 維向量：法向量兩個角度的標準差和距離的標準差
-    // 創建對角噪聲模型，使用 GTSAM 的 noiseModel::Diagonal::Sigmas
-    gtsam::SharedNoiseModel noiseModel = gtsam::noiseModel::Diagonal::Sigmas(sigmas);
-
-    gtsam::Key currentKey = cloudKeyPoses3D->points.size();
-    // 提取 measuredNormal 和 measuredDistance
-    gtsam::Vector3 measuredNormal(_Gk_star[0], _Gk_star[1], _Gk_star[2]); // 前三個元素作為法向量
-    double measuredDistance = _Gk_star[3];                                // 第四個元素作為距離
-    // RCLCPP_INFO(this->get_logger(), "before add");
-    gtSAMgraph.add(boost::make_shared<GroundPlaneFactor>(
-        currentKey, measuredNormal, measuredDistance, noiseModel, shared_from_this()));
-
+    // ////////////////////////////////////////////////////////////////////////////////
     
+
+    // // 假設法向量測量的兩個角度誤差（theta, phi）的標準差是 0.1，距離誤差的標準差是 0.05
+    // gtsam::Vector sigmas(3);
+    // sigmas <<  _Ground_Plane_param[0], _Ground_Plane_param[1], _Ground_Plane_param[2];
+    // // sigmas <<  1e-4, 1e-4, 1e-8; // 3 維向量：法向量兩個角度的標準差和距離的標準差
+    // // 創建對角噪聲模型，使用 GTSAM 的 noiseModel::Diagonal::Sigmas
+    // gtsam::SharedNoiseModel noiseModel = gtsam::noiseModel::Diagonal::Sigmas(sigmas);
+
+    // gtsam::Key currentKey = cloudKeyPoses3D->points.size();
+    // // 提取 measuredNormal 和 measuredDistance
+    // gtsam::Vector3 measuredNormal(_Gk_star[0], _Gk_star[1], _Gk_star[2]); // 前三個元素作為法向量
+    // double measuredDistance = _Gk_star[3];                                // 第四個元素作為距離
+    // // RCLCPP_INFO(this->get_logger(), "before add");
+    // gtSAMgraph.add(boost::make_shared<GroundPlaneFactor>(
+    //     currentKey, measuredNormal, measuredDistance, noiseModel, shared_from_this()));
+
+    // RCLCPP_INFO(this->get_logger(), "sigmas = [%f, %f, %f] = ", _Ground_Plane_param[0], _Ground_Plane_param[1], _Ground_Plane_param[2]);
+
+    // ////////////////////////////////////////////////////////////////////////////////
 
     initialEstimate.insert(
         cloudKeyPoses3D->points.size(),

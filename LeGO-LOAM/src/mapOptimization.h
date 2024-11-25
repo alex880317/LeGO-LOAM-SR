@@ -93,6 +93,8 @@ class MapOptimization : public rclcpp::Node {
   float _global_map_visualization_search_radius;
 
   // Alex
+  std::vector<double> _PGO_cov_param;
+  std::vector<double> _Ground_Plane_param;
   std::vector<double> _Gk_star;
 
   pcl::PointCloud<PointType>::Ptr _laser_cloud_input;
