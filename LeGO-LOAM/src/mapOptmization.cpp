@@ -565,10 +565,12 @@ void MapOptimization::publishGlobalMap() {
   for (size_t i = 0; i < pointSearchIndGlobalMap.size(); ++i)
     globalMapKeyPoses->points.push_back(
         cloudKeyPoses3D->points[pointSearchIndGlobalMap[i]]);
-  // downsample near selected key frames
-  downSizeFilterGlobalMapKeyPoses.setInputCloud(globalMapKeyPoses);
-  downSizeFilterGlobalMapKeyPoses.filter(*globalMapKeyPosesDS);
-  // extract visualized and downsampled key frames
+  // // downsample near selected key frames
+  // downSizeFilterGlobalMapKeyPoses.setInputCloud(globalMapKeyPoses);
+  // downSizeFilterGlobalMapKeyPoses.filter(*globalMapKeyPosesDS);
+  // // extract visualized and downsampled key frames
+  globalMapKeyPosesDS = globalMapKeyPoses;
+
   for (size_t i = 0; i < globalMapKeyPosesDS->points.size(); ++i) {
     int thisKeyInd = (int)globalMapKeyPosesDS->points[i].intensity;
     *globalMapKeyFrames += *transformPointCloud(
@@ -579,9 +581,10 @@ void MapOptimization::publishGlobalMap() {
         *transformPointCloud(outlierCloudKeyFrames[thisKeyInd],
                              &cloudKeyPoses6D->points[thisKeyInd]);
   }
-  // downsample visualized points
-  downSizeFilterGlobalMapKeyFrames.setInputCloud(globalMapKeyFrames);
-  downSizeFilterGlobalMapKeyFrames.filter(*globalMapKeyFramesDS);
+  // // downsample visualized points
+  // downSizeFilterGlobalMapKeyFrames.setInputCloud(globalMapKeyFrames);
+  // downSizeFilterGlobalMapKeyFrames.filter(*globalMapKeyFramesDS);
+  globalMapKeyFramesDS = globalMapKeyFrames;
 
   sensor_msgs::msg::PointCloud2 cloudMsgTemp;
   pcl::toROSMsg(*globalMapKeyFramesDS, cloudMsgTemp);
