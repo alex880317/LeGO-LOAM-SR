@@ -14,7 +14,7 @@ class GroundPlaneFactor : public gtsam::NoiseModelFactor1<gtsam::Pose3>
 private:
     gtsam::Vector3 measuredNormal_;      // 地面法向量測量
     double measuredDistance_;            // 地面距離測量
-    const gtsam::Vector3 G_k;            // 固定法向量
+    const gtsam::Vector3 G_k;            // 單位法向量
     gtsam::SharedNoiseModel noiseModel_; // 噪声模型
 
 public:
@@ -39,7 +39,7 @@ public:
                                 boost::optional<gtsam::Matrix &> H = boost::none) const override
     {
 
-        double initialDistance = 1.78; // 0.12 1.78
+        double initialDistance = 2.46; // 0.12 1.78
 
         // 計算法向量誤差
         gtsam::Vector3 initialNormal(0.0, 0.0, 1.0);
@@ -101,7 +101,7 @@ public:
             {
                 H_left << -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0.0, 0.0,
                     0.0, 0.0, 0.0, 0.0,
-                    0.0, 0.0, 0.0, 1.0; 
+                    -t_k_W(0), -t_k_W(1), -t_k_W(2), 1.0; 
                     // 1 / (1 + pow(G_k_W(1) / G_k_W(2), 2.0)) // -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0.0, 0.0,
                     // 0.0, 0.0, 0.0, 0.0,
                 // RCLCPP_INFO(node_->get_logger(), "denominator = 0");
@@ -110,7 +110,7 @@ public:
             {
                 H_left << -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0.0, 0.0,
                     (G_k_W(2) * G_k_W(0)) / denominator, (G_k_W(2) * G_k_W(1)) / denominator, -((G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1))) / denominator, 0.0,
-                    0.0, 0.0, 0.0, 1.0; 
+                    -t_k_W(0), -t_k_W(1), -t_k_W(2), 1.0; 
                     // -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0.0, 0.0,
                     // (G_k_W(2) * G_k_W(0)) / denominator, (G_k_W(2) * G_k_W(1)) / denominator, -((G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1))) / denominator, 0.0,
             }
@@ -157,6 +157,20 @@ public:
             // 最終的雅可比矩陣是兩個矩陣的乘積
             *H = H_left * H_right;
 
+            // 打印 H_left
+            {
+                std::stringstream ss_left;
+                ss_left << H_left.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
+                RCLCPP_INFO(node_->get_logger(), "Jacobian H_left:\n%s", ss_left.str().c_str());
+            }
+
+            // 打印 H_right
+            {
+                std::stringstream ss_right;
+                ss_right << H_right.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
+                RCLCPP_INFO(node_->get_logger(), "Jacobian H_right:\n%s", ss_right.str().c_str());
+            }
+
             // std::cout << "Jacobian H1:\n"
             //           << H_left << std::endl;
             // std::cout << "Jacobian H2:\n"
@@ -169,13 +183,13 @@ public:
         // weightedError = noiseModel_->whiten(error);
 
         // 假設 error 是一個 gtsam::Vector
-        // Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
+        Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
 
-        // std::stringstream ss;
-        // ss << error.transpose().format(CleanFmt);
-        // RCLCPP_INFO(node_->get_logger(), "Time: %f, error = %s", node_->now().seconds(), ss.str().c_str());
+        std::stringstream ss;
+        ss << error.transpose().format(CleanFmt);
+        RCLCPP_INFO(node_->get_logger(), "Time: %f, error = %s", node_->now().seconds(), ss.str().c_str());
         // RCLCPP_INFO(node_->get_logger(), "down : Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f], error = [%.6f, %.6f, %.6f]", node_->now().seconds(),
-        //     G_k(0), G_k(1), G_k(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2), error[0], error[1], error[2]);
+        //     G_k_W(0), G_k_W(1), G_k_W(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2), error[0], error[1], error[2]);
 
         // std::cout << "weightedError = " << weightedError.transpose() << std::endl;
 

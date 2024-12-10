@@ -37,6 +37,8 @@
 #include <cmath>
 #include <vector>
 
+// #include <rclcpp/rclcpp.hpp>
+
 const std::string PARAM_VERTICAL_SCANS = "laser.num_vertical_scans";
 const std::string PARAM_HORIZONTAL_SCANS = "laser.num_horizontal_scans";
 const std::string PARAM_ANGLE_BOTTOM = "laser.vertical_angle_bottom";
@@ -211,6 +213,10 @@ void ImageProjection::projectPointCloud()
     // std::atan2(thisPoint.z, sqrt(thisPoint.x * thisPoint.x + thisPoint.y * thisPoint.y));
 
     int rowIdn = (verticalAngle + _ang_bottom) / _ang_resolution_Y;
+    // // 當 i 是 180 的倍數時打印 rowIdn 資訊
+    // if (i % 180 == 0) {
+    //   RCLCPP_INFO(this->get_logger(), "Point %zu: rowIdn: %d, verticalAngle: %f", i, rowIdn, verticalAngle);
+    // }
     if (rowIdn < 0 || rowIdn >= _vertical_scans)
     {
       continue;
@@ -219,7 +225,10 @@ void ImageProjection::projectPointCloud()
     float horizonAngle = std::atan2(thisPoint.x, thisPoint.y);
 
     int columnIdn = -round((horizonAngle - M_PI_2) / _ang_resolution_X) + _horizontal_scans * 0.5;
-
+    // // 當 i 是 180 的倍數時打印 columnIdn 資訊
+    // if (i % 180 == 0) {
+    //   RCLCPP_INFO(this->get_logger(), "Point %zu: columnIdn: %d, horizonAngle: %f", i, columnIdn, horizonAngle);
+    // }
     if (columnIdn >= _horizontal_scans)
     {
       columnIdn -= _horizontal_scans;
@@ -367,6 +376,14 @@ void ImageProjection::groundRemovalRANSAC()
           _full_cloud->points[upperInd].z - _full_cloud->points[lowerInd].z;
 
       float vertical_angle = std::atan2(dZ , sqrt(dX * dX + dY * dY + dZ * dZ));
+      // // Alex
+      // // 打印資訊
+      // RCLCPP_INFO(this->get_logger(), "Points: lowerInd=(%f, %f, %f), upperInd=(%f, %f, %f)",
+      //             _full_cloud->points[lowerInd].x, _full_cloud->points[lowerInd].y, _full_cloud->points[lowerInd].z,
+      //             _full_cloud->points[upperInd].x, _full_cloud->points[upperInd].y, _full_cloud->points[upperInd].z);
+      // RCLCPP_INFO(this->get_logger(), "dX: %f, dY: %f, dZ: %f", dX, dY, dZ);
+      // RCLCPP_INFO(this->get_logger(), "Vertical angle: %f radians (%f degrees)",
+      //             vertical_angle, vertical_angle * 180.0 / M_PI);
 
       // TODO: review this change
 
@@ -557,13 +574,13 @@ void ImageProjection::groundRemovalRANSAC()
     }
   }
 
-  // 將 dk_star 填入 _Gk_star 的最後一個位置
-  _Gk_star[3] = dk_star;
-  std::cout << "Ground Plane Coefficient = ";
-  for (const auto& value : _Gk_star) {
-      std::cout << value << " ";
-  }
-  std::cout << std::endl;
+  // // 將 dk_star 填入 _Gk_star 的最後一個位置
+  // _Gk_star[3] = dk_star;
+  // std::cout << "Ground Plane Coefficient = ";
+  // for (const auto& value : _Gk_star) {
+  //     std::cout << value << " ";
+  // }
+  // std::cout << std::endl;
   /////////////////////////////////////////////////////////////////////////////////////
 
   // extract ground cloud (_ground_mat == 1)
@@ -590,6 +607,20 @@ void ImageProjection::groundRemovalRANSAC()
         _ground_cloud->push_back(_full_cloud->points[j + i * _horizontal_scans]);
     }
   }
+  // // 打印 ground_cloud 的點數
+  // RCLCPP_INFO(this->get_logger(), "Ground cloud size: %zu", _ground_cloud->size());
+  // if (!_ground_cloud->points.empty()) {
+  // RCLCPP_INFO(this->get_logger(), "First ground point: (%f, %f, %f)", 
+  //             _ground_cloud->points.front().x, 
+  //             _ground_cloud->points.front().y, 
+  //             _ground_cloud->points.front().z);
+  // RCLCPP_INFO(this->get_logger(), "Last ground point: (%f, %f, %f)", 
+  //             _ground_cloud->points.back().x, 
+  //             _ground_cloud->points.back().y, 
+  //             _ground_cloud->points.back().z);
+  // } else {
+  //   RCLCPP_WARN(this->get_logger(), "Ground cloud is empty.");
+  // }
 }
 
 void ImageProjection::cloudSegmentation()
@@ -772,25 +803,34 @@ void ImageProjection::publishClouds()
 {
 
   sensor_msgs::msg::PointCloud2 temp;
-  temp.header.stamp = _seg_msg.header.stamp;
-  temp.header.frame_id = "base_link";
 
-  auto PublishCloud = [](rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pub, sensor_msgs::msg::PointCloud2 &temp,
+  auto PublishCloud = [&](rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pub,
                          const pcl::PointCloud<PointType>::Ptr &cloud)
   {
     if (pub->get_subscription_count() != 0)
     {
       pcl::toROSMsg(*cloud, temp);
+      temp.header.stamp = _seg_msg.header.stamp;
+      temp.header.frame_id = "base_link";
+      pub->publish(temp);
+    }
+  };
+  auto PublishCloudCamera = [&](rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pub,
+                                const pcl::PointCloud<PointType>::Ptr& cloud) {
+    if (pub->get_subscription_count() != 0) {
+      pcl::toROSMsg(*cloud, temp);
+      temp.header.stamp = _seg_msg.header.stamp;
+      temp.header.frame_id = "camera";
       pub->publish(temp);
     }
   };
 
-  PublishCloud(_pub_outlier_cloud, temp, _outlier_cloud);
-  PublishCloud(_pub_segmented_cloud, temp, _segmented_cloud);
-  PublishCloud(_pub_full_cloud, temp, _full_cloud);
-  PublishCloud(_pub_ground_cloud, temp, _ground_cloud);
-  PublishCloud(_pub_segmented_cloud_pure, temp, _segmented_cloud_pure);
-  PublishCloud(_pub_full_info_cloud, temp, _full_info_cloud);
+  PublishCloud(_pub_outlier_cloud, _outlier_cloud);
+  PublishCloud(_pub_segmented_cloud, _segmented_cloud);
+  PublishCloud(_pub_full_cloud, _full_cloud);
+  PublishCloud(_pub_ground_cloud, _ground_cloud);
+  PublishCloud(_pub_segmented_cloud_pure, _segmented_cloud_pure);
+  PublishCloud(_pub_full_info_cloud, _full_info_cloud);
 
   if (_pub_segmented_cloud_info->get_subscription_count() != 0)
   {

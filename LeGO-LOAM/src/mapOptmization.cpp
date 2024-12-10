@@ -907,10 +907,12 @@ void MapOptimization::publishGlobalMap()
   for (size_t i = 0; i < pointSearchIndGlobalMap.size(); ++i)
     globalMapKeyPoses->points.push_back(
         cloudKeyPoses3D->points[pointSearchIndGlobalMap[i]]);
-  // downsample near selected key frames
-  downSizeFilterGlobalMapKeyPoses.setInputCloud(globalMapKeyPoses);
-  downSizeFilterGlobalMapKeyPoses.filter(*globalMapKeyPosesDS);
-  // extract visualized and downsampled key frames
+  // // downsample near selected key frames
+  // downSizeFilterGlobalMapKeyPoses.setInputCloud(globalMapKeyPoses);
+  // downSizeFilterGlobalMapKeyPoses.filter(*globalMapKeyPosesDS);
+  // // extract visualized and downsampled key frames
+  globalMapKeyPosesDS = globalMapKeyPoses;
+
   for (size_t i = 0; i < globalMapKeyPosesDS->points.size(); ++i)
   {
     int thisKeyInd = (int)globalMapKeyPosesDS->points[i].intensity;
@@ -926,9 +928,10 @@ void MapOptimization::publishGlobalMap()
         *transformPointCloud(outlierCloudKeyFrames[thisKeyInd],
                              &cloudKeyPoses6D->points[thisKeyInd]);
   }
-  // downsample visualized points
-  downSizeFilterGlobalMapKeyFrames.setInputCloud(globalMapKeyFrames);
-  downSizeFilterGlobalMapKeyFrames.filter(*globalMapKeyFramesDS);
+  // // downsample visualized points
+  // downSizeFilterGlobalMapKeyFrames.setInputCloud(globalMapKeyFrames);
+  // downSizeFilterGlobalMapKeyFrames.filter(*globalMapKeyFramesDS);
+  globalMapKeyFramesDS = globalMapKeyFrames;
 
   sensor_msgs::msg::PointCloud2 cloudMsgTemp;
   pcl::toROSMsg(*globalMapKeyFrames, cloudMsgTemp);
@@ -1763,27 +1766,33 @@ void MapOptimization::saveKeyFramesAndFactor()
     // gtSAMgraph.print();
     
 
-    // ////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
     
 
-    // // 假設法向量測量的兩個角度誤差（theta, phi）的標準差是 0.1，距離誤差的標準差是 0.05
-    // gtsam::Vector sigmas(3);
-    // sigmas <<  _Ground_Plane_param[0], _Ground_Plane_param[1], _Ground_Plane_param[2];
-    // // sigmas <<  1e-4, 1e-4, 1e-8; // 3 維向量：法向量兩個角度的標準差和距離的標準差
-    // // 創建對角噪聲模型，使用 GTSAM 的 noiseModel::Diagonal::Sigmas
-    // gtsam::SharedNoiseModel noiseModel = gtsam::noiseModel::Diagonal::Sigmas(sigmas);
+    // 假設法向量測量的兩個角度誤差（theta, phi）的標準差是 0.1，距離誤差的標準差是 0.05
+    gtsam::Vector sigmas(3);
+    sigmas <<  _Ground_Plane_param[0], _Ground_Plane_param[1], _Ground_Plane_param[2];
+    // sigmas <<  1e-4, 1e-4, 1e-8; // 3 維向量：法向量兩個角度的標準差和距離的標準差
+    // 創建對角噪聲模型，使用 GTSAM 的 noiseModel::Diagonal::Sigmas
+    gtsam::SharedNoiseModel noiseModel = gtsam::noiseModel::Diagonal::Sigmas(sigmas);
 
-    // gtsam::Key currentKey = cloudKeyPoses3D->points.size();
-    // // 提取 measuredNormal 和 measuredDistance
-    // gtsam::Vector3 measuredNormal(_Gk_star[0], _Gk_star[1], _Gk_star[2]); // 前三個元素作為法向量
-    // double measuredDistance = _Gk_star[3];                                // 第四個元素作為距離
-    // // RCLCPP_INFO(this->get_logger(), "before add");
-    // gtSAMgraph.add(boost::make_shared<GroundPlaneFactor>(
-    //     currentKey, measuredNormal, measuredDistance, noiseModel, shared_from_this()));
+    gtsam::Key currentKey = cloudKeyPoses3D->points.size();
+    // 提取 measuredNormal 和 measuredDistance
+    gtsam::Vector3 measuredNormal(_Gk_star[0], _Gk_star[1], _Gk_star[2]); // 前三個元素作為法向量
+    double measuredDistance = _Gk_star[3];                                // 第四個元素作為距離
+
+    // 打印 5 行空行
+    for (int i = 0; i < 5; ++i) {
+        RCLCPP_INFO(this->get_logger(), " ");
+    }
+    RCLCPP_INFO(this->get_logger(), "before add");
+    
+    gtSAMgraph.add(boost::make_shared<GroundPlaneFactor>(
+        currentKey, measuredNormal, measuredDistance, noiseModel, shared_from_this()));
 
     // RCLCPP_INFO(this->get_logger(), "sigmas = [%f, %f, %f] = ", _Ground_Plane_param[0], _Ground_Plane_param[1], _Ground_Plane_param[2]);
 
-    // ////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
 
     initialEstimate.insert(
         cloudKeyPoses3D->points.size(),
