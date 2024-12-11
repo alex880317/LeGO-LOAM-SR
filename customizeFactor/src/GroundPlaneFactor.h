@@ -17,19 +17,23 @@ private:
     const gtsam::Vector3 G_k;            // 單位法向量
     gtsam::SharedNoiseModel noiseModel_; // 噪声模型
 
+    bool isActive_; // 新增的布爾型成員變量
+
 public:
     using NoiseModelFactor1<gtsam::Pose3>::evaluateError;
 
     typedef std::shared_ptr<GroundPlaneFactor> shared_ptr;
 
     GroundPlaneFactor(gtsam::Key key, const gtsam::Point3 &normal, const double &distance,
-                      const gtsam::SharedNoiseModel &noiseModel, rclcpp::Node::SharedPtr node)
+                      const gtsam::SharedNoiseModel &noiseModel, rclcpp::Node::SharedPtr node,
+                      bool isActive = true)
         : gtsam::NoiseModelFactor1<gtsam::Pose3>(noiseModel, key),
           measuredNormal_(normal),
           measuredDistance_(distance),
           G_k(normal.normalized()), // 在構造函數中初始化 G_k_
           noiseModel_(noiseModel),
-          node_(node)
+          node_(node),
+          isActive_(isActive) // 初始化布爾型變量
     {
         // RCLCPP_INFO(node_->get_logger(), "out : Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f]", node_->now().seconds(),
         // G_k(0), G_k(1), G_k(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2));
@@ -39,7 +43,7 @@ public:
                                 boost::optional<gtsam::Matrix &> H = boost::none) const override
     {
 
-        double initialDistance = 2.46; // 0.12 1.78
+        double initialDistance = 1.78; // Gazebo:0.12 Mulran:1.78 Carla:2.46
 
         // 計算法向量誤差
         gtsam::Vector3 initialNormal(0.0, 0.0, 1.0);
@@ -101,7 +105,7 @@ public:
             {
                 H_left << -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0.0, 0.0,
                     0.0, 0.0, 0.0, 0.0,
-                    -t_k_W(0), -t_k_W(1), -t_k_W(2), 1.0; 
+                    0.0, 0.0, 0.0, 1.0; 
                     // 1 / (1 + pow(G_k_W(1) / G_k_W(2), 2.0)) // -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0.0, 0.0,
                     // 0.0, 0.0, 0.0, 0.0,
                 // RCLCPP_INFO(node_->get_logger(), "denominator = 0");
@@ -110,7 +114,7 @@ public:
             {
                 H_left << -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0.0, 0.0,
                     (G_k_W(2) * G_k_W(0)) / denominator, (G_k_W(2) * G_k_W(1)) / denominator, -((G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1))) / denominator, 0.0,
-                    -t_k_W(0), -t_k_W(1), -t_k_W(2), 1.0; 
+                    0.0, 0.0, 0.0, 1.0; 
                     // -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0.0, 0.0,
                     // (G_k_W(2) * G_k_W(0)) / denominator, (G_k_W(2) * G_k_W(1)) / denominator, -((G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1))) / denominator, 0.0,
             }
@@ -157,19 +161,19 @@ public:
             // 最終的雅可比矩陣是兩個矩陣的乘積
             *H = H_left * H_right;
 
-            // 打印 H_left
-            {
-                std::stringstream ss_left;
-                ss_left << H_left.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
-                RCLCPP_INFO(node_->get_logger(), "Jacobian H_left:\n%s", ss_left.str().c_str());
-            }
+            // // 打印 H_left
+            // {
+            //     std::stringstream ss_left;
+            //     ss_left << H_left.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
+            //     RCLCPP_INFO(node_->get_logger(), "Jacobian H_left:\n%s", ss_left.str().c_str());
+            // }
 
-            // 打印 H_right
-            {
-                std::stringstream ss_right;
-                ss_right << H_right.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
-                RCLCPP_INFO(node_->get_logger(), "Jacobian H_right:\n%s", ss_right.str().c_str());
-            }
+            // // 打印 H_right
+            // {
+            //     std::stringstream ss_right;
+            //     ss_right << H_right.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
+            //     RCLCPP_INFO(node_->get_logger(), "Jacobian H_right:\n%s", ss_right.str().c_str());
+            // }
 
             // std::cout << "Jacobian H1:\n"
             //           << H_left << std::endl;
@@ -182,14 +186,17 @@ public:
         // gtsam::Vector weightedError(3); // 假設殘差是 3 維
         // weightedError = noiseModel_->whiten(error);
 
-        // 假設 error 是一個 gtsam::Vector
-        Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
+        if (isActive_){
+            // Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
 
-        std::stringstream ss;
-        ss << error.transpose().format(CleanFmt);
-        RCLCPP_INFO(node_->get_logger(), "Time: %f, error = %s", node_->now().seconds(), ss.str().c_str());
-        // RCLCPP_INFO(node_->get_logger(), "down : Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f], error = [%.6f, %.6f, %.6f]", node_->now().seconds(),
-        //     G_k_W(0), G_k_W(1), G_k_W(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2), error[0], error[1], error[2]);
+            // std::stringstream ss;
+            // ss << error.transpose().format(CleanFmt);
+            // RCLCPP_INFO(node_->get_logger(), "Time: %f, error = %s", node_->now().seconds(), ss.str().c_str());
+            // RCLCPP_INFO(node_->get_logger(), "down : Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f], error = [%.6f, %.6f, %.6f]", node_->now().seconds(),
+            //     G_k_W(0), G_k_W(1), G_k_W(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2), error[0], error[1], error[2]);
+            // std::cout << "System is active" << std::endl;
+        }
+        
 
         // std::cout << "weightedError = " << weightedError.transpose() << std::endl;
 
@@ -204,6 +211,18 @@ public:
     {
         return boost::static_pointer_cast<gtsam::NonlinearFactor>(
             gtsam::NonlinearFactor::shared_ptr(new GroundPlaneFactor(*this)));
+    }
+
+    // 成員函數：設置布爾型變量的值
+    void setBool(bool value)
+    {
+        isActive_ = value;
+    }
+
+    // 成員函數：獲取布爾型變量的值
+    bool getBool() const
+    {
+        return isActive_;
     }
 
 private:

@@ -336,92 +336,22 @@
 
 
 # OS1-64
-# image_projection:
-#   ros__parameters:
-#     laser:
-#       sensor_type: OS1-64
-#       num_vertical_scans: 64
-#       num_horizontal_scans: 1024
-#       vertical_angle_bottom: -16.6          # degrees
-#       vertical_angle_top: 16.6              # degrees
-#       sensor_mount_angle: 0.0               # degrees
-#       ground_scan_index: 50
-#       use_kitti: false
-#       uniform_scans: true
-#       offline_path: "0000"
-#       offline_kitti_360: true
-#       lidarMinRange: 1.0
-#       lidarMaxRange: 1000.0
-
-#     image_projection:
-#       segment_valid_point_num: 5
-#       segment_valid_line_num: 3
-#       segment_theta: 60.0                   # decrese this value may improve accuracy
-
-# map_optimization:
-#   ros__parameters:
-#     mapping:
-#       enable_crossline: false
-#       enable_visualize_global_map: false
-#       enable_loop_closure: false
-#       save_key_feature_pcd: false
-#       use_image_color_cloud: false
-
-#       radius_search_loop: true
-#       scan_context_loop: false
-
-#       surrounding_keyframe_search_radius: 50.0   # key frame that is within n meters from current pose will be considered for scan-to-map optimization (when loop closure disabled)
-#       surrounding_keyframe_search_num: 50        # submap size (when loop closure enabled)
-
-#       history_keyframe_search_radius: 40.0       # key frame that is within n meters from current pose will be considerd for loop closure
-#       history_keyframe_search_num: 50            # 2n+1 number of history key frames will be fused into a submap for loop closure
-#       history_keyframe_fitness_score: 3.0        # the smaller the better alignment ICP:0.3 NDT:
-#       step_size: 1.0 #1.0
-#       stop_thres: 0.05 #0.05
-
-#       iterCountThres: 50
-
-#       global_map_visualization_search_radius: 5000.0 # key frames with in n meters will be visualized
-
-# # transform_fusion:
-# #   ros__parameters:
-# #     mapping:
-
-# feature_association:
-#   ros__parameters:
-#     laser:
-#       num_vertical_scans: 64
-#       num_horizontal_scans: 1024
-#       scan_period: 0.1                      # seconds
-#       vertical_angle_bottom: -16.6          # degrees
-#       vertical_angle_top: 16.6              # degrees
-#       DBFr: 7.5 #7.5
-#       RatioXY: 0.3 #0.3 
-#       RatioZ: 5.0 #5.0
-#       use_imu_undistortion: false
-
-#     mapping:
-#       mapping_frequency_divider: 1
-
-#     featureAssociation:
-#       edge_threshold: 0.005
-#       surf_threshold: 0.005
-#       nearest_feature_search_distance: 5.0
-
-
-# carla-customize LiDAR
 image_projection:
   ros__parameters:
     laser:
-      num_vertical_scans: 32
-      num_horizontal_scans: 1800
-      vertical_angle_bottom: -15.0          # degrees
-      vertical_angle_top: 25.0              # degrees
+      sensor_type: OS1-64
+      num_vertical_scans: 64
+      num_horizontal_scans: 1024
+      vertical_angle_bottom: -16.6          # degrees
+      vertical_angle_top: 16.6              # degrees
       sensor_mount_angle: 0.0               # degrees
-      ground_scan_index: 11
+      ground_scan_index: 50
       use_kitti: false
-      use_vlp32c: false
-      offline_path: "06"
+      uniform_scans: true
+      offline_path: "0000"
+      offline_kitti_360: true
+      lidarMinRange: 1.0
+      lidarMaxRange: 1000.0
 
     image_projection:
       segment_valid_point_num: 5
@@ -431,48 +361,118 @@ image_projection:
 map_optimization:
   ros__parameters:
     mapping:
-      enable_loop_closure: true
+      enable_crossline: false
+      enable_visualize_global_map: false
+      enable_loop_closure: false
       save_key_feature_pcd: false
+      use_image_color_cloud: false
+
+      radius_search_loop: true
+      scan_context_loop: false
 
       surrounding_keyframe_search_radius: 50.0   # key frame that is within n meters from current pose will be considered for scan-to-map optimization (when loop closure disabled)
-      surrounding_keyframe_search_num: 50 #50        # submap size (when loop closure enabled)
+      surrounding_keyframe_search_num: 50        # submap size (when loop closure enabled)
 
-      history_keyframe_search_radius: 15.0  #7.0      # key frame that is within n meters from current pose will be considered for loop closure
+      history_keyframe_search_radius: 40.0       # key frame that is within n meters from current pose will be considerd for loop closure
       history_keyframe_search_num: 50            # 2n+1 number of history key frames will be fused into a submap for loop closure
-      history_keyframe_fitness_score: 0.5        # the smaller the better alignment
+      history_keyframe_fitness_score: 3.0        # the smaller the better alignment ICP:0.3 NDT:
       step_size: 1.0 #1.0
       stop_thres: 0.05 #0.05
 
-      iterCountThres: 200
+      iterCountThres: 50
 
       global_map_visualization_search_radius: 5000.0 # key frames with in n meters will be visualized
-      info_save_path: "/home/alex/colcon_ws/"
 
-      PGO_cov_param: [1e-2, 1e-2, 1e-4, 1e-4, 1e-4, 1e-2]
-      Ground_Plane_param: [1e-6, 1e-6, 1e-8]
-
-transform_fusion:
-  ros__parameters:
-    mapping:
-      pose_save_path: "/home/alex/colcon_ws/result.txt"
+# transform_fusion:
+#   ros__parameters:
+#     mapping:
 
 feature_association:
   ros__parameters:
     laser:
-      num_vertical_scans: 16
-      num_horizontal_scans: 1800
+      num_vertical_scans: 64
+      num_horizontal_scans: 1024
       scan_period: 0.1                      # seconds
-      vertical_angle_bottom: -15.0          # degrees
-      vertical_angle_top: 15.0              # degrees
-      DBFr: 5.0 #5.0
-      RatioXY: 0.5 #0.5 
-      RatioZ: 2.5 #2.5
-      use_imu_undistortion: false # Alex
+      vertical_angle_bottom: -16.6          # degrees
+      vertical_angle_top: 16.6              # degrees
+      DBFr: 7.5 #7.5
+      RatioXY: 0.3 #0.3 
+      RatioZ: 5.0 #5.0
+      use_imu_undistortion: false
 
     mapping:
-      mapping_frequency_divider: 5
+      mapping_frequency_divider: 1
 
     featureAssociation:
-      edge_threshold: 0.05 #0.01
-      surf_threshold: 0.05 #0.005
+      edge_threshold: 0.005
+      surf_threshold: 0.005
       nearest_feature_search_distance: 5.0
+
+
+# # carla-customize LiDAR
+# image_projection:
+#   ros__parameters:
+#     laser:
+#       num_vertical_scans: 32
+#       num_horizontal_scans: 1800
+#       vertical_angle_bottom: -15.0          # degrees
+#       vertical_angle_top: 25.0              # degrees
+#       sensor_mount_angle: 0.0               # degrees
+#       ground_scan_index: 11
+#       use_kitti: false
+#       use_vlp32c: false
+#       offline_path: "06"
+
+#     image_projection:
+#       segment_valid_point_num: 5
+#       segment_valid_line_num: 3
+#       segment_theta: 60.0                   # decrese this value may improve accuracy
+
+# map_optimization:
+#   ros__parameters:
+#     mapping:
+#       enable_loop_closure: true
+#       save_key_feature_pcd: false
+
+#       surrounding_keyframe_search_radius: 50.0   # key frame that is within n meters from current pose will be considered for scan-to-map optimization (when loop closure disabled)
+#       surrounding_keyframe_search_num: 50 #50        # submap size (when loop closure enabled)
+
+#       history_keyframe_search_radius: 15.0  #7.0      # key frame that is within n meters from current pose will be considered for loop closure
+#       history_keyframe_search_num: 50            # 2n+1 number of history key frames will be fused into a submap for loop closure
+#       history_keyframe_fitness_score: 0.5        # the smaller the better alignment
+#       step_size: 1.0 #1.0
+#       stop_thres: 0.05 #0.05
+
+#       iterCountThres: 200
+
+#       global_map_visualization_search_radius: 5000.0 # key frames with in n meters will be visualized
+#       info_save_path: "/home/alex/colcon_ws/"
+
+#       PGO_cov_param: [1e-2, 1e-2, 1e-4, 1e-4, 1e-4, 1e-2]
+#       Ground_Plane_param: [1e-6, 1e-6, 1e-8]
+
+# transform_fusion:
+#   ros__parameters:
+#     mapping:
+#       pose_save_path: "/home/alex/colcon_ws/result.txt"
+
+# feature_association:
+#   ros__parameters:
+#     laser:
+#       num_vertical_scans: 16
+#       num_horizontal_scans: 1800
+#       scan_period: 0.1                      # seconds
+#       vertical_angle_bottom: -15.0          # degrees
+#       vertical_angle_top: 15.0              # degrees
+#       DBFr: 5.0 #5.0
+#       RatioXY: 0.5 #0.5 
+#       RatioZ: 2.5 #2.5
+#       use_imu_undistortion: false # Alex
+
+#     mapping:
+#       mapping_frequency_divider: 5
+
+#     featureAssociation:
+#       edge_threshold: 0.05 #0.01
+#       surf_threshold: 0.05 #0.005
+#       nearest_feature_search_distance: 5.0

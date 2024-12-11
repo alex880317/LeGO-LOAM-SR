@@ -1728,6 +1728,9 @@ void MapOptimization::saveKeyFramesAndFactor()
   /**
    * update gtsam graph
    */
+
+  // 在函數開始時聲明 shared_ptr
+  boost::shared_ptr<GroundPlaneFactor> groundPlaneFactor;
   if (cloudKeyPoses3D->points.empty())
   {
     gtSAMgraph.add(PriorFactor<Pose3>(
@@ -1786,11 +1789,18 @@ void MapOptimization::saveKeyFramesAndFactor()
         RCLCPP_INFO(this->get_logger(), " ");
     }
     RCLCPP_INFO(this->get_logger(), "before add");
-    
-    gtSAMgraph.add(boost::make_shared<GroundPlaneFactor>(
-        currentKey, measuredNormal, measuredDistance, noiseModel, shared_from_this()));
 
-    // RCLCPP_INFO(this->get_logger(), "sigmas = [%f, %f, %f] = ", _Ground_Plane_param[0], _Ground_Plane_param[1], _Ground_Plane_param[2]);
+    // 在外部創建因子的共享指針
+    groundPlaneFactor =
+        boost::make_shared<GroundPlaneFactor>(currentKey, measuredNormal, measuredDistance, noiseModel, shared_from_this());
+
+    
+    gtSAMgraph.add(groundPlaneFactor);
+
+    // // Alex Ground Plane Factor reset
+    // groundPlaneFactor->setBool(false);
+    bool isActive = groundPlaneFactor->getBool();
+    RCLCPP_INFO(this->get_logger(), "a isActive = %s", isActive ? "true" : "false");
 
     ////////////////////////////////////////////////////////////////////////////////
 
@@ -1800,8 +1810,24 @@ void MapOptimization::saveKeyFramesAndFactor()
                            transformAftMapped[1]),
               Point3(transformAftMapped[5], transformAftMapped[3],
                      transformAftMapped[4])));
-   
+    
+    // gtsam::Pose3 curPose = gtsam::Pose3(Rot3::RzRyRx(transformAftMapped[2], transformAftMapped[0],
+    //                        transformAftMapped[1]),
+    //                         Point3(transformAftMapped[5], transformAftMapped[3],
+    //                                transformAftMapped[4]));
+
+    // gtsam::Matrix3 R_k_W = curPose.rotation().matrix();
+
+    // RCLCPP_INFO(this->get_logger(), "current Rotation Matrix:");
+    // RCLCPP_INFO(this->get_logger(), "[%f, %f, %f]", R_k_W(0, 0), R_k_W(0, 1), R_k_W(0, 2));
+    // RCLCPP_INFO(this->get_logger(), "[%f, %f, %f]", R_k_W(1, 0), R_k_W(1, 1), R_k_W(1, 2));
+    // RCLCPP_INFO(this->get_logger(), "[%f, %f, %f]", R_k_W(2, 0), R_k_W(2, 1), R_k_W(2, 2));
+    isActive = groundPlaneFactor->getBool();
+    RCLCPP_INFO(this->get_logger(), "b isActive = %s", isActive ? "true" : "false");
   }
+  
+  bool isActive = groundPlaneFactor->getBool();
+  RCLCPP_INFO(this->get_logger(), "c isActive = %s", isActive ? "true" : "false");
 
   initialEstimate_full.insert(
       cloudKeyPoses3D->points.size(),
@@ -1813,91 +1839,20 @@ void MapOptimization::saveKeyFramesAndFactor()
   // 在調用 update 之前打印整個系統的 Jacobian
   gtsam::GaussianFactorGraph::shared_ptr linearizedGraph = gtSAMgraph.linearize(initialEstimate_full);
 
-  // // 遍歷每個因子並使用 ROS 的 RCLCPP_INFO 打印 Jacobian
-  // for (const auto &factor : *linearizedGraph)
-  // {
-  //   if (auto jacobianFactor = boost::dynamic_pointer_cast<gtsam::JacobianFactor>(factor))
-  //   {
-  //     // 打印因子的鍵
-  //     std::ostringstream keysStream;
-  //     keysStream << "Jacobian for factor on keys: ";
-  //     for (const auto &key : jacobianFactor->keys())
-  //     {
-  //       keysStream << key << " ";
-  //     }
-  //     RCLCPP_INFO(rclcpp::get_logger("MapOptimization"), "%s", keysStream.str().c_str());
-
-  //     // 打印 A 矩陣
-  //     std::ostringstream aMatrixStream;
-  //     aMatrixStream << "A matrix:\n"
-  //                   << jacobianFactor->getA();
-  //     RCLCPP_INFO(rclcpp::get_logger("MapOptimization"), "%s", aMatrixStream.str().c_str());
-
-  //     // 打印 b 向量
-  //     std::ostringstream bVectorStream;
-  //     bVectorStream << "b vector:\n"
-  //                   << jacobianFactor->getb();
-  //     RCLCPP_INFO(rclcpp::get_logger("MapOptimization"), "%s", bVectorStream.str().c_str());
-  //   }
-  // }
-
   /**
    * update iSAM
    */
+  
   gtsam::ISAM2Result result = isam->update(gtSAMgraph, initialEstimate);
   isam->update();
 
-  // for (int i = 0; i < 100; ++i) {
-  //   // 逐步添加新觀測或因子（如果有的話）
-  //   isam->update();
-
-  //   // 獲取當前優化後的變量估計值
-  //   isamCurrentEstimate = isam->calculateEstimate();
-
-  //   // 遍歷並列出每個變量的當前值
-  //   std::cout << "Iteration " << i << " results:\n";
-  //   // isamCurrentEstimate.print();
-  // }
-
-  // result.print();
-
-  // if (isam->params().enableDetailedResults)
-  // {
-  //   result.detail = gtsam::ISAM2Result::DetailedResults();
-  // }
-
-  // 將新的因子添加到累積的因子圖中
-  // cumulativeGraph.add(gtSAMgraph);
+  
 
   // //////////////////////////////////////////////////////////////////
-  // Values currentEstimate = isam->calculateEstimate();
-  // NonlinearFactorGraph graph = isam->getFactorsUnsafe();
-
-  // // 計算每個因子的殘差
-  // for (size_t i = 0; i < graph.size(); i++)
-  // {
-  //   // 獲取單個因子
-  //   boost::shared_ptr<NonlinearFactor> factor = graph.at(i);
-  //   if (!factor)
-  //     continue;
-
-  //   // 計算該因子的誤差
-  //   double error = factor->error(currentEstimate);
-
-  //   // // 如果需要,也可以獲取具體的殘差向量
-  //   // Vector residual;
-  //   // if (factor->dim() > 0)
-  //   // {
-  //   //   residual = factor->unwhitenedError(currentEstimate);
-  //   // }
-
-  //   std::cout << "Factor " << i << " error: " << error << std::endl;
-  //   // if (residual.size() > 0)
-  //   // {
-  //   //   std::cout << "Residual: " << residual.transpose() << std::endl;
-  //   // }
-  // }
+  
   // //////////////////////////////////////////////////////////////////
+
+  
 
   gtSAMgraph.resize(0);
   initialEstimate.clear();
