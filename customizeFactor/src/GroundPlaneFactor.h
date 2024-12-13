@@ -52,8 +52,6 @@ public:
         gtsam::Matrix3 R_k_W = pose.rotation().matrix();
         gtsam::Vector3 t_k_W = pose.translation();
 
-        // std::cout << "R_k_W = " << R_k_W << std::endl;
-        // std::cout << "t_k_W = " << t_k_W << std::endl;
 
         // RCLCPP_INFO(node_->get_logger(), "up : Time: %.6f, Key: %lu, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f]", node_->now().seconds(), this->key(),
         //     G_k(0), G_k(1), G_k(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2));
@@ -153,20 +151,16 @@ public:
             H_right.block<1, 3>(3, 0) = (J_rho_diff.transpose() * (R_k_W * G_k)).transpose() - (t_k_W.transpose() * skew_RWGk); // // 1x3  because of the inner product,{J_rho_diff} should be transposed
             H_right.block<1, 3>(3, 3) = (R_k_W * G_k).transpose() * J;                                                          // 1x3 負的轉置
 
-            // H_right.block<3, 3>(0, 3).setZero();                                                                                  // 空矩陣 0_{3x3}
-            // H_right.block<3, 3>(0, 0).setZero();                                                                               // 上三行
-            // H_right.block<1, 3>(3, 3) = -(R_k_W * G_k).transpose() * J;                                                           // 1x3 負的轉置
-            // H_right.block<1, 3>(3, 0).setZero(); // 1x3
 
             // 最終的雅可比矩陣是兩個矩陣的乘積
             *H = H_left * H_right;
 
-            // // 打印 H_left
-            // {
-            //     std::stringstream ss_left;
-            //     ss_left << H_left.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
-            //     RCLCPP_INFO(node_->get_logger(), "Jacobian H_left:\n%s", ss_left.str().c_str());
-            // }
+            // 打印 H_left
+            {
+                std::stringstream ss_left;
+                ss_left << H_left.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
+                RCLCPP_INFO(node_->get_logger(), "Jacobian H_left:\n%s", ss_left.str().c_str());
+            }
 
             // // 打印 H_right
             // {
@@ -187,14 +181,14 @@ public:
         // weightedError = noiseModel_->whiten(error);
 
         if (isActive_){
-            // Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
+            Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
 
-            // std::stringstream ss;
-            // ss << error.transpose().format(CleanFmt);
-            // RCLCPP_INFO(node_->get_logger(), "Time: %f, error = %s", node_->now().seconds(), ss.str().c_str());
+            std::stringstream ss;
+            ss << error.transpose().format(CleanFmt);
+            RCLCPP_INFO(node_->get_logger(), "Time: %f, error = %s", node_->now().seconds(), ss.str().c_str());
             // RCLCPP_INFO(node_->get_logger(), "down : Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f], error = [%.6f, %.6f, %.6f]", node_->now().seconds(),
             //     G_k_W(0), G_k_W(1), G_k_W(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2), error[0], error[1], error[2]);
-            // std::cout << "System is active" << std::endl;
+            std::cout << "System is active" << std::endl;
         }
         
 

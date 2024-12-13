@@ -1797,11 +1797,6 @@ void MapOptimization::saveKeyFramesAndFactor()
     
     gtSAMgraph.add(groundPlaneFactor);
 
-    // // Alex Ground Plane Factor reset
-    // groundPlaneFactor->setBool(false);
-    bool isActive = groundPlaneFactor->getBool();
-    RCLCPP_INFO(this->get_logger(), "a isActive = %s", isActive ? "true" : "false");
-
     ////////////////////////////////////////////////////////////////////////////////
 
     initialEstimate.insert(
@@ -1822,12 +1817,8 @@ void MapOptimization::saveKeyFramesAndFactor()
     // RCLCPP_INFO(this->get_logger(), "[%f, %f, %f]", R_k_W(0, 0), R_k_W(0, 1), R_k_W(0, 2));
     // RCLCPP_INFO(this->get_logger(), "[%f, %f, %f]", R_k_W(1, 0), R_k_W(1, 1), R_k_W(1, 2));
     // RCLCPP_INFO(this->get_logger(), "[%f, %f, %f]", R_k_W(2, 0), R_k_W(2, 1), R_k_W(2, 2));
-    isActive = groundPlaneFactor->getBool();
-    RCLCPP_INFO(this->get_logger(), "b isActive = %s", isActive ? "true" : "false");
+
   }
-  
-  bool isActive = groundPlaneFactor->getBool();
-  RCLCPP_INFO(this->get_logger(), "c isActive = %s", isActive ? "true" : "false");
 
   initialEstimate_full.insert(
       cloudKeyPoses3D->points.size(),
@@ -1851,7 +1842,12 @@ void MapOptimization::saveKeyFramesAndFactor()
   // //////////////////////////////////////////////////////////////////
   
   // //////////////////////////////////////////////////////////////////
-
+  if (!(cloudKeyPoses3D->points.empty()))
+  {
+    groundPlaneFactor->setBool(false);
+    // bool isActive = groundPlaneFactor->getBool();
+    // RCLCPP_INFO(this->get_logger(), "c isActive = %s", isActive ? "true" : "false");
+  }
   
 
   gtSAMgraph.resize(0);
