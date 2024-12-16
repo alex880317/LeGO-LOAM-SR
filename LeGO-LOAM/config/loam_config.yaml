@@ -450,7 +450,7 @@ map_optimization:
       info_save_path: "/home/alex/colcon_ws/"
 
       PGO_cov_param: [1e-2, 1e-2, 1e-4, 1e-4, 1e-4, 1e-2]
-      Ground_Plane_param: [1e-6, 1e-6, 1e-8]
+      Ground_Plane_param: [1e-2, 1e-2, 1e-8]
 
 transform_fusion:
   ros__parameters:

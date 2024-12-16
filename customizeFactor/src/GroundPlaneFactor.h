@@ -43,7 +43,7 @@ public:
                                 boost::optional<gtsam::Matrix &> H = boost::none) const override
     {
 
-        double initialDistance = 1.78; // Gazebo:0.12 Mulran:1.78 Carla:2.46
+        double initialDistance = 2.46; // Gazebo:0.12 Mulran:1.78 Carla:2.46
 
         // 計算法向量誤差
         gtsam::Vector3 initialNormal(0.0, 0.0, 1.0);
@@ -101,18 +101,18 @@ public:
             // 避免分母為零的情況
             if (std::abs(denominator) < epsilon)
             {
-                H_left << -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0.0, 0.0,
-                    0.0, 0.0, 0.0, 0.0,
-                    0.0, 0.0, 0.0, 1.0; 
+                H_left << -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0.0, compute_partialR1_partialDk(t_k_W, G_k_W),
+                    0.0, 0.0, 0.0, compute_partialR2_partialDk(t_k_W, G_k_W),
+                    -t_k_W(0), -t_k_W(1), -t_k_W(2), 1.0; 
                     // 1 / (1 + pow(G_k_W(1) / G_k_W(2), 2.0)) // -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0.0, 0.0,
                     // 0.0, 0.0, 0.0, 0.0,
                 // RCLCPP_INFO(node_->get_logger(), "denominator = 0");
             }
             else
             {
-                H_left << -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0.0, 0.0,
-                    (G_k_W(2) * G_k_W(0)) / denominator, (G_k_W(2) * G_k_W(1)) / denominator, -((G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1))) / denominator, 0.0,
-                    0.0, 0.0, 0.0, 1.0; 
+                H_left << -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0.0, compute_partialR1_partialDk(t_k_W, G_k_W),
+                    (G_k_W(2) * G_k_W(0)) / denominator, (G_k_W(2) * G_k_W(1)) / denominator, -((G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1))) / denominator, compute_partialR2_partialDk(t_k_W, G_k_W),
+                    -t_k_W(0), -t_k_W(1), -t_k_W(2), 1.0; 
                     // -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0.0, 0.0,
                     // (G_k_W(2) * G_k_W(0)) / denominator, (G_k_W(2) * G_k_W(1)) / denominator, -((G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1))) / denominator, 0.0,
             }
@@ -155,12 +155,12 @@ public:
             // 最終的雅可比矩陣是兩個矩陣的乘積
             *H = H_left * H_right;
 
-            // 打印 H_left
-            {
-                std::stringstream ss_left;
-                ss_left << H_left.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
-                RCLCPP_INFO(node_->get_logger(), "Jacobian H_left:\n%s", ss_left.str().c_str());
-            }
+            // // 打印 H_left
+            // {
+            //     std::stringstream ss_left;
+            //     ss_left << H_left.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
+            //     RCLCPP_INFO(node_->get_logger(), "Jacobian H_left:\n%s", ss_left.str().c_str());
+            // }
 
             // // 打印 H_right
             // {
@@ -186,9 +186,17 @@ public:
             std::stringstream ss;
             ss << error.transpose().format(CleanFmt);
             RCLCPP_INFO(node_->get_logger(), "Time: %f, error = %s", node_->now().seconds(), ss.str().c_str());
-            // RCLCPP_INFO(node_->get_logger(), "down : Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f], error = [%.6f, %.6f, %.6f]", node_->now().seconds(),
+            // RCLCPP_INFO(node_->get_logger(), "Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f], error = [%.6f, %.6f, %.6f]", node_->now().seconds(),
             //     G_k_W(0), G_k_W(1), G_k_W(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2), error[0], error[1], error[2]);
-            std::cout << "System is active" << std::endl;
+
+            double cost = std::pow(error[0], 2) + std::pow(error[1], 2) + std::pow(error[2], 2);
+            RCLCPP_INFO(node_->get_logger(), "Cost = %f", cost);
+
+            gtsam::Vector3 rot = calculateZYXEulerAngles(R_k_W);
+            RCLCPP_INFO(node_->get_logger(), "eular angle (Body frame with respect to World frame) : [%f, %f, %f]", rot(2), rot(1), rot(0));
+            RCLCPP_INFO(node_->get_logger(), "translation (Body frame with respect to World frame) : [%f, %f, %f]", t_k_W(0), rot(1), rot(2));
+            
+            // std::cout << "System is active" << std::endl;
         }
         
 
@@ -340,6 +348,69 @@ private:
         result[2] = rho2 * (sigma6 - sigma10 - (phi2 * sigma14) / safe_sigma17 + sigma3 + sigma7) - rho1 * ((phi1 * sigma14) / safe_sigma17 + sigma11 + sigma5 + sigma2 - sigma8) - rho3 * (pow(phi3, 2) * (sigma16 - sigma15) / safe_sigma17 + (2 * phi3 * sigma14) / safe_sigma17 - sigma16 + sigma15 - (2 * pow(phi3, 2) * abs(phi3) * std::copysign(1.0, phi3) * sigma14) / pow(safe_sigma17, 2));
 
         return result;
+    }
+
+    // 新增函數：計算ZYX順序的歐拉角 (Z-Y-X)
+    // 假設 R = Rz(γ)*Ry(β)*Rx(α)
+    // 回傳值為 [γ, β, α]
+    gtsam::Vector3 calculateZYXEulerAngles(const gtsam::Matrix3 &rot) const
+    {
+        // gtsam::Matrix3 R = rot.matrix();
+
+        // R(2,0) = -sin(β)
+        double beta = std::asin(-rot(2,0));
+
+        // γ = atan2(R(1,0), R(0,0))
+        double gamma = std::atan2(rot(1,0), rot(0,0));
+
+        // α = atan2(R(2,1), R(2,2))
+        double alpha = std::atan2(rot(2,1), rot(2,2));
+
+        return gtsam::Vector3(gamma, beta, alpha);
+    }
+
+    // Function to compute the first part of the expression (result1)
+    double compute_partialR1_partialDk(const gtsam::Vector3& P, const gtsam::Vector3& G) const
+    {
+        // Extract components from vectors
+        double px = P(0);
+        double py = P(1);
+        double Gx = G(0);
+        double Gy = G(1);
+
+        // Compute intermediate values
+        double denominator1 = Gx * (Gy * Gy / (Gx * Gx) + 1);
+        double term1 = -py / denominator1;
+        double term2 = -Gy * px / (Gx * Gx * (Gy * Gy / (Gx * Gx) + 1));
+        double numerator1 = term1 + term2;
+        double denominator_final1 = px * px + py * py;
+        double result1 = numerator1 / denominator_final1;
+
+        return result1;
+    }
+
+    // Function to compute the second part of the expression (result2)
+    double compute_partialR2_partialDk(const gtsam::Vector3& P, const gtsam::Vector3& G) const
+    {
+        // Extract components from vectors
+        double px = P(0);
+        double py = P(1);
+        double Gx = G(0);
+        double Gy = G(1);
+        double Gz = G(2);
+
+        // Compute \sigma_1
+        double denominator2 = std::sqrt(1 - (Gz * Gz) / (Gx * Gx + Gy * Gy + Gz * Gz));
+        double sigma1 = denominator2 * std::pow(Gx * Gx + Gy * Gy + Gz * Gz, 1.5);
+
+        // Compute second part of the expression
+        double term3 = Gx * Gz * px / sigma1;
+        double term4 = Gy * Gz * py / sigma1;
+        double numerator2 = term3 + term4;
+        double denominator_final1 = px * px + py * py;
+        double result2 = -numerator2 / denominator_final1;
+
+        return result2;
     }
 };
 
