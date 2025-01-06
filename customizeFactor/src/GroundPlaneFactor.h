@@ -80,13 +80,15 @@ public:
 
         gtsam::Vector3 G_k_W = measuredNormal_W;
 
+        // 構建雅可比矩陣
+        gtsam::Matrix H_left(3, 4);
+        gtsam::Matrix H_right(4, 6);
+
         // 如果需要雅可比矩陣 H，則計算
         if (H)
         {
             H->setZero(3, 6); // Jacobian 大小是 3x6
 
-            // 構建雅可比矩陣
-            gtsam::Matrix H_left(3, 4);
             // H_left << -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0, 0,
             //     (-G_k_W(0) * G_k_W(2)) / G_k_W.squaredNorm(), (-G_k_W(1) * G_k_W(2)) / G_k_W.squaredNorm(), (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)) / G_k_W.squaredNorm(), 0,
             //     0, 0, 0, 1;
@@ -115,12 +117,12 @@ public:
                     -t_k_W(0), -t_k_W(1), -t_k_W(2), 1.0; 
                     // -G_k_W(1) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), G_k_W(0) / (G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1)), 0.0, 0.0,
                     // (G_k_W(2) * G_k_W(0)) / denominator, (G_k_W(2) * G_k_W(1)) / denominator, -((G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1))) / denominator, 0.0,
+                RCLCPP_INFO(node_->get_logger(), "translation (Body frame with respect to World frame) (H_left) : [%f, %f, %f]", t_k_W(0), t_k_W(1), t_k_W(2));
             }
 
             ///////////////////////////////////////////////////////////////////////////////////////////////////
 
             // 使用反對稱矩陣構建旋轉的雅可比
-            gtsam::Matrix H_right(4, 6);
             gtsam::Matrix3 skew_RWGk = R_k_W * gtsam::skewSymmetric(G_k);
 
             // 使用 GTSAM 的 Logmap 函數將 Pose3 轉換為小 se(3)
@@ -149,11 +151,66 @@ public:
             H_right.block<3, 3>(0, 0) = -skew_RWGk;                                                                             // 上三行
             H_right.block<3, 3>(0, 3).setZero();                                                                                // 空矩陣 0_{3x3}
             H_right.block<1, 3>(3, 0) = (J_rho_diff.transpose() * (R_k_W * G_k)).transpose() - (t_k_W.transpose() * skew_RWGk); // // 1x3  because of the inner product,{J_rho_diff} should be transposed
-            H_right.block<1, 3>(3, 3) = (R_k_W * G_k).transpose() * J;                                                          // 1x3 負的轉置
+            H_right.block<1, 3>(3, 3) = J * (R_k_W * G_k);                                                          // 1x3 負的轉置
 
 
             // 最終的雅可比矩陣是兩個矩陣的乘積
             *H = H_left * H_right;
+
+            if (isActive_){
+                // 打印 H_left
+                {
+                    std::stringstream ss_left;
+                    ss_left << H_left.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
+                    RCLCPP_INFO(node_->get_logger(), "Jacobian H_left:\n%s", ss_left.str().c_str());
+                }
+
+                // 打印 H_right
+                {
+                    std::stringstream ss_right;
+                    ss_right << H_right.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
+                    RCLCPP_INFO(node_->get_logger(), "Jacobian H_right:\n%s", ss_right.str().c_str());
+                }
+
+                // 打印 H
+                {
+                    std::stringstream ss_total;
+                    gtsam::Matrix H_total(3, 6);
+                    H_total = H_left * H_right;
+                    ss_total << H_total.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
+                    RCLCPP_INFO(node_->get_logger(), "Jacobian H_total:\n%s", ss_total.str().c_str());
+                }
+            }
+        }
+        // error[0] = 0;
+        // 將兩個誤差結合成一個
+        // gtsam::Vector weightedError(3); // 假設殘差是 3 維
+        // weightedError = noiseModel_->whiten(error);
+
+        if (isActive_){
+            Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
+
+            std::stringstream ss;
+            ss << error.transpose().format(CleanFmt);
+            RCLCPP_INFO(node_->get_logger(), "Time: %f, error = %s", node_->now().seconds(), ss.str().c_str());
+            // std::cout << "Time: " << node_->now().seconds() << ", error = " << ss.str() << std::endl;
+            // RCLCPP_INFO(node_->get_logger(), "Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f], error = [%.6f, %.6f, %.6f]", node_->now().seconds(),
+            //     G_k_W(0), G_k_W(1), G_k_W(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2), error[0], error[1], error[2]);
+
+            double cost = std::pow(error[0], 2) + std::pow(error[1], 2) + std::pow(error[2], 2);
+            RCLCPP_INFO(node_->get_logger(), "Cost = %f", cost);
+            // std::cout << "Cost = " << cost << std::endl;
+
+            gtsam::Vector3 rot = calculateZYXEulerAngles(R_k_W);
+            RCLCPP_INFO(node_->get_logger(), "eular angle (Body frame with respect to World frame) (Factor) : [%f, %f, %f]", rot(2), rot(1), rot(0));
+            RCLCPP_INFO(node_->get_logger(), "translation (Body frame with respect to World frame) (Factor) : [%f, %f, %f]", t_k_W(0), t_k_W(1), t_k_W(2));
+            // std::cout << "Euler angle (Body frame with respect to World frame) (Factor): ["
+            //   << rot(2) << ", " << rot(1) << ", " << rot(0) << "]" << std::endl;
+
+            // std::cout << "Translation (Body frame with respect to World frame) (Factor): ["
+            //   << t_k_W(0) << ", " << t_k_W(1) << ", " << t_k_W(2) << "]" << std::endl;
+            
+            // std::cout << "System is active" << std::endl;
 
             // // 打印 H_left
             // {
@@ -169,34 +226,14 @@ public:
             //     RCLCPP_INFO(node_->get_logger(), "Jacobian H_right:\n%s", ss_right.str().c_str());
             // }
 
-            // std::cout << "Jacobian H1:\n"
-            //           << H_left << std::endl;
-            // std::cout << "Jacobian H2:\n"
-            //           << H_right << std::endl;
-            // RCLCPP_INFO(node_->get_logger(), "Time: %.6f, G_k = [%.6f, %.6f, %.6f]", node_->now().seconds(), G_k(0), G_k(1), G_k(2));
-        }
-        // error[0] = 0;
-        // 將兩個誤差結合成一個
-        // gtsam::Vector weightedError(3); // 假設殘差是 3 維
-        // weightedError = noiseModel_->whiten(error);
-
-        if (isActive_){
-            Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
-
-            std::stringstream ss;
-            ss << error.transpose().format(CleanFmt);
-            RCLCPP_INFO(node_->get_logger(), "Time: %f, error = %s", node_->now().seconds(), ss.str().c_str());
-            // RCLCPP_INFO(node_->get_logger(), "Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f], error = [%.6f, %.6f, %.6f]", node_->now().seconds(),
-            //     G_k_W(0), G_k_W(1), G_k_W(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2), error[0], error[1], error[2]);
-
-            double cost = std::pow(error[0], 2) + std::pow(error[1], 2) + std::pow(error[2], 2);
-            RCLCPP_INFO(node_->get_logger(), "Cost = %f", cost);
-
-            gtsam::Vector3 rot = calculateZYXEulerAngles(R_k_W);
-            RCLCPP_INFO(node_->get_logger(), "eular angle (Body frame with respect to World frame) : [%f, %f, %f]", rot(2), rot(1), rot(0));
-            RCLCPP_INFO(node_->get_logger(), "translation (Body frame with respect to World frame) : [%f, %f, %f]", t_k_W(0), rot(1), rot(2));
-            
-            // std::cout << "System is active" << std::endl;
+            // // 打印 H
+            // {
+            //     std::stringstream ss_total;
+            //     gtsam::Matrix H_total(3, 6);
+            //     H_total = H_left * H_right;
+            //     ss_total << H_total.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
+            //     RCLCPP_INFO(node_->get_logger(), "Jacobian H_total:\n%s", ss_total.str().c_str());
+            // }
         }
         
 
@@ -377,18 +414,18 @@ private:
         double py = P(1);
         double Gx = G(0);
         double Gy = G(1);
-
-        // Compute intermediate values
+    
+        // Compute result1
         double denominator1 = Gx * (Gy * Gy / (Gx * Gx) + 1);
-        double term1 = -py / denominator1;
-        double term2 = -Gy * px / (Gx * Gx * (Gy * Gy / (Gx * Gx) + 1));
-        double numerator1 = term1 + term2;
+        double term1 = py / denominator1;
+        double term2 = Gy * px / (Gx * Gx * (Gy * Gy / (Gx * Gx) + 1));
+        double numerator1 = term1 - term2;
         double denominator_final1 = px * px + py * py;
         double result1 = numerator1 / denominator_final1;
-
+    
         return result1;
     }
-
+    
     // Function to compute the second part of the expression (result2)
     double compute_partialR2_partialDk(const gtsam::Vector3& P, const gtsam::Vector3& G) const
     {
@@ -398,20 +435,21 @@ private:
         double Gx = G(0);
         double Gy = G(1);
         double Gz = G(2);
-
+    
         // Compute \sigma_1
-        double denominator2 = std::sqrt(1 - (Gz * Gz) / (Gx * Gx + Gy * Gy + Gz * Gz));
-        double sigma1 = denominator2 * std::pow(Gx * Gx + Gy * Gy + Gz * Gz, 1.5);
-
-        // Compute second part of the expression
+        double sigma1 = std::sqrt(1 - (Gz * Gz) / (Gx * Gx + Gy * Gy + Gz * Gz)) * 
+                        std::pow(Gx * Gx + Gy * Gy + Gz * Gz, 1.5);
+    
+        // Compute result2
         double term3 = Gx * Gz * px / sigma1;
         double term4 = Gy * Gz * py / sigma1;
         double numerator2 = term3 + term4;
         double denominator_final1 = px * px + py * py;
-        double result2 = -numerator2 / denominator_final1;
-
+        double result2 = numerator2 / denominator_final1;
+    
         return result2;
     }
+
 };
 
 #endif // GROUNDPLANEFACTOR_H

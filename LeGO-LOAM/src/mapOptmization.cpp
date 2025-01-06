@@ -1767,8 +1767,10 @@ void MapOptimization::saveKeyFramesAndFactor()
         poseFrom.between(poseTo), odometryNoise));
 
     // gtSAMgraph.print();
-    
-
+    RCLCPP_INFO(this->get_logger(), "//////////////////////////////////////////////////////////////");
+    RCLCPP_INFO(this->get_logger(), "eular angle (Body frame with respect to World frame) : [%f, %f, %f]", poseTo.rotation().yaw(), poseTo.rotation().pitch(), poseTo.rotation().roll());
+    RCLCPP_INFO(this->get_logger(), "translation (Body frame with respect to World frame) : [%f, %f, %f]", poseTo.translation().x(), poseTo.translation().y(), poseTo.translation().z());
+    RCLCPP_INFO(this->get_logger(), "//////////////////////////////////////////////////////////////");
     ////////////////////////////////////////////////////////////////////////////////
     
 
@@ -1820,21 +1822,22 @@ void MapOptimization::saveKeyFramesAndFactor()
 
   }
 
-  initialEstimate_full.insert(
-      cloudKeyPoses3D->points.size(),
-      Pose3(Rot3::RzRyRx(transformAftMapped[2], transformAftMapped[0],
-                         transformAftMapped[1]),
-            Point3(transformAftMapped[5], transformAftMapped[3],
-                   transformAftMapped[4])));
+  // initialEstimate_full.insert(
+  //     cloudKeyPoses3D->points.size(),
+  //     Pose3(Rot3::RzRyRx(transformAftMapped[2], transformAftMapped[0],
+  //                        transformAftMapped[1]),
+  //           Point3(transformAftMapped[5], transformAftMapped[3],
+  //                  transformAftMapped[4])));
 
-  // 在調用 update 之前打印整個系統的 Jacobian
-  gtsam::GaussianFactorGraph::shared_ptr linearizedGraph = gtSAMgraph.linearize(initialEstimate_full);
+  // // 在調用 update 之前打印整個系統的 Jacobian
+  // gtsam::GaussianFactorGraph::shared_ptr linearizedGraph = gtSAMgraph.linearize(initialEstimate_full);
 
   /**
    * update iSAM
    */
   
   gtsam::ISAM2Result result = isam->update(gtSAMgraph, initialEstimate);
+  // RCLCPP_INFO(this->get_logger(), "between");
   isam->update();
 
   
@@ -1911,6 +1914,12 @@ void MapOptimization::saveKeyFramesAndFactor()
   // std::cout << "Full Jacobian Matrix: \n"
   //           << fullJacobian << std::endl;
   // //////////////////////////////////////////////////////////////////////////////////
+
+  //////////////////////////////////////////////////////////////////////////////////
+  RCLCPP_INFO(this->get_logger(), "//////////////////////////////////////////////////////////////");
+  RCLCPP_INFO(this->get_logger(), "eular angle (Body frame with respect to World frame) : [%f, %f, %f]", latestEstimate.rotation().yaw(), latestEstimate.rotation().pitch(), latestEstimate.rotation().roll());
+  RCLCPP_INFO(this->get_logger(), "translation (Body frame with respect to World frame) : [%f, %f, %f]", latestEstimate.translation().x(), latestEstimate.translation().y(), latestEstimate.translation().z());
+  //////////////////////////////////////////////////////////////////////////////////
 
   thisPose3D.x = latestEstimate.translation().y();
   thisPose3D.y = latestEstimate.translation().z();
