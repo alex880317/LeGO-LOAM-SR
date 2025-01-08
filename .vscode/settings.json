@@ -139,7 +139,9 @@
     "variant": "cpp",
     "bit": "cpp",
     "*.ipp": "cpp",
-    "any": "cpp"
+    "any": "cpp",
+    "core": "cpp",
+    "numericaldiff": "cpp"
   },
   "cmake.ignoreCMakeListsMissing": true
 }
