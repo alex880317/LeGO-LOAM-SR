@@ -8,6 +8,7 @@
 #include "PlaneModel.hpp"
 #include <omp.h>
 #include <opencv2/opencv.hpp>
+#include <std_msgs/msg/float32_multi_array.hpp>
 
 class ImageProjection : public rclcpp::Node {
  public:
@@ -75,6 +76,9 @@ class ImageProjection : public rclcpp::Node {
   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr _pub_segmented_cloud_pure;
   rclcpp::Publisher<cloud_msgs::msg::CloudInfo>::SharedPtr _pub_segmented_cloud_info;
   rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr _pub_outlier_cloud;
+
+  rclcpp::Publisher<std_msgs::msg::Float32MultiArray>::SharedPtr _pub_ground_plane_coeffs;
+
 
   cloud_msgs::msg::CloudInfo _seg_msg;
 

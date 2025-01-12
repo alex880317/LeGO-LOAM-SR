@@ -63,6 +63,8 @@ ImageProjection::ImageProjection(const std::string &name, Channel<ProjectionOut>
   _pub_segmented_cloud_info = this->create_publisher<cloud_msgs::msg::CloudInfo>("/segmented_cloud_info", 1);
   _pub_outlier_cloud = this->create_publisher<sensor_msgs::msg::PointCloud2>("/outlier_cloud", 1);
 
+  _pub_ground_plane_coeffs = this->create_publisher<std_msgs::msg::Float32MultiArray>("/ground_plane_coeffs", 1);
+
   // Declare parameters
   this->declare_parameter(PARAM_VERTICAL_SCANS);
   this->declare_parameter(PARAM_HORIZONTAL_SCANS);
@@ -574,8 +576,9 @@ void ImageProjection::groundRemovalRANSAC()
     }
   }
 
-  // // 將 dk_star 填入 _Gk_star 的最後一個位置
-  // _Gk_star[3] = dk_star;
+  // 將 dk_star 填入 _Gk_star 的最後一個位置
+  _Gk_star[3] = dk_star;
+  
   // std::cout << "Ground Plane Coefficient = ";
   // for (const auto& value : _Gk_star) {
   //     std::cout << value << " ";
@@ -621,6 +624,16 @@ void ImageProjection::groundRemovalRANSAC()
   // } else {
   //   RCLCPP_WARN(this->get_logger(), "Ground cloud is empty.");
   // }
+
+  // 構造 Float32MultiArray 訊息
+  std_msgs::msg::Float32MultiArray coeffs_msg;
+  coeffs_msg.data.resize(_Gk_star.size());
+  for (size_t i = 0; i < _Gk_star.size(); ++i) {
+      coeffs_msg.data[i] = static_cast<float>(_Gk_star[i]);
+  }
+  
+  // 發布訊息
+  _pub_ground_plane_coeffs->publish(coeffs_msg);
 }
 
 void ImageProjection::cloudSegmentation()

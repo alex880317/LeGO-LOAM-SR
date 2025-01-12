@@ -63,7 +63,8 @@ public:
         // 計算法向量參數化 \(\tau(G^W_k)\)
         double theta = std::atan2(measuredNormal_W.y(), measuredNormal_W.x());            // 方位角
         double phi = std::acos(measuredNormal_W.z() / measuredNormal_W.head<3>().norm()); // 俯仰角
-        double d_k_prime = (measuredDistance_ + (t_k_W.transpose() * measuredNormal_W));  // 直接使用測量的距離值
+        double inner_product_term = (t_k_W.transpose() * measuredNormal_W);
+        double d_k_prime = (measuredDistance_ + inner_product_term);  // 直接使用測量的距離值
 
         gtsam::Vector3 tau_measured(theta, phi, d_k_prime); // 參數化後的測量值
 
@@ -85,7 +86,7 @@ public:
         // 如果需要雅可比矩陣 H，則計算
         if (H)
         {
-            H->setZero(1, 6); // Jacobian 大小是 3x6
+            H->setZero(3, 6); // Jacobian 大小是 3x6
 
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
             Eigen::Vector3d H11_left;
@@ -122,24 +123,56 @@ public:
                                ((1 - std::cos(angle)) / angle) * a_hat;
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            std::vector<double> sig_phi1 = calculate_sigma_phi1(rho[0], rho[1], rho[2], so3[0], so3[1], so3[2]);
+            std::vector<double> sig_phi2 = calculate_sigma_phi2(rho[0], rho[1], rho[2], so3[0], so3[1], so3[2]);
+            std::vector<double> sig_phi3 = calculate_sigma_phi3(rho[0], rho[1], rho[2], so3[0], so3[1], so3[2]);
+            gtsam::Matrix3 J_rho_diff;
+            J_rho_diff << sig_phi1[0], sig_phi2[0], sig_phi3[0],
+                sig_phi1[1], sig_phi2[1], sig_phi3[1],
+                sig_phi1[2], sig_phi2[2], sig_phi3[2];
+
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
             Eigen::MatrixXd& H_matrix = *H;  // 解包 boost::optional
-            // H_matrix.block<1, 3>(0, 0) = H11_left.transpose() * (-skew_RWGk);
-            // H_matrix.block<1, 3>(1, 0) = H21_left.transpose() * (-skew_RWGk);
-            H_matrix.block<1, 3>(0, 0) = -(t_k_W.transpose() * skew_RWGk);
-            // H_matrix.block<1, 3>(0, 3).setZero();
-            // H_matrix.block<1, 3>(1, 3).setZero();
-            H_matrix.block<1, 3>(0, 3) = J * (R_k_W * G_k);
+            H_matrix.block<1, 3>(0, 0) = H11_left.transpose() * (-skew_RWGk);
+            H_matrix.block<1, 3>(1, 0) = H21_left.transpose() * (-skew_RWGk);
+            H_matrix.block<1, 3>(2, 0) =  - (t_k_W.transpose() * skew_RWGk);    // (J_rho_diff.transpose() * (R_k_W * G_k)).transpose() 
+            H_matrix.block<1, 3>(0, 3).setZero();
+            H_matrix.block<1, 3>(1, 3).setZero();
+            H_matrix.block<1, 3>(2, 3) = J * (R_k_W * G_k);
 
             
 
             if (isActive_){
+                // // 打印 H_left
+                // {
+                //     std::stringstream ss_left;
+                //     ss_left << H_left.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
+                //     RCLCPP_INFO(node_->get_logger(), "Jacobian H_left:\n%s", ss_left.str().c_str());
+                // }
+
+                // // 打印 H_right
+                // {
+                //     std::stringstream ss_right;
+                //     ss_right << H_right.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
+                //     RCLCPP_INFO(node_->get_logger(), "Jacobian H_right:\n%s", ss_right.str().c_str());
+                // }
 
                 // 打印 H
                 {
                     std::stringstream ss_total;
                     ss_total << H_matrix.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
                     RCLCPP_INFO(node_->get_logger(), "Jacobian H_total:\n%s", ss_total.str().c_str());
+                }
+
+                RCLCPP_INFO(node_->get_logger(), "T_k in Jacobian : [%f, %f, %f]", t_k_W(0), t_k_W(1), t_k_W(2));
+                // 打印 skew_RWGk
+                {
+                    std::stringstream ss_skew_RWGk;
+                    ss_skew_RWGk << skew_RWGk.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
+                    RCLCPP_INFO(node_->get_logger(), "Jacobian skew_RWGk:\n%s", ss_skew_RWGk.str().c_str());
                 }
             }
         }
@@ -148,62 +181,43 @@ public:
         // gtsam::Vector weightedError(3); // 假設殘差是 3 維
         // weightedError = noiseModel_->whiten(error);
 
-        // if (isActive_){
-        //     Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
+        if (isActive_){
+            Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
 
-        //     std::stringstream ss;
-        //     ss << error.transpose().format(CleanFmt);
-        //     RCLCPP_INFO(node_->get_logger(), "Time: %f, error = %s", node_->now().seconds(), ss.str().c_str());
-        //     // std::cout << "Time: " << node_->now().seconds() << ", error = " << ss.str() << std::endl;
-        //     // RCLCPP_INFO(node_->get_logger(), "Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f], error = [%.6f, %.6f, %.6f]", node_->now().seconds(),
-        //     //     G_k_W(0), G_k_W(1), G_k_W(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2), error[0], error[1], error[2]);
+            std::stringstream ss;
+            ss << error.transpose().format(CleanFmt);
+            RCLCPP_INFO(node_->get_logger(), "Time: %f, error = %s", node_->now().seconds(), ss.str().c_str());
+            // std::cout << "Time: " << node_->now().seconds() << ", error = " << ss.str() << std::endl;
+            // RCLCPP_INFO(node_->get_logger(), "Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f], error = [%.6f, %.6f, %.6f]", node_->now().seconds(),
+            //     G_k_W(0), G_k_W(1), G_k_W(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2), error[0], error[1], error[2]);
 
-        //     double cost = std::pow(error[0], 2) + std::pow(error[1], 2) + std::pow(error[2], 2);
-        //     RCLCPP_INFO(node_->get_logger(), "Cost = %f", cost);
-        //     // std::cout << "Cost = " << cost << std::endl;
+            double cost = std::pow(error[0], 2) + std::pow(error[1], 2) + std::pow(error[2], 2);
+            RCLCPP_INFO(node_->get_logger(), "Cost = %f", cost);
+            // std::cout << "Cost = " << cost << std::endl;
 
-        //     gtsam::Vector3 rot = calculateZYXEulerAngles(R_k_W);
-        //     RCLCPP_INFO(node_->get_logger(), "eular angle (Body frame with respect to World frame) (Factor) : [%f, %f, %f]", rot(2), rot(1), rot(0));
-        //     RCLCPP_INFO(node_->get_logger(), "translation (Body frame with respect to World frame) (Factor) : [%f, %f, %f]", t_k_W(0), t_k_W(1), t_k_W(2));
-        //     // std::cout << "Euler angle (Body frame with respect to World frame) (Factor): ["
-        //     //   << rot(2) << ", " << rot(1) << ", " << rot(0) << "]" << std::endl;
-
-        //     // std::cout << "Translation (Body frame with respect to World frame) (Factor): ["
-        //     //   << t_k_W(0) << ", " << t_k_W(1) << ", " << t_k_W(2) << "]" << std::endl;
+            gtsam::Vector3 rot = calculateZYXEulerAngles(R_k_W);
+            RCLCPP_INFO(node_->get_logger(), "eular angle (Body frame with respect to World frame) (Factor) : [%f, %f, %f]", rot(2), rot(1), rot(0));
+            RCLCPP_INFO(node_->get_logger(), "translation (Body frame with respect to World frame) (Factor) : [%f, %f, %f]", t_k_W(0), t_k_W(1), t_k_W(2));
             
-        //     // std::cout << "System is active" << std::endl;
-
-        //     // // 打印 H_left
-        //     // {
-        //     //     std::stringstream ss_left;
-        //     //     ss_left << H_left.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
-        //     //     RCLCPP_INFO(node_->get_logger(), "Jacobian H_left:\n%s", ss_left.str().c_str());
-        //     // }
-
-        //     // // 打印 H_right
-        //     // {
-        //     //     std::stringstream ss_right;
-        //     //     ss_right << H_right.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
-        //     //     RCLCPP_INFO(node_->get_logger(), "Jacobian H_right:\n%s", ss_right.str().c_str());
-        //     // }
-
-        //     // // 打印 H
-        //     // {
-        //     //     std::stringstream ss_total;
-        //     //     gtsam::Matrix H_total(3, 6);
-        //     //     H_total = H_left * H_right;
-        //     //     ss_total << H_total.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
-        //     //     RCLCPP_INFO(node_->get_logger(), "Jacobian H_total:\n%s", ss_total.str().c_str());
-        //     // }
-        // }
+            RCLCPP_INFO(node_->get_logger(), "tau_measured is: [%f, %f, %f]", tau_measured(0), tau_measured(1), tau_measured(2));
+            RCLCPP_INFO(node_->get_logger(), "tau_initial is: [%f, %f, %f]", tau_initial(0), tau_initial(1), tau_initial(2));
+            RCLCPP_INFO(node_->get_logger(), "measuredNormal_W: [%f, %f, %f]",
+                measuredNormal_W(0), measuredNormal_W(1), measuredNormal_W(2));
+            
+            // double inner_product_term = (t_k_W.transpose() * measuredNormal_W);
+            RCLCPP_INFO(node_->get_logger(), "The inner product term is: %f", inner_product_term);
+            RCLCPP_INFO(node_->get_logger(), "The measuredDistance is: %f", measuredDistance_);
+            
+        }
         
 
+        // std::cout << "weightedError = " << weightedError.transpose() << std::endl;
 
         gtsam::Vector error_star = error.tail<1>();
 
-
-
-        return error_star;
+        // return weightedError;
+        // return error_star;
+        return error;
     }
 
     gtsam::NonlinearFactor::shared_ptr clone() const override
