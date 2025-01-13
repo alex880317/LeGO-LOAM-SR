@@ -141,7 +141,7 @@ public:
             H_matrix.block<1, 3>(2, 0) =  - (t_k_W.transpose() * skew_RWGk);    // (J_rho_diff.transpose() * (R_k_W * G_k)).transpose() 
             H_matrix.block<1, 3>(0, 3).setZero();
             H_matrix.block<1, 3>(1, 3).setZero();
-            H_matrix.block<1, 3>(2, 3) = J * (R_k_W * G_k);
+            H_matrix.block<1, 3>(2, 3) = J.transpose() * (R_k_W * G_k);
 
             
 
