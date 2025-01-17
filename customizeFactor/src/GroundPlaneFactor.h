@@ -43,7 +43,7 @@ public:
                                 boost::optional<gtsam::Matrix &> H = boost::none) const override
     {
 
-        double initialDistance = 2.46; // Gazebo:0.12 Mulran:1.78 Carla:2.46
+        double initialDistance = 1.78; // Gazebo:0.12 Mulran:1.78 Carla:2.46 // d0
 
         // 計算法向量誤差
         gtsam::Vector3 initialNormal(0.0, 0.0, 1.0);
@@ -86,7 +86,7 @@ public:
         // 如果需要雅可比矩陣 H，則計算
         if (H)
         {
-            H->setZero(3, 6); // Jacobian 大小是 3x6
+            H->setZero(1, 6); // Jacobian 大小是 3x6
 
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
             Eigen::Vector3d H11_left;
@@ -136,12 +136,12 @@ public:
 
 
             Eigen::MatrixXd& H_matrix = *H;  // 解包 boost::optional
-            H_matrix.block<1, 3>(0, 0) = H11_left.transpose() * (-skew_RWGk);
-            H_matrix.block<1, 3>(1, 0) = H21_left.transpose() * (-skew_RWGk);
-            H_matrix.block<1, 3>(2, 0) =  - (t_k_W.transpose() * skew_RWGk);    // (J_rho_diff.transpose() * (R_k_W * G_k)).transpose() 
-            H_matrix.block<1, 3>(0, 3).setZero();
-            H_matrix.block<1, 3>(1, 3).setZero();
-            H_matrix.block<1, 3>(2, 3) = J.transpose() * (R_k_W * G_k);
+            // H_matrix.block<1, 3>(0, 0) = H11_left.transpose() * (-skew_RWGk);
+            // H_matrix.block<1, 3>(1, 0) = H21_left.transpose() * (-skew_RWGk);
+            H_matrix.block<1, 3>(0, 0) =  - (t_k_W.transpose() * skew_RWGk);    // (J_rho_diff.transpose() * (R_k_W * G_k)).transpose() 
+            // H_matrix.block<1, 3>(0, 3).setZero();
+            // H_matrix.block<1, 3>(1, 3).setZero();
+            H_matrix.block<1, 3>(0, 3) = J.transpose() * (R_k_W * G_k);
 
             
 
@@ -216,8 +216,8 @@ public:
         gtsam::Vector error_star = error.tail<1>();
 
         // return weightedError;
-        // return error_star;
-        return error;
+        return error_star;
+        // return error;
     }
 
     gtsam::NonlinearFactor::shared_ptr clone() const override

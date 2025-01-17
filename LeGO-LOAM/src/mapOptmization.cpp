@@ -1779,7 +1779,7 @@ void MapOptimization::saveKeyFramesAndFactor()
     sigmas <<  _Ground_Plane_param[0], _Ground_Plane_param[1], _Ground_Plane_param[2];
     // sigmas <<  1e-4, 1e-4, 1e-8; // 3 維向量：法向量兩個角度的標準差和距離的標準差
     // 創建對角噪聲模型，使用 GTSAM 的 noiseModel::Diagonal::Sigmas
-    gtsam::SharedNoiseModel noiseModel = gtsam::noiseModel::Diagonal::Sigmas(sigmas);
+    gtsam::SharedNoiseModel noiseModel = gtsam::noiseModel::Diagonal::Sigmas(sigmas.tail<1>());
 
     gtsam::Key currentKey = cloudKeyPoses3D->points.size();
     // 提取 measuredNormal 和 measuredDistance
