@@ -22,17 +22,17 @@ def generate_launch_description():
     rviz_config = os.path.join(get_package_share_directory('lego_loam_sr'), 'rviz', 'origin.rviz')
 
     # Declare launch arguments for parameters
-    declare_pgo_cov_param = DeclareLaunchArgument(
-        'PGO_cov_param',
-        default_value='[1e-6, 1e-6, 1e-6, 1e-8, 1e-8, 1e-6]',
-        description='Covariance parameters for PGO'
-    )
+    # declare_pgo_cov_param = DeclareLaunchArgument(
+    #     'PGO_cov_param',
+    #     default_value='[1e-6, 1e-6, 1e-6, 1e-8, 1e-8, 1e-6]',
+    #     description='Covariance parameters for PGO'
+    # )
 
-    declare_ground_plane_param = DeclareLaunchArgument(
-        'Ground_Plane_param',
-        default_value='[1e-4, 1e-4, 1e-8]',
-        description='Parameters for ground plane'
-    )
+    # declare_ground_plane_param = DeclareLaunchArgument(
+    #     'Ground_Plane_param',
+    #     default_value='[1e-4, 1e-4, 1e-8]',
+    #     description='Parameters for ground plane'
+    # )
 
     # Tf transformations
     transform_map = Node(
@@ -55,11 +55,7 @@ def generate_launch_description():
         executable='lego_loam_sr',
         output='screen',
         parameters=[
-            config_file,
-            {
-                'mapping.PGO_cov_param': LaunchConfiguration('PGO_cov_param'),
-                'mapping.Ground_Plane_param': LaunchConfiguration('Ground_Plane_param'),
-            }
+            config_file
         ],
         remappings=[('/lidar_points', '/velodyne_points')],
     )
@@ -77,8 +73,8 @@ def generate_launch_description():
     ld = LaunchDescription()
 
     # Add declared arguments
-    ld.add_action(declare_pgo_cov_param)
-    ld.add_action(declare_ground_plane_param)
+    # ld.add_action(declare_pgo_cov_param)
+    # ld.add_action(declare_ground_plane_param)
 
     # Set environment variables
     ld.add_action(stdout_linebuf_envvar)

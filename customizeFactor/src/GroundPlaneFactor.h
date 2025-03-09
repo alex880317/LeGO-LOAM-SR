@@ -104,6 +104,9 @@ public:
             H21_left << (G_k_W(2) * G_k_W(0)) / denominator, 
                         (G_k_W(2) * G_k_W(1)) / denominator, 
                         -((G_k_W(0) * G_k_W(0) + G_k_W(1) * G_k_W(1))) / denominator;
+            // H21_left << - (G_k_W.squaredNorm() * G_k_W(2) * G_k_W(0)) / (pow(G_k_W.norm(), 3) * (G_k_W.squaredNorm() + pow(G_k_W(2), 2))),
+            //             - (G_k_W.squaredNorm() * G_k_W(2) * G_k_W(1)) / (pow(G_k_W.norm(), 3) * (G_k_W.squaredNorm() + pow(G_k_W(2), 2))),
+            //             (G_k_W.squaredNorm() * (G_k_W.squaredNorm() - pow(G_k_W(2), 2))) / (pow(G_k_W.norm(), 3) * (G_k_W.squaredNorm() + pow(G_k_W(2), 2)));
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -117,98 +120,110 @@ public:
             // 提取旋轉角度（弧度）
             double angle = so3.norm();
             // std::cout << "angle = " << angle << std::endl;
-
+            
+            // Right Perturbation Jacobian
             gtsam::Matrix3 J = (std::sin(angle) / angle) * Eigen::Matrix3d::Identity() +
-                               ((1 - std::sin(angle) / angle) * (a * a.transpose())) +
+                               ((1 - std::sin(angle) / angle) * (a * a.transpose())) -
                                ((1 - std::cos(angle)) / angle) * a_hat;
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            std::vector<double> sig_phi1 = calculate_sigma_phi1(rho[0], rho[1], rho[2], so3[0], so3[1], so3[2]);
-            std::vector<double> sig_phi2 = calculate_sigma_phi2(rho[0], rho[1], rho[2], so3[0], so3[1], so3[2]);
-            std::vector<double> sig_phi3 = calculate_sigma_phi3(rho[0], rho[1], rho[2], so3[0], so3[1], so3[2]);
-            gtsam::Matrix3 J_rho_diff;
-            J_rho_diff << sig_phi1[0], sig_phi2[0], sig_phi3[0],
-                sig_phi1[1], sig_phi2[1], sig_phi3[1],
-                sig_phi1[2], sig_phi2[2], sig_phi3[2];
+            // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // std::vector<double> sig_phi1 = calculate_sigma_phi1(rho[0], rho[1], rho[2], so3[0], so3[1], so3[2]);
+            // std::vector<double> sig_phi2 = calculate_sigma_phi2(rho[0], rho[1], rho[2], so3[0], so3[1], so3[2]);
+            // std::vector<double> sig_phi3 = calculate_sigma_phi3(rho[0], rho[1], rho[2], so3[0], so3[1], so3[2]);
+            // gtsam::Matrix3 J_rho_diff;
+            // J_rho_diff << sig_phi1[0], sig_phi2[0], sig_phi3[0],
+            //     sig_phi1[1], sig_phi2[1], sig_phi3[1],
+            //     sig_phi1[2], sig_phi2[2], sig_phi3[2];
 
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+            // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // gtsam::Matrix3 dGdEulerAngles = computeEulerAngleDerivatives(R_k_W, G_k);
+            // gtsam::Matrix dPdotGdEulerAngles = computePdotEulerAngleDerivatives(R_k_W, G_k, t_k_W);
+            // ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             Eigen::MatrixXd& H_matrix = *H;  // 解包 boost::optional
+            // H_matrix.block<1, 3>(0, 3) = H11_left.transpose() * (dGdEulerAngles);
+            // H_matrix.block<1, 3>(1, 3) = H21_left.transpose() * (dGdEulerAngles);
+            // H_matrix.block<1, 3>(2, 3) = dPdotGdEulerAngles;     
+            // H_matrix.block<1, 3>(0, 0).setZero();
+            // H_matrix.block<1, 3>(1, 0).setZero();
+            // H_matrix.block<1, 3>(2, 0) = (R_k_W * G_k);
+
             // H_matrix.block<1, 3>(0, 0) = H11_left.transpose() * (-skew_RWGk);
             // H_matrix.block<1, 3>(1, 0) = H21_left.transpose() * (-skew_RWGk);
-            H_matrix.block<1, 3>(0, 0) =  - (t_k_W.transpose() * skew_RWGk);    // (J_rho_diff.transpose() * (R_k_W * G_k)).transpose() 
+            H_matrix.block<1, 3>(0, 0) =  - (t_k_W.transpose() * skew_RWGk);   // (J_rho_diff.transpose() * (R_k_W * G_k)).transpose()
             // H_matrix.block<1, 3>(0, 3).setZero();
             // H_matrix.block<1, 3>(1, 3).setZero();
-            H_matrix.block<1, 3>(0, 3) = J.transpose() * (R_k_W * G_k);
+            H_matrix.block<1, 3>(0, 3) = (J.transpose() * (R_k_W * G_k)).transpose();
 
             
 
-            if (isActive_){
-                // // 打印 H_left
-                // {
-                //     std::stringstream ss_left;
-                //     ss_left << H_left.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
-                //     RCLCPP_INFO(node_->get_logger(), "Jacobian H_left:\n%s", ss_left.str().c_str());
-                // }
+            // if (isActive_){
+            //     // // 打印 H_left
+            //     // {
+            //     //     std::stringstream ss_left;
+            //     //     ss_left << H_left.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
+            //     //     RCLCPP_INFO(node_->get_logger(), "Jacobian H_left:\n%s", ss_left.str().c_str());
+            //     // }
 
-                // // 打印 H_right
-                // {
-                //     std::stringstream ss_right;
-                //     ss_right << H_right.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
-                //     RCLCPP_INFO(node_->get_logger(), "Jacobian H_right:\n%s", ss_right.str().c_str());
-                // }
+            //     // // 打印 H_right
+            //     // {
+            //     //     std::stringstream ss_right;
+            //     //     ss_right << H_right.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
+            //     //     RCLCPP_INFO(node_->get_logger(), "Jacobian H_right:\n%s", ss_right.str().c_str());
+            //     // }
 
-                // 打印 H
-                {
-                    std::stringstream ss_total;
-                    ss_total << H_matrix.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
-                    RCLCPP_INFO(node_->get_logger(), "Jacobian H_total:\n%s", ss_total.str().c_str());
-                }
+            //     // 打印 H
+            //     {
+            //         std::stringstream ss_total;
+            //         ss_total << H_matrix.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
+            //         RCLCPP_INFO(node_->get_logger(), "Jacobian H_total:\n%s", ss_total.str().c_str());
+            //     }
 
-                RCLCPP_INFO(node_->get_logger(), "T_k in Jacobian : [%f, %f, %f]", t_k_W(0), t_k_W(1), t_k_W(2));
-                // 打印 skew_RWGk
-                {
-                    std::stringstream ss_skew_RWGk;
-                    ss_skew_RWGk << skew_RWGk.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
-                    RCLCPP_INFO(node_->get_logger(), "Jacobian skew_RWGk:\n%s", ss_skew_RWGk.str().c_str());
-                }
-            }
+            //     RCLCPP_INFO(node_->get_logger(), "T_k in Jacobian : [%f, %f, %f]", t_k_W(0), t_k_W(1), t_k_W(2));
+            //     // 打印 skew_RWGk
+            //     {
+            //         std::stringstream ss_skew_RWGk;
+            //         ss_skew_RWGk << skew_RWGk.format(Eigen::IOFormat(Eigen::FullPrecision, 0, ", ", "\n", "[", "]"));
+            //         RCLCPP_INFO(node_->get_logger(), "Jacobian skew_RWGk:\n%s", ss_skew_RWGk.str().c_str());
+            //     }
+            // }
         }
         // error[0] = 0;
         // 將兩個誤差結合成一個
         // gtsam::Vector weightedError(3); // 假設殘差是 3 維
         // weightedError = noiseModel_->whiten(error);
 
-        if (isActive_){
-            Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
+        // if (isActive_){
+        //     Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
 
-            std::stringstream ss;
-            ss << error.transpose().format(CleanFmt);
-            RCLCPP_INFO(node_->get_logger(), "Time: %f, error = %s", node_->now().seconds(), ss.str().c_str());
-            // std::cout << "Time: " << node_->now().seconds() << ", error = " << ss.str() << std::endl;
-            // RCLCPP_INFO(node_->get_logger(), "Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f], error = [%.6f, %.6f, %.6f]", node_->now().seconds(),
-            //     G_k_W(0), G_k_W(1), G_k_W(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2), error[0], error[1], error[2]);
+        //     std::stringstream ss;
+        //     ss << error.transpose().format(CleanFmt);
+        //     RCLCPP_INFO(node_->get_logger(), "Time: %f, error = %s", node_->now().seconds(), ss.str().c_str());
+        //     // std::cout << "Time: " << node_->now().seconds() << ", error = " << ss.str() << std::endl;
+        //     // RCLCPP_INFO(node_->get_logger(), "Time: %.6f, G_k = [%.6f, %.6f, %.6f], measuredNormal_ = [%.6f, %.6f, %.6f], error = [%.6f, %.6f, %.6f]", node_->now().seconds(),
+        //     //     G_k_W(0), G_k_W(1), G_k_W(2), measuredNormal_(0), measuredNormal_(1), measuredNormal_(2), error[0], error[1], error[2]);
 
-            double cost = std::pow(error[0], 2) + std::pow(error[1], 2) + std::pow(error[2], 2);
-            RCLCPP_INFO(node_->get_logger(), "Cost = %f", cost);
-            // std::cout << "Cost = " << cost << std::endl;
+        //     double cost = std::pow(error[0], 2) + std::pow(error[1], 2) + std::pow(error[2], 2);
+        //     RCLCPP_INFO(node_->get_logger(), "Cost = %f", cost);
+        //     // std::cout << "Cost = " << cost << std::endl;
 
-            gtsam::Vector3 rot = calculateZYXEulerAngles(R_k_W);
-            RCLCPP_INFO(node_->get_logger(), "eular angle (Body frame with respect to World frame) (Factor) : [%f, %f, %f]", rot(2), rot(1), rot(0));
-            RCLCPP_INFO(node_->get_logger(), "translation (Body frame with respect to World frame) (Factor) : [%f, %f, %f]", t_k_W(0), t_k_W(1), t_k_W(2));
+        //     gtsam::Vector3 rot = calculateZYXEulerAngles(R_k_W);
+        //     RCLCPP_INFO(node_->get_logger(), "eular angle (Body frame with respect to World frame) (Factor) : [%f, %f, %f]", rot(2), rot(1), rot(0));
+        //     RCLCPP_INFO(node_->get_logger(), "translation (Body frame with respect to World frame) (Factor) : [%f, %f, %f]", t_k_W(0), t_k_W(1), t_k_W(2));
             
-            RCLCPP_INFO(node_->get_logger(), "tau_measured is: [%f, %f, %f]", tau_measured(0), tau_measured(1), tau_measured(2));
-            RCLCPP_INFO(node_->get_logger(), "tau_initial is: [%f, %f, %f]", tau_initial(0), tau_initial(1), tau_initial(2));
-            RCLCPP_INFO(node_->get_logger(), "measuredNormal_W: [%f, %f, %f]",
-                measuredNormal_W(0), measuredNormal_W(1), measuredNormal_W(2));
+        //     RCLCPP_INFO(node_->get_logger(), "tau_measured is: [%f, %f, %f]", tau_measured(0), tau_measured(1), tau_measured(2));
+        //     RCLCPP_INFO(node_->get_logger(), "tau_initial is: [%f, %f, %f]", tau_initial(0), tau_initial(1), tau_initial(2));
+        //     RCLCPP_INFO(node_->get_logger(), "measuredNormal_W: [%f, %f, %f]",
+        //         measuredNormal_W(0), measuredNormal_W(1), measuredNormal_W(2));
             
-            // double inner_product_term = (t_k_W.transpose() * measuredNormal_W);
-            RCLCPP_INFO(node_->get_logger(), "The inner product term is: %f", inner_product_term);
-            RCLCPP_INFO(node_->get_logger(), "The measuredDistance is: %f", measuredDistance_);
+        //     // double inner_product_term = (t_k_W.transpose() * measuredNormal_W);
+        //     RCLCPP_INFO(node_->get_logger(), "The inner product term is: %f", inner_product_term);
+        //     RCLCPP_INFO(node_->get_logger(), "The measuredDistance is: %f", measuredDistance_);
             
-        }
+        // }
         
 
         // std::cout << "weightedError = " << weightedError.transpose() << std::endl;
@@ -422,6 +437,58 @@ private:
         double result2 = numerator2 / denominator_final1;
     
         return result2;
+    }
+
+    // Function to compute partial derivatives of R * G_k with respect to Euler angles
+    gtsam::Matrix3 computeEulerAngleDerivatives(const gtsam::Matrix3& R, const gtsam::Point3& G_k) const
+    {
+        // Compute Euler angles (ZYX order) from the rotation matrix
+        double theta = std::asin(-R(2, 0));
+        double phi = std::atan2(R(2, 1), R(2, 2));
+        double psi = std::atan2(R(1, 0), R(0, 0));
+
+        // Compute trigonometric values
+        double c_phi = std::cos(phi), s_phi = std::sin(phi);
+        double c_theta = std::cos(theta), s_theta = std::sin(theta);
+        double c_psi = std::cos(psi), s_psi = std::sin(psi);
+
+        // Extract elements of G_k
+        double x_k = G_k.x(), y_k = G_k.y(), z_k = G_k.z();
+
+        // Initialize output matrix (3x3, for dT/dphi, dT/dtheta, dT/dpsi)
+        gtsam::Matrix3 derivatives;
+
+        // Partial derivatives with respect to phi (roll)
+        derivatives(0, 0) = -s_phi * c_theta * x_k - (s_phi * s_theta * s_psi + c_phi * c_psi) * y_k - (s_phi * s_theta * c_psi - c_phi * s_psi) * z_k;
+        derivatives(1, 0) =  c_phi * c_theta * x_k + (c_phi * s_theta * s_psi - s_phi * c_psi) * y_k + (c_phi * s_theta * c_psi + s_phi * s_psi) * z_k;
+        derivatives(2, 0) = 0;
+
+        // Partial derivatives with respect to theta (pitch)
+        derivatives(0, 1) = -c_phi * s_theta * x_k + c_phi * c_theta * s_psi * y_k + c_phi * c_theta * c_psi * z_k;
+        derivatives(1, 1) = -s_phi * s_theta * x_k + s_phi * c_theta * s_psi * y_k + s_phi * c_theta * c_psi * z_k;
+        derivatives(2, 1) = -c_theta * x_k - s_theta * s_psi * y_k - s_theta * c_psi * z_k;
+
+        // Partial derivatives with respect to psi (yaw)
+        derivatives(0, 2) = 0 * x_k + (c_phi * c_theta * c_psi - s_phi * s_psi) * y_k + (-c_phi * c_theta * s_psi - s_phi * c_psi) * z_k;
+        derivatives(1, 2) = 0 * x_k + (s_phi * c_theta * c_psi + c_phi * s_psi) * y_k + (-s_phi * c_theta * s_psi + c_phi * c_psi) * z_k;
+        derivatives(2, 2) = 0 * x_k - s_theta * c_psi * y_k + s_theta * s_psi * z_k;
+
+        return derivatives;
+    }
+
+    // Function to compute the new partial derivatives with scaling vector P
+    gtsam::Matrix computePdotEulerAngleDerivatives(const gtsam::Matrix3& R, const gtsam::Point3& G_k, const gtsam::Vector3& P) const
+    {
+        // Compute the original derivatives matrix (3x3)
+        gtsam::Matrix originalDerivatives = computeEulerAngleDerivatives(R, G_k);
+
+        // Compute the scaled derivatives
+        gtsam::Matrix derivatives(1, 3);
+        derivatives(0, 0) = P(0) * originalDerivatives(0, 0) + P(1) * originalDerivatives(1, 0) + P(2) * originalDerivatives(2, 0);
+        derivatives(0, 1) = P(0) * originalDerivatives(0, 1) + P(1) * originalDerivatives(1, 1) + P(2) * originalDerivatives(2, 1);
+        derivatives(0, 2) = P(0) * originalDerivatives(0, 2) + P(1) * originalDerivatives(1, 2) + P(2) * originalDerivatives(2, 2);
+
+        return derivatives;
     }
 
 };

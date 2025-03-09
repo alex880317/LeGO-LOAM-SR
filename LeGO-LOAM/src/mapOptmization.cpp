@@ -77,23 +77,23 @@ MapOptimization::MapOptimization(const std::string &name, Channel<AssociationOut
     : Node(name), _input_channel(input_channel), _publish_global_signal(false), _loop_closure_signal(false)
 {
   ISAM2Params parameters;
-  parameters.relinearizeThreshold = 0.001;
+  parameters.relinearizeThreshold = 0.01;
   parameters.relinearizeSkip = 1;
   parameters.enableDetailedResults = true;
   parameters.evaluateNonlinearError = true;
-  parameters.factorization = gtsam::ISAM2Params::QR;
+  // parameters.factorization = gtsam::ISAM2Params::QR;
 
   // 創建 ISAM2DoglegParams 變數，並進行調整
-  gtsam::ISAM2DoglegParams doglegParams;
+  // gtsam::ISAM2DoglegParams doglegParams;
   // doglegParams.initialDelta = 0.25;                                          // 調整初始信任區域半徑
   // doglegParams.wildfireThreshold = 0.001;                                    // 調整野火閾值
-  doglegParams.adaptationMode = DoglegOptimizerImpl::ONE_STEP_PER_ITERATION; // 設置信任區域調整模式
+  // doglegParams.adaptationMode = DoglegOptimizerImpl::ONE_STEP_PER_ITERATION; // 設置信任區域調整模式
   // 啟用 verbose 模式
   // doglegParams.setVerbose(true);
   // doglegParams.verbose = true;                                               // 開啟詳細輸出
 
   // 將調整好的 DoglegParams 賦值給 ISAM2Params 的 optimizationParams
-  parameters.optimizationParams = doglegParams;
+  // parameters.optimizationParams = doglegParams;
 
   isam = new ISAM2(parameters);
   parameters.print();
@@ -158,8 +158,8 @@ MapOptimization::MapOptimization(const std::string &name, Channel<AssociationOut
   this->declare_parameter(PARAM_HISTORY_SCORE);
   this->declare_parameter(PARAM_GLOBAL_SEARCH_RADIUS);
 
-  this->declare_parameter<std::vector<double>>(PGO_COV_PARAM, {1e-6, 1e-6, 1e-6, 1e-8, 1e-8, 1e-6});
-  this->declare_parameter<std::vector<double>>(GROUND_PLANE_PARAM, {1e-4, 1e-4, 1e-8});
+  this->declare_parameter<std::vector<double>>(PGO_COV_PARAM, {1e-0, 1e-0, 1e-1, 1e-1, 1e-1, 1e-0});
+  this->declare_parameter<std::vector<double>>(GROUND_PLANE_PARAM, {1e+2, 1e-2, 1e-2});
 
 
   // Read parameters
@@ -218,12 +218,12 @@ MapOptimization::MapOptimization(const std::string &name, Channel<AssociationOut
   {
     RCLCPP_WARN(this->get_logger(), "Parameter %s not found", GROUND_PLANE_PARAM.c_str());
   }
-  // // 確認讀取的值
-  // RCLCPP_INFO(this->get_logger(), "PGO_cov_param: [%f, %f, %f, %f, %f, %f]",
-  //             _PGO_cov_param[0], _PGO_cov_param[1], _PGO_cov_param[2],
-  //             _PGO_cov_param[3], _PGO_cov_param[4], _PGO_cov_param[5]);
-  // RCLCPP_INFO(this->get_logger(), "Ground_Plane_param: [%f, %f, %f]",
-  //             _Ground_Plane_param[0], _Ground_Plane_param[1], _Ground_Plane_param[2]);
+  // 確認讀取的值
+  RCLCPP_INFO(this->get_logger(), "PGO_cov_param: [%f, %f, %f, %f, %f, %f]",
+              _PGO_cov_param[0], _PGO_cov_param[1], _PGO_cov_param[2],
+              _PGO_cov_param[3], _PGO_cov_param[4], _PGO_cov_param[5]);
+  RCLCPP_INFO(this->get_logger(), "Ground_Plane_param: [%f, %f, %f]",
+              _Ground_Plane_param[0], _Ground_Plane_param[1], _Ground_Plane_param[2]);
 
   allocateMemory();
 
@@ -927,6 +927,11 @@ void MapOptimization::publishGlobalMap()
     *globalMapKeyFrames +=
         *transformPointCloud(outlierCloudKeyFrames[thisKeyInd],
                              &cloudKeyPoses6D->points[thisKeyInd]);
+    // if (i == globalMapKeyPosesDS->points.size() - 1) {
+    //   RCLCPP_INFO(this->get_logger(), "[publishGlobalMap] Processing FINAL Keyframe %zu / %zu (Index: %d)", 
+    //           i, globalMapKeyPosesDS->points.size(), thisKeyInd);
+    // }
+  
   }
   // // downsample visualized points
   // downSizeFilterGlobalMapKeyFrames.setInputCloud(globalMapKeyFrames);
@@ -1703,11 +1708,12 @@ void MapOptimization::saveKeyFramesAndFactor()
   currentRobotPosPoint.z = transformAftMapped[5];
 
   gtsam::Vector Vector6(6);
+  gtsam::Vector priorVector6(6);
   Vector6 << _PGO_cov_param[0], _PGO_cov_param[1], _PGO_cov_param[2],
              _PGO_cov_param[3], _PGO_cov_param[4], _PGO_cov_param[5];
-  // Vector6 << 1e-6, 1e-6, 1e-6, 1e-8, 1e-8, 1e-6;
+  priorVector6 << 1e-6, 1e-6, 1e-6, 1e-8, 1e-8, 1e-6;
   // Vector6 << 1, 1, 1, 1, 1, 1;
-  auto priorNoise = noiseModel::Diagonal::Variances(Vector6);
+  auto priorNoise = noiseModel::Diagonal::Variances(priorVector6);
   auto odometryNoise = noiseModel::Diagonal::Variances(Vector6);
 
   bool saveThisKeyFrame = true;
@@ -1777,7 +1783,7 @@ void MapOptimization::saveKeyFramesAndFactor()
     // 假設法向量測量的兩個角度誤差（theta, phi）的標準差是 0.1，距離誤差的標準差是 0.05
     gtsam::Vector sigmas(3);
     sigmas <<  _Ground_Plane_param[0], _Ground_Plane_param[1], _Ground_Plane_param[2];
-    // sigmas <<  1e-4, 1e-4, 1e-8; // 3 維向量：法向量兩個角度的標準差和距離的標準差
+    // sigmas <<  1e-4, 1e-4, 1e-1; // 3 維向量：法向量兩個角度的標準差和距離的標準差
     // 創建對角噪聲模型，使用 GTSAM 的 noiseModel::Diagonal::Sigmas
     gtsam::SharedNoiseModel noiseModel = gtsam::noiseModel::Diagonal::Sigmas(sigmas.tail<1>());
 
@@ -1836,9 +1842,116 @@ void MapOptimization::saveKeyFramesAndFactor()
    * update iSAM
    */
   
-  gtsam::ISAM2Result result = isam->update(gtSAMgraph, initialEstimate);
-  // RCLCPP_INFO(this->get_logger(), "between");
-  isam->update();
+   try {
+    gtsam::ISAM2Result result = isam->update(gtSAMgraph, initialEstimate);
+    // RCLCPP_INFO(this->get_logger(), "between");
+    isam->update();
+
+    // try {
+    //   // 取得最新的估計值
+    //   Values currentEstimate = isam->calculateEstimate();
+
+    //   std::cout << "Keys stored in ISAM2:" << std::endl;
+    //   for (const auto& key_value : currentEstimate) {
+    //     gtsam::Symbol key_symbol(key_value.key); // 解析 key 為 Symbol
+    //     std::cout << "Key: " << key_value.key << " (" << key_symbol.chr() << key_symbol.index() << ")" << std::endl;
+    
+    //     // 檢查變數類型並打印內容
+    //     if (currentEstimate.exists(key_value.key)) {
+    //         try {
+    //             auto pose = currentEstimate.at<gtsam::Pose3>(key_value.key);
+    //             std::cout << "Pose3 Value:\n";
+    //             std::cout << "R:\n" << pose.rotation().matrix() << std::endl;
+    //             std::cout << "t: [" << pose.translation().x() << ", "
+    //                                     << pose.translation().y() << ", "
+    //                                     << pose.translation().z() << "]\n" << std::endl;
+    //         } catch (const std::exception& e) {
+    //             std::cout << "Value is not Pose3, skipping detailed print." << std::endl;
+    //         }
+    //     } else {
+    //         std::cout << "Key does not exist in currentEstimate." << std::endl;
+    //     }
+    //   }
+
+    //   // 創建 Marginals 物件
+    //   Marginals marginals(gtSAMgraph, currentEstimate);
+    
+    //   // 打印共變異數矩陣
+    //   for (const auto& key_value : currentEstimate) {
+    //       Matrix covariance = marginals.marginalCovariance(key_value.key);
+    //       std::cout << "Covariance for " << key_value.key << ":\n" << covariance << std::endl;
+    //   }
+      
+    // } catch (const std::exception& e) {
+    //     std::cerr << "Error computing marginals: " << e.what() << std::endl;
+    // }
+   } catch (const gtsam::IndeterminantLinearSystemException& e) {
+    std::cerr << "GTSAM Indeterminant Linear System Exception: " << e.what() << std::endl;
+    
+    // 1. 打印因子圖，確保變數有足夠的約束
+    std::cout << "Factor Graph Before Failure:" << std::endl;
+    gtSAMgraph.print();
+
+    // 2. 打印當前變數估計值
+    std::cout << "Values Before Failure:" << std::endl;
+    initialEstimate.print();
+
+    // 3. 嘗試線性化因子圖，找出是否有未約束變數
+    try {
+        GaussianFactorGraph linearGraph = *gtSAMgraph.linearize(initialEstimate);
+        std::cout << "Linearized Factor Graph:" << std::endl;
+        linearGraph.print();
+    } catch (const std::exception& lin_err) {
+        std::cerr << "Error linearizing factor graph: " << lin_err.what() << std::endl;
+    }
+
+    // 4. 使用 Marginals 檢查變數的共變異數矩陣
+    try {
+        // 取得最新的估計值
+        Values currentEstimate = isam->calculateEstimate();
+
+        std::cout << "Keys stored in ISAM2:" << std::endl;
+        for (const auto& key_value : currentEstimate) {
+          gtsam::Symbol key_symbol(key_value.key); // 解析 key 為 Symbol
+          std::cout << "Key: " << key_value.key << " (" << key_symbol.chr() << key_symbol.index() << ")" << std::endl;
+      
+          // 檢查變數類型並打印內容
+          if (currentEstimate.exists(key_value.key)) {
+              try {
+                  auto pose = currentEstimate.at<gtsam::Pose3>(key_value.key);
+                  std::cout << "Pose3 Value:\n";
+                  std::cout << "R:\n" << pose.rotation().matrix() << std::endl;
+                  std::cout << "t: [" << pose.translation().x() << ", "
+                                          << pose.translation().y() << ", "
+                                          << pose.translation().z() << "]\n" << std::endl;
+              } catch (const std::exception& e) {
+                  std::cout << "Value is not Pose3, skipping detailed print." << std::endl;
+              }
+          } else {
+              std::cout << "Key does not exist in currentEstimate." << std::endl;
+          }
+      }
+      
+        // 創建 Marginals 物件
+        Marginals marginals(gtSAMgraph, currentEstimate);
+      
+        // 打印共變異數矩陣
+        for (const auto& key_value : currentEstimate) {
+            Matrix covariance = marginals.marginalCovariance(key_value.key);
+            std::cout << "Covariance for " << key_value.key << ":\n" << covariance << std::endl;
+        }
+      
+    } catch (const std::exception& e) {
+        std::cerr << "Error computing marginals: " << e.what() << std::endl;
+    }
+
+    // 5. 強制程式結束，避免進一步錯誤影響
+    std::cerr << "Terminating due to optimization failure." << std::endl;
+    std::exit(EXIT_FAILURE);
+
+
+   }
+  
 
   
 
@@ -1915,11 +2028,11 @@ void MapOptimization::saveKeyFramesAndFactor()
   //           << fullJacobian << std::endl;
   // //////////////////////////////////////////////////////////////////////////////////
 
-  //////////////////////////////////////////////////////////////////////////////////
-  RCLCPP_INFO(this->get_logger(), "//////////////////////////////////////////////////////////////");
-  RCLCPP_INFO(this->get_logger(), "eular angle (Body frame with respect to World frame) : [%f, %f, %f]", latestEstimate.rotation().yaw(), latestEstimate.rotation().pitch(), latestEstimate.rotation().roll());
-  RCLCPP_INFO(this->get_logger(), "translation (Body frame with respect to World frame) : [%f, %f, %f]", latestEstimate.translation().x(), latestEstimate.translation().y(), latestEstimate.translation().z());
-  //////////////////////////////////////////////////////////////////////////////////
+  // //////////////////////////////////////////////////////////////////////////////////
+  // RCLCPP_INFO(this->get_logger(), "//////////////////////////////////////////////////////////////");
+  // RCLCPP_INFO(this->get_logger(), "eular angle (Body frame with respect to World frame) : [%f, %f, %f]", latestEstimate.rotation().yaw(), latestEstimate.rotation().pitch(), latestEstimate.rotation().roll());
+  // RCLCPP_INFO(this->get_logger(), "translation (Body frame with respect to World frame) : [%f, %f, %f]", latestEstimate.translation().x(), latestEstimate.translation().y(), latestEstimate.translation().z());
+  // //////////////////////////////////////////////////////////////////////////////////
 
   thisPose3D.x = latestEstimate.translation().y();
   thisPose3D.y = latestEstimate.translation().z();
